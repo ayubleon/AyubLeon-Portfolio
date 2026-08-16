@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=Instrument+Serif:ital@0;1&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #060505; }
+  body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  * { box-sizing: border-box; }
+  a { color: rgba(238,230,227,0.72); text-decoration: none; transition: color .35s cubic-bezier(.22,1,.36,1), opacity .35s ease; }
+  a:hover { color: #fff8f4; }
+  ::selection { background: #ff3b12; color: #0a0606; }
+  @keyframes alRise { from { transform: translate3d(0, 110%, 0) rotate(1.2deg); } to { transform: translate3d(0,0,0) rotate(0deg); } }
+  @keyframes alFade { from { opacity: 0; transform: translate3d(0, 14px, 0); } to { opacity: 1; transform: none; } }
+  @keyframes alNav { from { opacity: 0; transform: translate(-50%, -18px); } to { opacity: 1; transform: translate(-50%, 0); } }
+  @keyframes alCue { 0%, 100% { transform: translateY(0); opacity: .55; } 50% { transform: translateY(5px); opacity: 1; } }
+  @keyframes alSpin { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
+  .nav-toggle { display: none; align-items: center; justify-content: center; width: 38px; height: 38px; padding: 0; border: 0; border-radius: 999px; background: rgba(255,255,255,0.08); color: #f6efec; cursor: pointer; -webkit-tap-highlight-color: transparent; flex: 0 0 auto; }
+  .nav-toggle:hover { background: rgba(255,255,255,0.14); }
+  .nav-toggle-bars { position: relative; display: block; width: 17px; height: 1.5px; background: currentColor; transition: background .2s ease .12s; }
+  .nav-toggle-bars::before, .nav-toggle-bars::after { content: ''; position: absolute; left: 0; width: 17px; height: 1.5px; background: currentColor; transition: top .2s ease .12s, transform .25s cubic-bezier(.22,1,.36,1); }
+  .nav-toggle-bars::before { top: -5px; }
+  .nav-toggle-bars::after { top: 5px; }
+  .nav-toggle-bars.is-open { background: transparent; }
+  .nav-toggle-bars.is-open::before { top: 0; transform: rotate(45deg); }
+  .nav-toggle-bars.is-open::after { top: 0; transform: rotate(-45deg); }
+  .nav-mobile { display: none; position: fixed; top: 84px; left: 24px; right: 24px; max-width: 1192px; margin: 0 auto; z-index: 35; flex-direction: column; gap: 2px; padding: 10px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.13); background: rgba(15,9,8,0.94); backdrop-filter: blur(22px) saturate(1.6); -webkit-backdrop-filter: blur(22px) saturate(1.6); box-shadow: 0 30px 70px -28px rgba(0,0,0,0.9); opacity: 0; pointer-events: none; transform: translateY(-10px); transition: opacity .35s cubic-bezier(.22,1,.36,1), transform .4s cubic-bezier(.22,1,.36,1); }
+  .nav-mobile a { padding: 13px 16px; border-radius: 12px; font-size: 15px; color: rgba(246,239,236,0.86); }
+  .nav-mobile a:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  @media (max-width: 700px) {
+    .nav-links { display: none !important; }
+    .nav-toggle { display: inline-flex !important; }
+    .nav-mobile { display: flex; }
+    .nav-mobile.is-open { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .scroll-cue { display: none !important; }
+    .work-grid { grid-template-columns: minmax(0, 1fr) !important; }
+    .work-media { display: none !important; }
+  }
+</style>
+</helmet>
+<div style="position: relative; width: 100%; min-height: 100svh; overflow-x: clip; background: #060505; font-family: 'Schibsted Grotesk', Helvetica, Arial, sans-serif; color: #eee6e3;" data-screen-label="Hero">
+
+  <canvas ref="{{ canvasRef }}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100svh; display: block;"></canvas>
+  <div style="position: absolute; top: 0; left: 0; right: 0; height: 100svh; pointer-events: none; background: radial-gradient(120% 90% at 18% 92%, rgba(4,3,3,0.92) 0%, rgba(4,3,3,0.45) 38%, rgba(0,0,0,0) 68%);"></div>
+  <div style="position: absolute; top: 0; left: 0; right: 0; height: 100svh; pointer-events: none; background: radial-gradient(58% 40% at 50% 47%, rgba(5,4,4,0.82) 0%, rgba(5,4,4,0.58) 45%, rgba(5,4,4,0) 76%);"></div>
+
+  <div ref="{{ toastRef }}" role="status" aria-live="polite" style="position: fixed; left: 50%; bottom: 34px; z-index: 60; padding: 1.6px; border-radius: 999px; overflow: hidden; isolation: isolate; box-shadow: 0 30px 70px -26px rgba(0,0,0,0.98); opacity: 0; transform: translate(-50%, 18px); pointer-events: none; transition: opacity .45s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.22,1,.36,1);">
+    <div aria-hidden="true" style="position: absolute; left: 50%; top: 50%; width: 260%; aspect-ratio: 1; background: conic-gradient(from 0deg, rgba(255,255,255,0) 0deg, rgba(255,255,255,0) 200deg, #ff5a2b 292deg, #ffd0b8 330deg, #ffffff 348deg, rgba(255,255,255,0) 360deg); animation: alSpin 2.6s linear infinite;"></div>
+    <div style="position: relative; display: flex; align-items: center; padding: 14px 24px; border-radius: 999px; background: #100908; font-family: 'Schibsted Grotesk', Helvetica, sans-serif; font-size: 14px; letter-spacing: -0.005em; color: #fdf9f7;">
+      <span ref="{{ toastTextRef }}" style="font-family: Poppins">Email copied to clipboard</span>
+    </div>
+  </div>
+
+  <nav style="position: fixed; top: 22px; left: 50%; transform: translateX(-50%); width: calc(100% - 48px); max-width: 1240px; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 13px 14px 13px 24px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.13); background: rgba(28,14,12,0.22); backdrop-filter: blur(22px) saturate(1.6) brightness(0.78); -webkit-backdrop-filter: blur(22px) saturate(1.6) brightness(0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -1px 0 rgba(0,0,0,0.35), 0 22px 50px -28px rgba(0,0,0,0.9); animation: alNav 1s cubic-bezier(.22,1,.36,1) .15s both;">
+    <a href="#top" style="font-size: 15px; font-weight: 500; letter-spacing: -0.01em; color: #f6efec; display: flex; align-items: center; gap: 9px;">
+      Ayub Leon
+    </a>
+    <div class="nav-links" style="display: flex; align-items: center; gap: 6px;">
+      <a href="#work" style="font-size: 13.5px; padding: 9px 16px; border-radius: 999px; color: rgba(246,239,236,0.78);" style-hover="background: rgba(255,255,255,0.09); color: #fff;">Work</a>
+      <a href="Ayub Leon - About.dc.html" style="font-size: 13.5px; padding: 9px 16px; border-radius: 999px; color: rgba(246,239,236,0.78);" style-hover="background: rgba(255,255,255,0.09); color: #fff;">About me</a>
+      <a href="#contact" style="font-size: 13.5px; padding: 9px 18px; border-radius: 999px; background: rgba(255,255,255,0.95); color: #120a08; font-weight: 500;" style-hover="background: #fff; color: #000;">Contact</a>
+    </div>
+    <button type="button" class="nav-toggle" data-nav-toggle="1" aria-label="Open menu" aria-expanded="false">
+      <span class="nav-toggle-bars" data-nav-bars="1" aria-hidden="true"></span>
+    </button>
+  </nav>
+  <div class="nav-mobile" data-nav-mobile="1">
+    <a href="#work">Work</a>
+    <a href="Ayub Leon - About.dc.html">About me</a>
+    <a href="#contact">Contact</a>
+  </div>
+
+  <div id="top" style="position: relative; z-index: 10; min-height: 100svh; display: grid; grid-template-rows: 1fr auto; padding: 118px 24px 26px;">
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 26px; width: 100%; min-width: 0; position: relative;">
+      <p style="margin: 0; font-family: Poppins; font-size: 15px; letter-spacing: 0.16em; text-transform: none; color: rgba(250,242,238,0.92); text-shadow: 0 1px 18px rgba(4,2,2,0.75); animation: alFade 1.1s cubic-bezier(.22,1,.36,1) .35s both">Hello there, Hujambo?</p>
+
+
+
+      <h1 data-hero-title="1" style="margin: 0; max-width: min(100%, 30ch); font-size: clamp(1.9rem, 6.6vw, 6.1rem); line-height: 1.08; font-weight: 600; letter-spacing: -0.038em; color: #efe8e5; text-wrap: balance;">
+        <span style="display: block; overflow: hidden; padding-bottom: 0.06em;">
+          <span style="display: block; animation: alRise 1.25s cubic-bezier(.19,1,.22,1) .5s both; font-family: Poppins, 'Schibsted Grotesk', Helvetica, sans-serif;">Most designers hand off files.</span>
+        </span>
+        <span style="display: block; overflow: hidden; padding-bottom: 0.06em;">
+          <span style="display: block; animation: alRise 1.25s cubic-bezier(.19,1,.22,1) .62s both; font-family: Poppins, 'Schibsted Grotesk', Helvetica, sans-serif;">I hand off&nbsp;&nbsp;<em style="font-family: &quot;Instrument Serif&quot;, Georgia, serif; font-style: italic; font-weight: 400; letter-spacing: -0.01em; background: linear-gradient(96deg, rgb(255, 247, 243) 8%, rgb(255, 181, 154) 52%, rgb(255, 90, 43) 96%) text; color: transparent;">finished products.</em></span>
+        </span>
+      </h1>
+
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; animation: alFade 1.1s cubic-bezier(.22,1,.36,1) .9s both;">
+        <p style="margin: 0; font-family: Poppins; font-size: 15px; font-weight: 600; letter-spacing: -0.005em; color: #ffffff; text-shadow: 0 1px 18px rgba(4,2,2,0.7);">I am Ayub Leon</p>
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <span style="width: 34px; height: 1px; background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.45) 100%);"></span>
+          <p style="margin: 0; font-size: 15px; letter-spacing: 0.005em; color: rgba(238,230,227,0.82); font-family: Poppins">Product Designer <span style="color: #FFFFFFE6; padding: 0 4px">|</span> 4+ Years Experience</p>
+          <span style="width: 34px; height: 1px; background: linear-gradient(270deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.45) 100%);"></span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 14px 20px; min-width: 0; padding-top: 34px; border-top: 1px solid rgba(255,255,255,0.09); font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase; color: rgba(238,230,227,0.55); animation: alFade 1.2s cubic-bezier(.22,1,.36,1) 1.05s both;">
+      <span></span>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; min-width: 0;">
+
+        <a href="mailto:ayubleon9@gmail.com" onClick="{{ copyEmail }}" style="letter-spacing: 0.13em; font-family: Poppins; text-transform: capitalize" style-hover="color: #C8F135;">Email</a><span style="opacity: .3;">/</span>
+        <a href="https://www.linkedin.com/in/ayubleon" target="_blank" rel="noopener noreferrer" style="letter-spacing: 0.13em; font-family: Poppins; text-transform: capitalize" style-hover="color: #C8F135;">LinkedIn</a>
+        <span style="opacity: .3;">/</span>
+        <a href="Ayub%20Leon%20-%20Resume.pdf" target="_blank" rel="noopener noreferrer" style="letter-spacing: 0.13em; text-transform: capitalize" style-hover="color: #C8F135;">Resume</a>
+        <span style="opacity: .3;">/</span>
+        <a href="https://www.behance.net/ayubleon" target="_blank" rel="noopener noreferrer" style="letter-spacing: 0.13em; font-family: Poppins; text-transform: capitalize" style-hover="color: #C8F135;">Behance</a>
+      </div>
+      <span class="scroll-cue" style="display: flex; align-items: center; gap: 8px; text-transform: capitalize">Scroll <span style="display: inline-block; animation: alCue 2.2s ease-in-out infinite;">↓</span></span>
+    </div>
+  </div>
+
+  <section id="work" data-work-section="1" style="position: relative; z-index: 10; height: 280vh;">
+    <div style="position: sticky; top: 0; height: 100svh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 40px; max-width: 1400px; margin: 0 auto; padding: 96px 40px 56px;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;">
+        <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.7rem, 3.2vw, 2.6rem); font-weight: 700; letter-spacing: -0.04em; color: #f6f0ed;">Featured work</h2>
+
+      </div>
+
+      <div class="work-grid" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.02fr); gap: 60px; align-items: center;">
+        <div data-work-viewport="1" style="position: relative; height: 56svh; overflow: hidden; -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0) 0%, #000 20%, #000 80%, rgba(0,0,0,0) 100%); mask-image: linear-gradient(180deg, rgba(0,0,0,0) 0%, #000 20%, #000 80%, rgba(0,0,0,0) 100%);">
+          <div data-work-list="1" style="position: absolute; top: 50%; left: 0; right: 0; display: flex; flex-direction: column; will-change: transform;">
+          <a data-work-row="0" href="BuzzIQ.dc.html" style="display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 26px; align-items: center; padding: 30px 0; color: inherit; text-decoration: none;">
+            <span data-row-num="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: rgba(255,255,255,0.22); transition: color .55s cubic-bezier(.22,1,.36,1);">01</span>
+            <span style="display: flex; flex-direction: column; gap: 10px;">
+              <span data-row-title="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.5rem, 2.4vw, 2.1rem); font-weight: 600; letter-spacing: -0.032em; color: rgba(255,255,255,0.24); transition: color .55s cubic-bezier(.22,1,.36,1);">BuzzIQ</span>
+              <span data-row-desc="1" style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 15.5px; line-height: 1.5; color: rgba(255,255,255,0.2); transition: color .55s cubic-bezier(.22,1,.36,1); text-wrap: pretty;">TikTok Shop intelligence platform built to scale creator commerce</span>
+              <span data-row-meta="1" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 13.5px; color: rgba(255,255,255,0.16); transition: color .55s cubic-bezier(.22,1,.36,1);"><span>Sole Product Designer</span><span>2025 – 2026</span></span>
+            </span>
+          </a>
+          <a data-work-row="1" href="Danadana.dc.html" style="display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 26px; align-items: center; padding: 30px 0; color: inherit; text-decoration: none;">
+            <span data-row-num="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: rgba(255,255,255,0.22); transition: color .55s cubic-bezier(.22,1,.36,1);">02</span>
+            <span style="display: flex; flex-direction: column; gap: 10px;">
+              <span data-row-title="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.5rem, 2.4vw, 2.1rem); font-weight: 600; letter-spacing: -0.032em; color: rgba(255,255,255,0.24); transition: color .55s cubic-bezier(.22,1,.36,1);">Danadana</span>
+              <span data-row-desc="1" style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 15.5px; line-height: 1.5; color: rgba(255,255,255,0.2); transition: color .55s cubic-bezier(.22,1,.36,1); text-wrap: pretty;">A crash betting game engineered for high-frequency engagement</span>
+              <span data-row-meta="1" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 13.5px; color: rgba(255,255,255,0.16); transition: color .55s cubic-bezier(.22,1,.36,1);"><span>Product Designer</span><span>2024 – 2025</span></span>
+            </span>
+          </a>
+          <a data-work-row="2" href="Unified Design System.dc.html" style="display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 26px; align-items: center; padding: 30px 0; color: inherit; text-decoration: none;">
+            <span data-row-num="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: rgba(255,255,255,0.22); transition: color .55s cubic-bezier(.22,1,.36,1);">03</span>
+            <span style="display: flex; flex-direction: column; gap: 10px;">
+              <span data-row-title="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.5rem, 2.4vw, 2.1rem); font-weight: 600; letter-spacing: -0.032em; color: rgba(255,255,255,0.24); transition: color .55s cubic-bezier(.22,1,.36,1);">Unified Design System</span>
+              <span data-row-desc="1" style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 15.5px; line-height: 1.5; color: rgba(255,255,255,0.2); transition: color .55s cubic-bezier(.22,1,.36,1); text-wrap: pretty;">A scalable component framework based on Shad.cn</span>
+              <span data-row-meta="1" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 13.5px; color: rgba(255,255,255,0.16); transition: color .55s cubic-bezier(.22,1,.36,1);"><span>Systems Product Designer</span><span>2024 – Present</span></span>
+            </span>
+          </a>
+          <a data-work-row="3" href="Kenyan Banking Redesign.dc.html" style="display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 26px; align-items: center; padding: 30px 0; color: inherit; text-decoration: none;">
+            <span data-row-num="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: rgba(255,255,255,0.22); transition: color .55s cubic-bezier(.22,1,.36,1);">04</span>
+            <span style="display: flex; flex-direction: column; gap: 10px;">
+              <span data-row-title="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.5rem, 2.4vw, 2.1rem); font-weight: 600; letter-spacing: -0.032em; color: rgba(255,255,255,0.24); transition: color .55s cubic-bezier(.22,1,.36,1);">Kenyan Banking Redesign</span>
+              <span data-row-desc="1" style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 15.5px; line-height: 1.5; color: rgba(255,255,255,0.2); transition: color .55s cubic-bezier(.22,1,.36,1); text-wrap: pretty;">Overhauling digital banking friction across four major regional apps</span>
+              <span data-row-meta="1" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 13.5px; color: rgba(255,255,255,0.16); transition: color .55s cubic-bezier(.22,1,.36,1);"><span>Product Designer</span><span>2025</span></span>
+            </span>
+          </a>
+          </div>
+        </div>
+
+        <div class="work-media" style="display: flex; flex-direction: column; gap: 26px;">
+          <div style="position: relative; aspect-ratio: 16 / 10.4;">
+        <a data-work-panel="0" href="BuzzIQ.dc.html" style="position: absolute; inset: 0; border-radius: 20px; overflow: hidden; background: #f4f2f0; opacity: 1; transform: scale(1); transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1); box-shadow: 0 50px 110px -50px rgba(0,0,0,0.9);">
+          <img src="images/work-buzziq.png" alt="BuzzIQ dashboard and creator detail screens" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+        </a>
+        <a data-work-panel="1" href="Danadana.dc.html" style="position: absolute; inset: 0; border-radius: 20px; overflow: hidden; background: #f4f2f0; opacity: 0; transform: scale(0.97); transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1); box-shadow: 0 50px 110px -50px rgba(0,0,0,0.9);">
+          <img src="images/work-danadana.png" alt="Danadana brand key visual" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+        </a>
+        <a data-work-panel="2" href="Unified Design System.dc.html" style="position: absolute; inset: 0; border-radius: 20px; overflow: hidden; background: #f4f2f0; opacity: 0; transform: scale(0.97); transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1); box-shadow: 0 50px 110px -50px rgba(0,0,0,0.9);">
+          <img src="images/work-design-system.png" alt="Component documentation pages in light and dark" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+        </a>
+        <a data-work-panel="3" href="Kenyan Banking Redesign.dc.html" style="position: absolute; inset: 0; border-radius: 20px; overflow: hidden; background: #f4f2f0; opacity: 0; transform: scale(0.97); transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1); box-shadow: 0 50px 110px -50px rgba(0,0,0,0.9);">
+          <img src="images/work-banking.png" alt="Banking app home and card management screens" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+        </a>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 9px;">
+          <span data-work-dot="0" style="width: 10px; height: 10px; border-radius: 50%; background: #ffffff; transition: all .45s cubic-bezier(.22,1,.36,1);"></span>
+          <span data-work-dot="1" style="width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.28); transition: all .45s cubic-bezier(.22,1,.36,1);"></span>
+          <span data-work-dot="2" style="width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.28); transition: all .45s cubic-bezier(.22,1,.36,1);"></span>
+          <span data-work-dot="3" style="width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.28); transition: all .45s cubic-bezier(.22,1,.36,1);"></span>
+            </div>
+            <p data-work-counter="1" style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 14px; letter-spacing: -0.005em; color: rgba(255,255,255,0.9);">Project 1/4</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" style="position: relative; z-index: 10; max-width: 1400px; margin: 0 auto; padding: 40px 40px 120px;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 30px; padding: 96px 40px 104px; border-radius: 22px; border: 1px solid rgba(255,255,255,0.1); background: radial-gradient(120% 130% at 50% 118%, rgba(214,26,10,0.22) 0%, rgba(140,14,32,0.1) 42%, rgba(255,255,255,0.014) 74%); text-align: center;">
+      <h2 style="margin: 0; max-width: 22ch; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.7rem, 3.2vw, 2.6rem); font-weight: 700; line-height: 1.06; letter-spacing: -0.04em; color: #f8f2ef; text-wrap: balance;">Let's ship something real!</h2>
+      <p style="margin: 0; max-width: 62ch; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(15px, 1.3vw, 16.5px); line-height: 1.72; color: rgba(244,238,235,0.84); text-wrap: pretty;">I'm currently open to full-time roles, contract work, and high-impact product builds. If you need a designer who takes ownership from first sketch to final QA, let's talk.</p>
+
+      <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; margin-top: 10px;">
+        <a data-glass="1" href="mailto:ayubleon9@gmail.com" onClick="{{ copyEmail }}" style="position: relative; display: inline-flex; align-items: center; gap: 9px; padding: 11px 24px; border-radius: 999px; overflow: hidden; isolation: isolate; background: rgba(255,255,255,0.05); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.16), inset 0 1px 0 rgba(255,255,255,0.14); color: #f8f2ef; font-family: Poppins, Helvetica, sans-serif; font-size: 15px; font-weight: 500; letter-spacing: -0.005em;" style-hover="background: rgba(255,255,255,0.09);">
+          <span data-glass-shimmer="1" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 200px; height: 200px; margin: -100px 0 0 -100px; pointer-events: none; opacity: 0; transition: opacity .35s ease; background: radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.18) 38%, rgba(255,255,255,0) 66%);"></span>
+          <span data-glass-face="1" aria-hidden="true" style="position: absolute; inset: 1.2px; border-radius: 999px; background: rgba(14,9,8,0.86); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);"></span>
+          <span style="position: relative; display: inline-flex; align-items: center; gap: 9px;">Copy email</span>
+        </a>
+        <a data-glass="1" href="https://www.linkedin.com/in/ayubleon" target="_blank" rel="noopener noreferrer" style="position: relative; display: inline-flex; align-items: center; gap: 9px; padding: 11px 24px; border-radius: 999px; overflow: hidden; isolation: isolate; background: rgba(255,255,255,0.05); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.16), inset 0 1px 0 rgba(255,255,255,0.14); color: #f8f2ef; font-family: Poppins, Helvetica, sans-serif; font-size: 15px; font-weight: 500; letter-spacing: -0.005em;" style-hover="background: rgba(255,255,255,0.09);">
+          <span data-glass-shimmer="1" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 200px; height: 200px; margin: -100px 0 0 -100px; pointer-events: none; opacity: 0; transition: opacity .35s ease; background: radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.18) 38%, rgba(255,255,255,0) 66%);"></span>
+          <span data-glass-face="1" aria-hidden="true" style="position: absolute; inset: 1.2px; border-radius: 999px; background: rgba(14,9,8,0.86); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);"></span>
+          <span style="position: relative; display: inline-flex; align-items: center; gap: 9px;">LinkedIn <span style="font-size: 13px;">↗</span></span>
+        </a>
+        <a data-glass="1" href="Ayub%20Leon%20-%20Resume.pdf" target="_blank" rel="noopener noreferrer" style="position: relative; display: inline-flex; align-items: center; gap: 9px; padding: 11px 24px; border-radius: 999px; overflow: hidden; isolation: isolate; background: rgba(255,255,255,0.05); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.16), inset 0 1px 0 rgba(255,255,255,0.14); color: #f8f2ef; font-family: Poppins, Helvetica, sans-serif; font-size: 15px; font-weight: 500; letter-spacing: -0.005em;" style-hover="background: rgba(255,255,255,0.09);">
+          <span data-glass-shimmer="1" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 200px; height: 200px; margin: -100px 0 0 -100px; pointer-events: none; opacity: 0; transition: opacity .35s ease; background: radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.18) 38%, rgba(255,255,255,0) 66%);"></span>
+          <span data-glass-face="1" aria-hidden="true" style="position: absolute; inset: 1.2px; border-radius: 999px; background: rgba(14,9,8,0.86); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);"></span>
+          <span style="position: relative; display: inline-flex; align-items: center; gap: 9px;">Resume <span style="font-size: 13px;">↗</span></span>
+        </a>
+      </div>
+
+      <p style="margin: 8px 0 0; font-family: Poppins, Helvetica, sans-serif; font-size: 13.5px; color: rgba(244,238,235,0.5);">ayubleon9@gmail.com</p>
+    </div>
+  </section>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;bodyFont&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Poppins&quot;,&quot;Schibsted Grotesk&quot;,&quot;Helvetica&quot;],&quot;default&quot;:&quot;Poppins&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Typography&quot;},&quot;displayFont&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Poppins&quot;,&quot;Schibsted Grotesk&quot;,&quot;Instrument Serif&quot;],&quot;default&quot;:&quot;Poppins&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Typography&quot;},&quot;plumeX&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.62,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.01,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Background — plume position&quot;},&quot;plumeY&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.72,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.01,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Background — plume position&quot;},&quot;plumeSize&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0.4,&quot;max&quot;:2.2,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Background — plume position&quot;},&quot;glowStrength&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0.2,&quot;max&quot;:2,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Background — light&quot;},&quot;hueShift&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0,&quot;min&quot;:-1.2,&quot;max&quot;:1.2,&quot;step&quot;:0.02,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Background — light&quot;},&quot;blackLevel&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0,&quot;max&quot;:1.6,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Background — black&quot;,&quot;unit&quot;:&quot;×&quot;},&quot;cursorReactive&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Background — light&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.canvasRef = React.createRef();
+    this.toastRef = React.createRef();
+    this.toastTextRef = React.createRef();
+    this.mouse = { x: 0.5, y: 0.42, tx: 0.5, ty: 0.42 };
+  }
+
+  renderVals() {
+    return {
+      canvasRef: this.canvasRef,
+      toastRef: this.toastRef,
+      toastTextRef: this.toastTextRef,
+      copyEmail: (e) => {
+        e.preventDefault();
+        const email = 'ayubleon9@gmail.com';
+        const done = () => this.showToast('Email copied to clipboard — ' + email);
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(email).then(done).catch(() => this.fallbackCopy(email, done));
+        } else {
+          this.fallbackCopy(email, done);
+        }
+      }
+    };
+  }
+
+  fallbackCopy(text, done) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); } catch (err) { this.showToast('Copy blocked — ' + text); }
+    document.body.removeChild(ta);
+  }
+
+  showToast(msg) {
+    const t = this.toastRef.current, tx = this.toastTextRef.current;
+    if (!t) return;
+    if (tx) tx.textContent = msg;
+    t.style.opacity = '1';
+    t.style.transform = 'translate(-50%, 0)';
+    clearTimeout(this.toastTimer);
+    this.toastTimer = setTimeout(() => {
+      t.style.opacity = '0';
+      t.style.transform = 'translate(-50%, 18px)';
+    }, 2600);
+  }
+
+  applyFonts() {
+    const stack = {
+      'Poppins': "Poppins, 'Schibsted Grotesk', Helvetica, Arial, sans-serif",
+      'Schibsted Grotesk': "'Schibsted Grotesk', Helvetica, Arial, sans-serif",
+      'Helvetica': "Helvetica, 'Helvetica Neue', Arial, sans-serif",
+      'Instrument Serif': "'Instrument Serif', Georgia, serif"
+    };
+    const body = stack[this.props.bodyFont ?? 'Poppins'] || stack['Poppins'];
+    const display = stack[this.props.displayFont ?? 'Poppins'] || stack['Poppins'];
+    document.body.style.fontFamily = body;
+    document.querySelectorAll('h1, h2, h3, [data-work-title]').forEach((el) => { el.style.fontFamily = display; });
+    document.querySelectorAll('p, a, span, li').forEach((el) => {
+      const f = el.style.fontFamily || '';
+      if (f.indexOf('JetBrains') !== -1 || f.indexOf('Instrument Serif') !== -1) return;
+      el.style.fontFamily = body;
+    });
+  }
+
+  componentDidUpdate() { this.applyFonts(); }
+
+  // once the entrance reveal has played, masks must never clip wrapped lines
+  unclipHeroMasks() {
+    const h1 = document.querySelector('[data-hero-title]');
+    if (!h1) return;
+    h1.querySelectorAll(':scope > span').forEach((mask) => { mask.style.overflow = 'visible'; });
+  }
+
+  initNavToggle() {
+    const btn = document.querySelector('[data-nav-toggle]');
+    const bars = document.querySelector('[data-nav-bars]');
+    const panel = document.querySelector('[data-nav-mobile]');
+    if (!btn || !panel) return;
+    const setOpen = (open) => {
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (bars) bars.classList.toggle('is-open', open);
+      panel.classList.toggle('is-open', open);
+    };
+    btn.addEventListener('click', () => setOpen(btn.getAttribute('aria-expanded') !== 'true'));
+    panel.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+    this.onNavResize = () => { if (window.innerWidth > 700) setOpen(false); };
+    window.addEventListener('resize', this.onNavResize);
+  }
+
+  componentDidMount() {
+    this.applyFonts();
+    this.unclipTimer = setTimeout(() => this.unclipHeroMasks(), 2000);
+    this.initNavToggle();
+    this.initWork();
+    const canvas = this.canvasRef.current;
+    if (!canvas) return;
+    const gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'high-performance' });
+    if (!gl) { canvas.style.background = 'radial-gradient(90% 70% at 62% 18%, #e0230c 0%, #6c0f16 42%, #060505 78%)'; return; }
+    this.gl = gl;
+
+    const vs = 'attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }';
+    const fs = [
+      'precision highp float;',
+      'uniform vec2 u_res; uniform float u_time; uniform vec2 u_mouse; uniform float u_glow; uniform float u_hue;',
+      'uniform vec2 u_anchor; uniform float u_size; uniform float u_dark;',
+      'float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }',
+      'float noise(vec2 p){ vec2 i = floor(p); vec2 f = fract(p); vec2 u = f*f*(3.0-2.0*f);',
+      '  return mix(mix(hash(i), hash(i+vec2(1.0,0.0)), u.x), mix(hash(i+vec2(0.0,1.0)), hash(i+vec2(1.0,1.0)), u.x), u.y); }',
+      'float fbm(vec2 p){ float v = 0.0; float a = 0.5; for(int i = 0; i < 5; i++){ v += a * noise(p); p = p * 2.02 + 11.7; a *= 0.5; } return v; }',
+      'vec3 hueShift(vec3 c, float h){ const vec3 k = vec3(0.57735); float ca = cos(h); return c*ca + cross(k, c)*sin(h) + k*dot(k, c)*(1.0-ca); }',
+      'void main(){',
+      '  vec2 uv = gl_FragCoord.xy / u_res;',
+      '  float asp = u_res.x / u_res.y;',
+      '  vec2 st = vec2((uv.x - 0.5) * asp, uv.y - 0.5);',
+      '  vec2 mo = vec2((u_mouse.x - 0.5) * asp, u_mouse.y - 0.5);',
+      '  float t = u_time * 0.045;',
+      '  vec2 w = st * 1.15 + vec2(fbm(st * 1.4 + vec2(t, -t * 0.7)), fbm(st * 1.4 + vec2(4.3 - t, t * 0.9))) * 0.85;',
+      '  w += (mo - st) * 0.22;',
+      '  float d = fbm(w * 1.35 + vec2(t * 0.6, -t * 0.4));',
+      '  float md = length(st - mo);',
+      '  float core = exp(-md * 2.35) * u_glow;',
+      '  vec2 anc = vec2((u_anchor.x - 0.5) * asp, u_anchor.y - 0.5);',
+      '  vec2 dr = anc + vec2(sin(u_time * 0.11) * 0.10, cos(u_time * 0.09) * 0.07);',
+      '  float amb = exp(-length(st - dr) * (2.1 / max(u_size, 0.2))) * 0.85;',
+      '  float top = smoothstep(anc.y - 1.06, anc.y - 0.30, st.y);',
+      '  float e = (d * 1.02 + core * 1.05 + amb * 0.92) * mix(0.42, 1.15, top);',
+      '  float m1 = smoothstep(0.60, 1.36, e);',
+      '  float m2 = smoothstep(0.96, 1.62, e);',
+      '  float m3 = smoothstep(1.26, 1.86, e);',
+      '  vec3 base = vec3(0.022, 0.018, 0.019);',
+      '  vec3 deep = hueShift(vec3(0.30, 0.021, 0.075), u_hue);',
+      '  vec3 mid  = hueShift(vec3(0.86, 0.10, 0.035), u_hue);',
+      '  vec3 hot  = hueShift(vec3(1.00, 0.42, 0.20), u_hue);',
+      '  vec3 col = base;',
+      '  col = mix(col, deep, m1);',
+      '  col = mix(col, mid, m2 * 0.96);',
+      '  col = mix(col, hot, m3 * 0.9);',
+      '  float vig = smoothstep(1.32, 0.24, length(st * vec2(0.86, 1.06)));',
+      '  col *= mix(1.0, mix(0.34, 1.0, vig), u_dark);',
+      '  col *= mix(1.0, mix(0.14, 1.0, smoothstep(anc.y - 1.24, anc.y - 0.42, st.y)), u_dark);',
+      '  col *= mix(1.0, mix(0.62, 1.0, smoothstep(-0.95, -0.05, st.x)), u_dark);',
+      '  float g = hash(gl_FragCoord.xy + fract(u_time) * 133.7);',
+      '  col += (g - 0.5) * 0.028;',
+      '  col = col / (col + 1.05) * 1.24;',
+      '  gl_FragColor = vec4(pow(max(col, 0.0), vec3(0.92)), 1.0);',
+      '}'
+    ].join('\n');
+
+    const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
+    const prog = gl.createProgram();
+    gl.attachShader(prog, sh(gl.VERTEX_SHADER, vs));
+    gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fs));
+    gl.linkProgram(prog);
+    gl.useProgram(prog);
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(prog, 'p');
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+    this.u = {
+      res: gl.getUniformLocation(prog, 'u_res'),
+      time: gl.getUniformLocation(prog, 'u_time'),
+      mouse: gl.getUniformLocation(prog, 'u_mouse'),
+      glow: gl.getUniformLocation(prog, 'u_glow'),
+      hue: gl.getUniformLocation(prog, 'u_hue'),
+      anchor: gl.getUniformLocation(prog, 'u_anchor'),
+      size: gl.getUniformLocation(prog, 'u_size'),
+      dark: gl.getUniformLocation(prog, 'u_dark')
+    };
+
+    this.resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.6);
+      const w = Math.max(1, Math.round(canvas.clientWidth * dpr));
+      const h = Math.max(1, Math.round(canvas.clientHeight * dpr));
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w; canvas.height = h;
+        gl.viewport(0, 0, w, h);
+      }
+    };
+    this.ro = new ResizeObserver(this.resize);
+    this.ro.observe(canvas);
+    this.resize();
+
+    this.onMove = (e) => {
+      const r = canvas.getBoundingClientRect();
+      const pt = e.touches ? e.touches[0] : e;
+      this.mouse.tx = (pt.clientX - r.left) / r.width;
+      this.mouse.ty = 1 - (pt.clientY - r.top) / r.height;
+    };
+    window.addEventListener('pointermove', this.onMove, { passive: true });
+    window.addEventListener('touchmove', this.onMove, { passive: true });
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const start = performance.now();
+    const draw = (now) => {
+      this.raf = requestAnimationFrame(draw);
+      if (document.hidden) return;
+      const ease = 0.055;
+      this.mouse.x += (this.mouse.tx - this.mouse.x) * ease;
+      this.mouse.y += (this.mouse.ty - this.mouse.y) * ease;
+      const t = reduce ? 12 : (now - start) / 1000;
+      gl.uniform2f(this.u.res, canvas.width, canvas.height);
+      gl.uniform1f(this.u.time, t);
+      const ax = this.props.plumeX ?? 0.62, ay = this.props.plumeY ?? 0.72;
+      const live = (this.props.cursorReactive ?? true) && !reduce;
+      gl.uniform2f(this.u.mouse, live ? this.mouse.x : ax, live ? this.mouse.y : ay);
+      gl.uniform1f(this.u.glow, (this.props.glowStrength ?? 1) * (live ? 1 : 0.85));
+      gl.uniform1f(this.u.hue, this.props.hueShift ?? 0);
+      gl.uniform2f(this.u.anchor, ax, ay);
+      gl.uniform1f(this.u.size, this.props.plumeSize ?? 1);
+      gl.uniform1f(this.u.dark, this.props.blackLevel ?? 1);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    };
+    this.raf = requestAnimationFrame(draw);
+  }
+
+  // arriving with #work / #contact: re-apply the jump once layout has settled
+  initHashJump() {
+    const jump = (smooth) => {
+      const id = (window.location.hash || '').slice(1);
+      if (!id) return;
+      const el = document.getElementById(id);
+      if (!el) return;
+      const y = el.getBoundingClientRect().top + window.pageYOffset;
+      window.scrollTo({ top: y, behavior: smooth ? 'smooth' : 'auto' });
+    };
+    jump(false);
+    this.hashTimers = [setTimeout(() => jump(false), 120), setTimeout(() => jump(false), 500)];
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => jump(false));
+    this.onHash = () => jump(true);
+    window.addEventListener('hashchange', this.onHash);
+  }
+
+  initGlass() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.querySelectorAll('[data-glass]').forEach((btn) => {
+      const sh = btn.querySelector('[data-glass-shimmer]');
+      if (!sh) return;
+      const p = { x: 0, y: 0, tx: 0, ty: 0 };
+      let raf = null, on = false;
+      const tick = () => {
+        p.x += (p.tx - p.x) * 0.2;
+        p.y += (p.ty - p.y) * 0.2;
+        sh.style.left = p.x + 'px';
+        sh.style.top = p.y + 'px';
+        if (on || Math.abs(p.tx - p.x) > 0.4) { raf = requestAnimationFrame(tick); } else { raf = null; }
+      };
+      btn.addEventListener('pointerenter', (e) => {
+        const r = btn.getBoundingClientRect();
+        p.x = p.tx = e.clientX - r.left;
+        p.y = p.ty = e.clientY - r.top;
+        on = true;
+        sh.style.opacity = '1';
+        if (!raf) raf = requestAnimationFrame(tick);
+      });
+      btn.addEventListener('pointermove', (e) => {
+        const r = btn.getBoundingClientRect();
+        p.tx = e.clientX - r.left;
+        p.ty = e.clientY - r.top;
+        if (!raf) raf = requestAnimationFrame(tick);
+      });
+      btn.addEventListener('pointerleave', () => { on = false; sh.style.opacity = '0'; });
+    });
+  }
+
+  initWork() {
+    this.initGlass();
+    this.initHashJump();
+    const section = document.querySelector('[data-work-section]');
+    const list = document.querySelector('[data-work-list]');
+    if (!section || !list) return;
+    const rows = Array.from(section.querySelectorAll('[data-work-row]'));
+    const panels = Array.from(section.querySelectorAll('[data-work-panel]'));
+    const dots = Array.from(section.querySelectorAll('[data-work-dot]'));
+    const counter = section.querySelector('[data-work-counter]');
+    const n = rows.length;
+    let current = -1, queued = false;
+
+    const paint = () => {
+      queued = false;
+      const rect = section.getBoundingClientRect();
+      const span = section.offsetHeight - window.innerHeight;
+      const p = Math.min(Math.max(-rect.top / (span || 1), 0), 1);
+      const raw = p * (n - 1);
+      const i = Math.round(raw);
+      const lo = Math.floor(raw), hi = Math.min(lo + 1, n - 1), t = raw - lo;
+      const centerOf = (el) => el.offsetTop + el.offsetHeight / 2;
+      const y = centerOf(rows[lo]) + (centerOf(rows[hi]) - centerOf(rows[lo])) * t;
+      list.style.transform = 'translate3d(0,' + (-y).toFixed(2) + 'px,0)';
+
+      if (i !== current) {
+        current = i;
+        rows.forEach((r, ri) => {
+          const on = ri === i;
+          const q = (sel, c) => { const el = r.querySelector(sel); if (el) el.style.color = c; };
+          q('[data-row-title]', on ? '#ffffff' : 'rgba(255,255,255,0.24)');
+          q('[data-row-num]', on ? '#ffffff' : 'rgba(255,255,255,0.22)');
+          q('[data-row-desc]', on ? 'rgba(255,255,255,0.88)' : 'rgba(255,255,255,0.2)');
+          q('[data-row-meta]', on ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.16)');
+        });
+        panels.forEach((el, pi) => {
+          el.style.opacity = pi === i ? '1' : '0';
+          el.style.transform = pi === i ? 'scale(1)' : 'scale(0.97)';
+          el.style.pointerEvents = pi === i ? 'auto' : 'none';
+        });
+        dots.forEach((d, di) => {
+          const on = di === i;
+          d.style.width = on ? '10px' : '7px';
+          d.style.height = on ? '10px' : '7px';
+          d.style.background = on ? '#ffffff' : 'rgba(255,255,255,0.28)';
+        });
+        if (counter) counter.textContent = 'Project ' + (i + 1) + '/' + n;
+      }
+    };
+
+    this.onWorkScroll = () => { if (!queued) { queued = true; requestAnimationFrame(paint); } };
+    window.addEventListener('scroll', this.onWorkScroll, { passive: true });
+    window.addEventListener('resize', this.onWorkScroll);
+    paint();
+
+    return;
+  }
+
+  initWorkCards() {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.querySelectorAll('[data-work]').forEach((card) => {
+      const media = card.querySelector('[data-work-media]');
+      const img = card.querySelector('[data-work-img]');
+      const glow = card.querySelector('[data-work-glow]');
+      const scan = card.querySelector('[data-work-scan]');
+      const cue = card.querySelector('[data-work-cue]');
+      const title = card.querySelector('[data-work-title]');
+      const s = { cx: 0, cy: 0, tcx: 0, tcy: 0, rx: 0, ry: 0, trx: 0, try_: 0 };
+      let raf = null, on = false;
+
+      const tick = () => {
+        s.cx += (s.tcx - s.cx) * 0.16;
+        s.cy += (s.tcy - s.cy) * 0.16;
+        s.rx += (s.trx - s.rx) * 0.09;
+        s.ry += (s.try_ - s.ry) * 0.09;
+        if (cue) { cue.style.left = s.cx + 'px'; cue.style.top = s.cy + 'px'; }
+        card.style.transform = 'perspective(1100px) rotateY(' + s.rx.toFixed(3) + 'deg) rotateX(' + s.ry.toFixed(3) + 'deg)';
+        if (img) img.style.transform = 'scale(' + (on ? 1.07 : 1) + ') translate3d(' + (s.rx * -1.4).toFixed(2) + 'px,' + (s.ry * 1.4).toFixed(2) + 'px,0)';
+        const moving = Math.abs(s.tcx - s.cx) > 0.3 || Math.abs(s.trx - s.rx) > 0.02 || Math.abs(s.try_ - s.ry) > 0.02;
+        if (on || moving) { raf = requestAnimationFrame(tick); } else { raf = null; }
+      };
+
+      const enter = (e) => {
+        on = true;
+        if (glow) glow.style.opacity = '1';
+        if (scan) scan.style.opacity = '1';
+        if (cue) { cue.style.opacity = '1'; cue.style.transform = 'scale(1)'; }
+        if (title) { title.style.transform = 'translate3d(6px, 0, 0)'; title.style.color = '#ffffff'; }
+        move(e, true);
+      };
+      const move = (e, snap) => {
+        if (media) {
+          const mr = media.getBoundingClientRect();
+          s.tcx = e.clientX - mr.left;
+          s.tcy = e.clientY - mr.top;
+          if (snap) { s.cx = s.tcx; s.cy = s.tcy; }
+        }
+        const r = card.getBoundingClientRect();
+        s.trx = ((e.clientX - r.left) / r.width - 0.5) * 6;
+        s.try_ = -((e.clientY - r.top) / r.height - 0.5) * 5;
+        if (!raf) raf = requestAnimationFrame(tick);
+      };
+      const leave = () => {
+        on = false;
+        s.trx = 0; s.try_ = 0;
+        if (glow) glow.style.opacity = '0';
+        if (scan) scan.style.opacity = '0';
+        if (cue) { cue.style.opacity = '0'; cue.style.transform = 'scale(0.5)'; }
+        if (title) { title.style.transform = 'none'; title.style.color = '#f4eeeb'; }
+        if (!raf) raf = requestAnimationFrame(tick);
+      };
+
+      if (reduce) return;
+      card.addEventListener('pointerenter', enter);
+      card.addEventListener('pointermove', move);
+      card.addEventListener('pointerleave', leave);
+    });
+  }
+
+  componentWillUnmount() {
+    (this.hashTimers || []).forEach(clearTimeout);
+    window.removeEventListener('hashchange', this.onHash);
+    clearTimeout(this.unclipTimer);
+    clearTimeout(this.toastTimer);
+    cancelAnimationFrame(this.raf);
+    if (this.ro) this.ro.disconnect();
+    window.removeEventListener('pointermove', this.onMove);
+    window.removeEventListener('touchmove', this.onMove);
+    window.removeEventListener('scroll', this.onWorkScroll);
+    window.removeEventListener('resize', this.onWorkScroll);
+    window.removeEventListener('resize', this.onNavResize);
+  }
+}
+
+</script>
+</body>
+</html>
