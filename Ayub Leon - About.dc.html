@@ -299,7 +299,16 @@ class Component extends DCLogic {
     // logical front-to-back order, kept in JS only — never reorders real DOM nodes,
     // since this template is rendered by React and direct DOM reordering fights its reconciliation
     let order = cards.map((_, i) => i);
-    const slotStyle = (slot) => `translate3d(0, ${slot * 6}px, 0) scale(${1 - slot * 0.02})`;
+    const slotStyle = (slot) => {
+      if (slot === 0) return 'translate3d(0, 0, 0) scale(1) rotate(0deg)';
+      const dir = slot % 2 === 1 ? -1 : 1;
+      const depth = Math.ceil(slot / 2);
+      const x = dir * (10 + depth * 4);
+      const y = 8 + slot * 6;
+      const rot = dir * (5 + depth * 3);
+      const scale = 1 - slot * 0.035;
+      return `translate3d(${x}px, ${y}px, 0) scale(${scale}) rotate(${rot}deg)`;
+    };
 
     const layout = (animate) => {
       order.forEach((cardIndex, slot) => {
