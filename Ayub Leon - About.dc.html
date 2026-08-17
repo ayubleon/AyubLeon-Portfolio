@@ -3,6 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About — Ayub Leon</title>
+<meta name="description" content="Get to know Ayub Leon, a product designer — how he got into design, what drives his work, and what he does outside of Figma.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta property="og:title" content="About — Ayub Leon">
+<meta property="og:description" content="Get to know Ayub Leon, a product designer — how he got into design, what drives his work, and what he does outside of Figma.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ayub-leon-portfolio.vercel.app/Ayub%20Leon%20-%20About.dc.html">
+<meta property="og:image" content="https://ayub-leon-portfolio.vercel.app/images/image-2.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="About — Ayub Leon">
+<meta name="twitter:description" content="Get to know Ayub Leon, a product designer — how he got into design, what drives his work, and what he does outside of Figma.">
+<meta name="twitter:image" content="https://ayub-leon-portfolio.vercel.app/images/image-2.png">
 <script src="./support.js"></script>
 </head>
 <body>
@@ -16,8 +28,11 @@
   html, body { margin: 0; padding: 0; background: #060505; }
   body { -webkit-font-smoothing: antialiased; }
   * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   a { color: rgba(238,230,227,0.72); text-decoration: none; transition: color .35s cubic-bezier(.22,1,.36,1), opacity .35s ease; }
   a:hover { color: #fff8f4; }
+  a:focus-visible, button:focus-visible { outline: 2px solid #C8F135; outline-offset: 3px; border-radius: 4px; }
+  a:active, button:active { opacity: 0.7; }
   ::selection { background: #ff3b12; color: #0a0606; }
   @keyframes alNav { from { opacity: 0; transform: translate(-50%, -18px); } to { opacity: 1; transform: translate(-50%, 0); } }
   @keyframes alRise { from { transform: translate3d(0, 110%, 0); } to { transform: translate3d(0,0,0); } }
@@ -43,7 +58,7 @@
     75%  { border-radius: 38% 62% 56% 44% / 40% 56% 44% 60%; }
     100% { border-radius: 62% 38% 44% 56% / 54% 44% 56% 46%; }
   }
-  @media (prefers-reduced-motion: reduce) { * { animation-duration: .01ms !important; transition: none !important; } }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation-duration: .01ms !important; transition: none !important; } }
   .nav-toggle { display: none; align-items: center; justify-content: center; width: 38px; height: 38px; padding: 0; border: 0; border-radius: 999px; background: rgba(255,255,255,0.08); color: #f6efec; cursor: pointer; -webkit-tap-highlight-color: transparent; flex: 0 0 auto; }
   .nav-toggle:hover { background: rgba(255,255,255,0.14); }
   .nav-toggle-bars { position: relative; display: block; width: 17px; height: 1.5px; background: currentColor; transition: background .2s ease .12s; }
@@ -53,7 +68,7 @@
   .nav-toggle-bars.is-open { background: transparent; }
   .nav-toggle-bars.is-open::before { top: 0; transform: rotate(45deg); }
   .nav-toggle-bars.is-open::after { top: 0; transform: rotate(-45deg); }
-  .nav-mobile { display: none; position: fixed; top: 84px; left: 24px; right: 24px; max-width: 1192px; margin: 0 auto; z-index: 35; flex-direction: column; gap: 2px; padding: 10px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.13); background: rgba(15,9,8,0.94); backdrop-filter: blur(22px) saturate(1.6); -webkit-backdrop-filter: blur(22px) saturate(1.6); box-shadow: 0 30px 70px -28px rgba(0,0,0,0.9); opacity: 0; pointer-events: none; transform: translateY(-10px); transition: opacity .35s cubic-bezier(.22,1,.36,1), transform .4s cubic-bezier(.22,1,.36,1); }
+  .nav-mobile { display: none; position: fixed; top: 84px; left: 16px; right: 16px; max-width: 1192px; margin: 0 auto; z-index: 35; flex-direction: column; gap: 2px; padding: 10px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.13); background: rgba(15,9,8,0.94); backdrop-filter: blur(22px) saturate(1.6); -webkit-backdrop-filter: blur(22px) saturate(1.6); box-shadow: 0 30px 70px -28px rgba(0,0,0,0.9); opacity: 0; pointer-events: none; transform: translateY(-10px); transition: opacity .35s cubic-bezier(.22,1,.36,1), transform .4s cubic-bezier(.22,1,.36,1); }
   .nav-mobile a { padding: 13px 16px; border-radius: 12px; font-size: 15px; color: rgba(246,239,236,0.86); }
   .nav-mobile a:hover { background: rgba(255,255,255,0.08); color: #fff; }
   .photo-stack-card { cursor: grab; }
@@ -73,12 +88,14 @@
     .story-photo-trio { display: none !important; }
     .photo-stack-wrap { display: block; }
     .story-grid-2 { grid-template-columns: 1fr !important; gap: 32px !important; }
+    .nav-pill { width: calc(100% - 32px) !important; }
+    .mobile-gutter { padding-left: 16px !important; padding-right: 16px !important; }
   }
 </style>
 </helmet>
 <div style="position: relative; width: 100%; background: #060505; font-family: 'Schibsted Grotesk', Helvetica, Arial, sans-serif; color: #eee6e3; overflow-x: hidden;" data-screen-label="About">
 
-  <nav style="position: fixed; top: 22px; left: 50%; transform: translateX(-50%); width: calc(100% - 48px); max-width: 1240px; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 13px 14px 13px 24px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.13); background: rgba(28,14,12,0.22); backdrop-filter: blur(22px) saturate(1.6) brightness(0.78); -webkit-backdrop-filter: blur(22px) saturate(1.6) brightness(0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -1px 0 rgba(0,0,0,0.35), 0 22px 50px -28px rgba(0,0,0,0.9); animation: alNav 1s cubic-bezier(.22,1,.36,1) .1s both;">
+  <nav class="nav-pill" style="position: fixed; top: 22px; left: 50%; transform: translateX(-50%); width: calc(100% - 48px); max-width: 1240px; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 13px 14px 13px 24px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.13); background: rgba(28,14,12,0.22); backdrop-filter: blur(22px) saturate(1.6) brightness(0.78); -webkit-backdrop-filter: blur(22px) saturate(1.6) brightness(0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -1px 0 rgba(0,0,0,0.35), 0 22px 50px -28px rgba(0,0,0,0.9); animation: alNav 1s cubic-bezier(.22,1,.36,1) .1s both;">
     <a href="Ayub%20Leon%20-%20Landing%20Page.dc.html" style="font-size: 15px; font-weight: 500; letter-spacing: -0.01em; color: #f6efec;">Ayub Leon</a>
     <div class="nav-links" style="display: flex; align-items: center; gap: 6px;">
       <a href="Ayub%20Leon%20-%20Landing%20Page.dc.html#work" style="font-size: 13.5px; padding: 9px 16px; border-radius: 999px; color: rgba(246,239,236,0.78);" style-hover="background: rgba(255,255,255,0.09); color: #fff;">Work</a>
@@ -95,7 +112,8 @@
     <a href="Ayub%20Leon%20-%20Landing%20Page.dc.html#contact">Contact</a>
   </div>
 
-  <section id="top" style="position: relative; padding: 132px 40px 0; max-width: 1400px; margin: 0 auto;">
+  <main>
+  <section id="top" class="mobile-gutter" style="position: relative; padding: 132px 40px 0; max-width: 1400px; margin: 0 auto;">
     <canvas ref="{{ canvasRef }}" style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100vw; height: 100%; display: block;"></canvas>
     <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100vw; bottom: 0; pointer-events: none; background: linear-gradient(180deg, rgba(6,5,5,0) 0%, rgba(6,5,5,0) 52%, rgba(6,5,5,0.55) 78%, #060505 100%);"></div>
 
@@ -121,7 +139,7 @@
     </div>
   </section>
 
-  <section style="max-width: 1400px; margin: 96px auto 0; padding: 0 40px;">
+  <section class="mobile-gutter" style="max-width: 1400px; margin: 96px auto 0; padding: 0 40px;">
     <div style="height: 1px; background: rgba(255,255,255,0.12);"></div>
     <p style="margin: 40px 0 54px; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: capitalize; color: #FFFFFF">My story</p>
 
@@ -196,7 +214,7 @@
     <p data-reveal="1" style="margin: 78px 0 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.1rem, 1.5vw, 1.35rem); font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Thanks for stopping by!</p>
   </section>
 
-  <section id="friends" style="max-width: 1400px; margin: 110px auto 0; padding: 0 40px 120px;">
+  <section id="friends" class="mobile-gutter" style="max-width: 1400px; margin: 110px auto 0; padding: 0 40px 120px;">
     <div style="height: 1px; background: rgba(255,255,255,0.12);"></div>
     <p style="margin: 40px 0 54px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: capitalize; color: #FFFFFF">My friends</p>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 46px 40px;">
@@ -226,6 +244,7 @@
       </div>
     </div>
   </section>
+  </main>
 </div>
 
 </x-dc>
