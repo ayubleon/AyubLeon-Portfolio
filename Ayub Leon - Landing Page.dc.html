@@ -15,6 +15,7 @@
 <meta name="twitter:title" content="Ayub Leon — Product Designer">
 <meta name="twitter:description" content="Portfolio of Ayub Leon, a product designer with 4+ years of experience building TikTok Shop platforms, crash betting games, banking apps, and design systems.">
 <meta name="twitter:image" content="https://ayub-leon-portfolio.vercel.app/images/image-2.png">
+<style>html, body { background: #060505; margin: 0; }</style>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -49,14 +50,18 @@
   .nav-toggle-bars.is-open { background: transparent; }
   .nav-toggle-bars.is-open::before { top: 0; transform: rotate(45deg); }
   .nav-toggle-bars.is-open::after { top: 0; transform: rotate(-45deg); }
-  .nav-mobile { display: none; position: fixed; top: 84px; left: 16px; right: 16px; max-width: 1192px; margin: 0 auto; z-index: 35; flex-direction: column; gap: 2px; padding: 10px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.13); background: rgba(15,9,8,0.94); backdrop-filter: blur(22px) saturate(1.6); -webkit-backdrop-filter: blur(22px) saturate(1.6); box-shadow: 0 30px 70px -28px rgba(0,0,0,0.9); opacity: 0; pointer-events: none; transform: translateY(-10px); transition: opacity .35s cubic-bezier(.22,1,.36,1), transform .4s cubic-bezier(.22,1,.36,1); }
+  .nav-wrap { border-radius: 999px; border: 1px solid rgba(255,255,255,0.13); background: rgba(28,14,12,0.22); backdrop-filter: blur(22px) saturate(1.6) brightness(0.78); -webkit-backdrop-filter: blur(22px) saturate(1.6) brightness(0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -1px 0 rgba(0,0,0,0.35), 0 22px 50px -28px rgba(0,0,0,0.9); overflow: hidden; transition: border-radius .4s cubic-bezier(.22,1,.36,1); }
+  .nav-wrap.is-open { border-radius: 28px; }
+  .nav-mobile { display: none; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .45s cubic-bezier(.22,1,.36,1), opacity .35s ease; }
+  .nav-mobile.is-open { grid-template-rows: 1fr; opacity: 1; }
+  .nav-mobile-inner { overflow: hidden; min-height: 0; display: flex; flex-direction: column; gap: 2px; padding: 0 10px; border-top: 0 solid rgba(255,255,255,0.1); transition: padding .3s ease, border-top-width .3s ease; }
+  .nav-mobile.is-open .nav-mobile-inner { padding: 6px 10px 10px; border-top-width: 1px; }
   .nav-mobile a { padding: 13px 16px; border-radius: 12px; font-size: 15px; color: rgba(246,239,236,0.86); }
   .nav-mobile a:hover { background: rgba(255,255,255,0.08); color: #fff; }
   @media (max-width: 700px) {
     .nav-links { display: none !important; }
     .nav-toggle { display: inline-flex !important; }
-    .nav-mobile { display: flex; }
-    .nav-mobile.is-open { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .nav-mobile { display: grid; }
     .scroll-cue { display: none !important; }
     .work-grid { grid-template-columns: minmax(0, 1fr) !important; }
     .work-media { display: none !important; }
@@ -74,27 +79,31 @@
   <div ref="{{ toastRef }}" role="status" aria-live="polite" style="position: fixed; left: 50%; bottom: 34px; z-index: 60; padding: 1.6px; border-radius: 999px; overflow: hidden; isolation: isolate; box-shadow: 0 30px 70px -26px rgba(0,0,0,0.98); opacity: 0; transform: translate(-50%, 18px); pointer-events: none; transition: opacity .45s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.22,1,.36,1);">
     <div aria-hidden="true" style="position: absolute; left: 50%; top: 50%; width: 260%; aspect-ratio: 1; background: conic-gradient(from 0deg, rgba(255,255,255,0) 0deg, rgba(255,255,255,0) 200deg, #ff5a2b 292deg, #ffd0b8 330deg, #ffffff 348deg, rgba(255,255,255,0) 360deg); animation: alSpin 2.6s linear infinite;"></div>
     <div style="position: relative; display: flex; align-items: center; padding: 14px 24px; border-radius: 999px; background: #100908; font-family: 'Schibsted Grotesk', Helvetica, sans-serif; font-size: 14px; letter-spacing: -0.005em; color: #fdf9f7;">
-      <span ref="{{ toastTextRef }}" style="font-family: Poppins">Email copied to clipboard</span>
+      <span ref="{{ toastTextRef }}" style="font-family: Poppins">Copied to Clipboard</span>
     </div>
   </div>
 
-  <nav class="nav-pill" style="position: fixed; top: 22px; left: 50%; transform: translateX(-50%); width: calc(100% - 48px); max-width: 1240px; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 13px 14px 13px 24px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.13); background: rgba(28,14,12,0.22); backdrop-filter: blur(22px) saturate(1.6) brightness(0.78); -webkit-backdrop-filter: blur(22px) saturate(1.6) brightness(0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -1px 0 rgba(0,0,0,0.35), 0 22px 50px -28px rgba(0,0,0,0.9); animation: alNav 1s cubic-bezier(.22,1,.36,1) .15s both;">
-    <a href="#top" style="font-size: 15px; font-weight: 500; letter-spacing: -0.01em; color: #f6efec; display: flex; align-items: center; gap: 9px;">
-      Ayub Leon
-    </a>
-    <div class="nav-links" style="display: flex; align-items: center; gap: 6px;">
-      <a href="#work" style="font-size: 13.5px; padding: 9px 16px; border-radius: 999px; color: rgba(246,239,236,0.78);" style-hover="background: rgba(255,255,255,0.09); color: #fff;">Work</a>
-      <a href="Ayub Leon - About.dc.html" style="font-size: 13.5px; padding: 9px 16px; border-radius: 999px; color: rgba(246,239,236,0.78);" style-hover="background: rgba(255,255,255,0.09); color: #fff;">About me</a>
-      <a href="#contact" style="font-size: 13.5px; padding: 9px 18px; border-radius: 999px; background: rgba(255,255,255,0.95); color: #120a08; font-weight: 500;" style-hover="background: #fff; color: #000;">Contact</a>
+  <div class="nav-wrap nav-pill" style="position: fixed; top: 22px; left: 50%; transform: translateX(-50%); width: calc(100% - 48px); max-width: 1240px; z-index: 20; animation: alNav 1s cubic-bezier(.22,1,.36,1) .15s both;">
+    <nav style="display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 13px 14px 13px 24px;">
+      <a href="#top" style="font-size: 15px; font-weight: 500; letter-spacing: -0.01em; color: #f6efec; display: flex; align-items: center; gap: 9px;">
+        Ayub Leon
+      </a>
+      <div class="nav-links" style="display: flex; align-items: center; gap: 6px;">
+        <a href="#work" style="font-size: 13.5px; padding: 9px 16px; border-radius: 999px; color: rgba(246,239,236,0.78);" style-hover="background: rgba(255,255,255,0.09); color: #fff;">Work</a>
+        <a href="Ayub Leon - About.dc.html" style="font-size: 13.5px; padding: 9px 16px; border-radius: 999px; color: rgba(246,239,236,0.78);" style-hover="background: rgba(255,255,255,0.09); color: #fff;">About me</a>
+        <a href="#contact" style="font-size: 13.5px; padding: 9px 18px; border-radius: 999px; background: rgba(255,255,255,0.95); color: #120a08; font-weight: 500;" style-hover="background: #fff; color: #000;">Contact</a>
+      </div>
+      <button type="button" class="nav-toggle" data-nav-toggle="1" aria-label="Open menu" aria-expanded="false">
+        <span class="nav-toggle-bars" data-nav-bars="1" aria-hidden="true"></span>
+      </button>
+    </nav>
+    <div class="nav-mobile" data-nav-mobile="1">
+      <div class="nav-mobile-inner">
+        <a href="#work">Work</a>
+        <a href="Ayub Leon - About.dc.html">About me</a>
+        <a href="#contact">Contact</a>
+      </div>
     </div>
-    <button type="button" class="nav-toggle" data-nav-toggle="1" aria-label="Open menu" aria-expanded="false">
-      <span class="nav-toggle-bars" data-nav-bars="1" aria-hidden="true"></span>
-    </button>
-  </nav>
-  <div class="nav-mobile" data-nav-mobile="1">
-    <a href="#work">Work</a>
-    <a href="Ayub Leon - About.dc.html">About me</a>
-    <a href="#contact">Contact</a>
   </div>
 
   <main>
@@ -260,7 +269,7 @@ class Component extends DCLogic {
       copyEmail: (e) => {
         e.preventDefault();
         const email = 'ayubleon9@gmail.com';
-        const done = () => this.showToast('Email copied to clipboard — ' + email);
+        const done = () => this.showToast('Copied to Clipboard');
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(email).then(done).catch(() => this.fallbackCopy(email, done));
         } else {
@@ -325,10 +334,12 @@ class Component extends DCLogic {
     const btn = document.querySelector('[data-nav-toggle]');
     const bars = document.querySelector('[data-nav-bars]');
     const panel = document.querySelector('[data-nav-mobile]');
+    const wrap = document.querySelector('.nav-wrap');
     if (!btn || !panel) return;
     const setOpen = (open) => {
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
       if (bars) bars.classList.toggle('is-open', open);
+      if (wrap) wrap.classList.toggle('is-open', open);
       panel.classList.toggle('is-open', open);
     };
     btn.addEventListener('click', () => setOpen(btn.getAttribute('aria-expanded') !== 'true'));

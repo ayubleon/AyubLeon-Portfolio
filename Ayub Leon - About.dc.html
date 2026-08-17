@@ -15,6 +15,7 @@
 <meta name="twitter:title" content="About — Ayub Leon">
 <meta name="twitter:description" content="Get to know Ayub Leon, a product designer — how he got into design, what drives his work, and what he does outside of Figma.">
 <meta name="twitter:image" content="https://ayub-leon-portfolio.vercel.app/images/image-2.png">
+<style>html, body { background: #060505; margin: 0; }</style>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -68,7 +69,12 @@
   .nav-toggle-bars.is-open { background: transparent; }
   .nav-toggle-bars.is-open::before { top: 0; transform: rotate(45deg); }
   .nav-toggle-bars.is-open::after { top: 0; transform: rotate(-45deg); }
-  .nav-mobile { display: none; position: fixed; top: 84px; left: 16px; right: 16px; max-width: 1192px; margin: 0 auto; z-index: 35; flex-direction: column; gap: 2px; padding: 10px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.13); background: rgba(15,9,8,0.94); backdrop-filter: blur(22px) saturate(1.6); -webkit-backdrop-filter: blur(22px) saturate(1.6); box-shadow: 0 30px 70px -28px rgba(0,0,0,0.9); opacity: 0; pointer-events: none; transform: translateY(-10px); transition: opacity .35s cubic-bezier(.22,1,.36,1), transform .4s cubic-bezier(.22,1,.36,1); }
+  .nav-wrap { border-radius: 999px; border: 1px solid rgba(255,255,255,0.13); background: rgba(28,14,12,0.22); backdrop-filter: blur(22px) saturate(1.6) brightness(0.78); -webkit-backdrop-filter: blur(22px) saturate(1.6) brightness(0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -1px 0 rgba(0,0,0,0.35), 0 22px 50px -28px rgba(0,0,0,0.9); overflow: hidden; transition: border-radius .4s cubic-bezier(.22,1,.36,1); }
+  .nav-wrap.is-open { border-radius: 28px; }
+  .nav-mobile { display: none; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .45s cubic-bezier(.22,1,.36,1), opacity .35s ease; }
+  .nav-mobile.is-open { grid-template-rows: 1fr; opacity: 1; }
+  .nav-mobile-inner { overflow: hidden; min-height: 0; display: flex; flex-direction: column; gap: 2px; padding: 0 10px; border-top: 0 solid rgba(255,255,255,0.1); transition: padding .3s ease, border-top-width .3s ease; }
+  .nav-mobile.is-open .nav-mobile-inner { padding: 6px 10px 10px; border-top-width: 1px; }
   .nav-mobile a { padding: 13px 16px; border-radius: 12px; font-size: 15px; color: rgba(246,239,236,0.86); }
   .nav-mobile a:hover { background: rgba(255,255,255,0.08); color: #fff; }
   .photo-stack-card { cursor: grab; }
@@ -77,8 +83,7 @@
   @media (max-width: 700px) {
     .nav-links { display: none !important; }
     .nav-toggle { display: inline-flex !important; }
-    .nav-mobile { display: flex; }
-    .nav-mobile.is-open { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .nav-mobile { display: grid; }
     .about-hero-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
     .about-hero-photos { grid-template-columns: 1fr !important; }
     .about-hero-photo-1 { display: none !important; }
@@ -88,6 +93,7 @@
     .story-photo-trio { display: none !important; }
     .photo-stack-wrap { display: block; }
     .story-grid-2 { grid-template-columns: 1fr !important; gap: 32px !important; }
+    [data-blob] { display: none !important; }
     .nav-pill { width: calc(100% - 32px) !important; }
     .mobile-gutter { padding-left: 16px !important; padding-right: 16px !important; }
   }
@@ -95,21 +101,25 @@
 </helmet>
 <div style="position: relative; width: 100%; background: #060505; font-family: 'Schibsted Grotesk', Helvetica, Arial, sans-serif; color: #eee6e3; overflow-x: hidden;" data-screen-label="About">
 
-  <nav class="nav-pill" style="position: fixed; top: 22px; left: 50%; transform: translateX(-50%); width: calc(100% - 48px); max-width: 1240px; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 13px 14px 13px 24px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.13); background: rgba(28,14,12,0.22); backdrop-filter: blur(22px) saturate(1.6) brightness(0.78); -webkit-backdrop-filter: blur(22px) saturate(1.6) brightness(0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -1px 0 rgba(0,0,0,0.35), 0 22px 50px -28px rgba(0,0,0,0.9); animation: alNav 1s cubic-bezier(.22,1,.36,1) .1s both;">
-    <a href="Ayub%20Leon%20-%20Landing%20Page.dc.html" style="font-size: 15px; font-weight: 500; letter-spacing: -0.01em; color: #f6efec;">Ayub Leon</a>
-    <div class="nav-links" style="display: flex; align-items: center; gap: 6px;">
-      <a href="Ayub%20Leon%20-%20Landing%20Page.dc.html#work" style="font-size: 13.5px; padding: 9px 16px; border-radius: 999px; color: rgba(246,239,236,0.78);" style-hover="background: rgba(255,255,255,0.09); color: #fff;">Work</a>
-      <a href="#top" style="font-size: 13.5px; padding: 9px 16px; border-radius: 999px; color: #fff; background: rgba(255,255,255,0.10);">About me</a>
-      <a href="Ayub%20Leon%20-%20Landing%20Page.dc.html#contact" style="font-size: 13.5px; padding: 9px 18px; border-radius: 999px; background: rgba(255,255,255,0.95); color: #120a08; font-weight: 500;" style-hover="background: #fff; color: #000;">Contact</a>
+  <div class="nav-wrap nav-pill" style="position: fixed; top: 22px; left: 50%; transform: translateX(-50%); width: calc(100% - 48px); max-width: 1240px; z-index: 30; animation: alNav 1s cubic-bezier(.22,1,.36,1) .1s both;">
+    <nav style="display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 13px 14px 13px 24px;">
+      <a href="Ayub%20Leon%20-%20Landing%20Page.dc.html" style="font-size: 15px; font-weight: 500; letter-spacing: -0.01em; color: #f6efec;">Ayub Leon</a>
+      <div class="nav-links" style="display: flex; align-items: center; gap: 6px;">
+        <a href="Ayub%20Leon%20-%20Landing%20Page.dc.html#work" style="font-size: 13.5px; padding: 9px 16px; border-radius: 999px; color: rgba(246,239,236,0.78);" style-hover="background: rgba(255,255,255,0.09); color: #fff;">Work</a>
+        <a href="#top" style="font-size: 13.5px; padding: 9px 16px; border-radius: 999px; color: #fff; background: rgba(255,255,255,0.10);">About me</a>
+        <a href="Ayub%20Leon%20-%20Landing%20Page.dc.html#contact" style="font-size: 13.5px; padding: 9px 18px; border-radius: 999px; background: rgba(255,255,255,0.95); color: #120a08; font-weight: 500;" style-hover="background: #fff; color: #000;">Contact</a>
+      </div>
+      <button type="button" class="nav-toggle" data-nav-toggle="1" aria-label="Open menu" aria-expanded="false">
+        <span class="nav-toggle-bars" data-nav-bars="1" aria-hidden="true"></span>
+      </button>
+    </nav>
+    <div class="nav-mobile" data-nav-mobile="1">
+      <div class="nav-mobile-inner">
+        <a href="Ayub%20Leon%20-%20Landing%20Page.dc.html#work">Work</a>
+        <a href="#top">About me</a>
+        <a href="Ayub%20Leon%20-%20Landing%20Page.dc.html#contact">Contact</a>
+      </div>
     </div>
-    <button type="button" class="nav-toggle" data-nav-toggle="1" aria-label="Open menu" aria-expanded="false">
-      <span class="nav-toggle-bars" data-nav-bars="1" aria-hidden="true"></span>
-    </button>
-  </nav>
-  <div class="nav-mobile" data-nav-mobile="1">
-    <a href="Ayub%20Leon%20-%20Landing%20Page.dc.html#work">Work</a>
-    <a href="#top">About me</a>
-    <a href="Ayub%20Leon%20-%20Landing%20Page.dc.html#contact">Contact</a>
   </div>
 
   <main>
@@ -222,25 +232,25 @@
         <div data-blob="1" style="position: absolute; left: 0; top: 0; width: 190px; height: 190px; margin: -95px 0 0 -95px; pointer-events: none; opacity: 0; transform: scale(0.55); transition: opacity .5s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); background: radial-gradient(circle at 38% 34%, rgba(255,138,72,0.95) 0%, rgba(226,32,12,0.7) 46%, rgba(120,12,30,0.18) 78%, rgba(120,12,30,0) 100%); filter: blur(16px); animation: alBlob 9s ease-in-out infinite; z-index: 0;"></div>
         <p style="position: relative; z-index: 1; margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.06rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Nelson Kuria</p>
         <p style="position: relative; z-index: 1; margin: 0; font-size: 14px; color: rgba(239,232,229,0.72);">Software Engineer</p>
-        <a href="https://www.linkedin.com/in/nelsonkuria/" target="_blank" rel="noopener noreferrer" style="position: relative; z-index: 1; align-self: flex-start; display: inline-flex; align-items: center; gap: 9px; margin-top: 6px; font-size: 14px; color: rgba(238,230,227,0.86);" style-hover="color: #C8F135;">Linked In <span style="font-size: 13px;">↗</span></a>
+        <a href="https://www.linkedin.com/in/nelsonkuria/" target="_blank" rel="noopener noreferrer" style="position: relative; z-index: 1; align-self: flex-start; display: inline-flex; align-items: center; gap: 9px; margin-top: 6px; font-size: 14px; color: rgba(238,230,227,0.86);" style-hover="color: #C8F135;">Linked In <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></a>
       </div>
       <div data-friend="1" data-reveal="2" style="position: relative; display: flex; flex-direction: column; gap: 7px; padding: 4px 2px;">
         <div data-blob="1" style="position: absolute; left: 0; top: 0; width: 190px; height: 190px; margin: -95px 0 0 -95px; pointer-events: none; opacity: 0; transform: scale(0.55); transition: opacity .5s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); background: radial-gradient(circle at 38% 34%, rgba(255,138,72,0.95) 0%, rgba(226,32,12,0.7) 46%, rgba(120,12,30,0.18) 78%, rgba(120,12,30,0) 100%); filter: blur(16px); animation: alBlob 9s ease-in-out infinite; z-index: 0;"></div>
         <p style="position: relative; z-index: 1; margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.06rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Harrison Sunda</p>
         <p style="position: relative; z-index: 1; margin: 0; font-size: 14px; color: rgba(239,232,229,0.72);">Backend Developer</p>
-        <a href="https://www.linkedin.com/in/harrison-sunda-2216261a1/" target="_blank" rel="noopener noreferrer" style="position: relative; z-index: 1; align-self: flex-start; display: inline-flex; align-items: center; gap: 9px; margin-top: 6px; font-size: 14px; color: rgba(238,230,227,0.86);" style-hover="color: #C8F135;">Linked In <span style="font-size: 13px;">↗</span></a>
+        <a href="https://www.linkedin.com/in/harrison-sunda-2216261a1/" target="_blank" rel="noopener noreferrer" style="position: relative; z-index: 1; align-self: flex-start; display: inline-flex; align-items: center; gap: 9px; margin-top: 6px; font-size: 14px; color: rgba(238,230,227,0.86);" style-hover="color: #C8F135;">Linked In <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></a>
       </div>
       <div data-friend="1" data-reveal="3" style="position: relative; display: flex; flex-direction: column; gap: 7px; padding: 4px 2px;">
         <div data-blob="1" style="position: absolute; left: 0; top: 0; width: 190px; height: 190px; margin: -95px 0 0 -95px; pointer-events: none; opacity: 0; transform: scale(0.55); transition: opacity .5s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); background: radial-gradient(circle at 38% 34%, rgba(255,138,72,0.95) 0%, rgba(226,32,12,0.7) 46%, rgba(120,12,30,0.18) 78%, rgba(120,12,30,0) 100%); filter: blur(16px); animation: alBlob 9s ease-in-out infinite; z-index: 0;"></div>
         <p style="position: relative; z-index: 1; margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.06rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Abraham Nzau</p>
         <p style="position: relative; z-index: 1; margin: 0; font-size: 14px; color: rgba(239,232,229,0.72);">Backend Developer</p>
-        <a href="https://www.linkedin.com/in/abraham-nzau-1a8554106/" target="_blank" rel="noopener noreferrer" style="position: relative; z-index: 1; align-self: flex-start; display: inline-flex; align-items: center; gap: 9px; margin-top: 6px; font-size: 14px; color: rgba(238,230,227,0.86);" style-hover="color: #C8F135;">Linked In <span style="font-size: 13px;">↗</span></a>
+        <a href="https://www.linkedin.com/in/abraham-nzau-1a8554106/" target="_blank" rel="noopener noreferrer" style="position: relative; z-index: 1; align-self: flex-start; display: inline-flex; align-items: center; gap: 9px; margin-top: 6px; font-size: 14px; color: rgba(238,230,227,0.86);" style-hover="color: #C8F135;">Linked In <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></a>
       </div>
       <div data-friend="1" data-reveal="4" style="position: relative; display: flex; flex-direction: column; gap: 7px; padding: 4px 2px;">
         <div data-blob="1" style="position: absolute; left: 0; top: 0; width: 190px; height: 190px; margin: -95px 0 0 -95px; pointer-events: none; opacity: 0; transform: scale(0.55); transition: opacity .5s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); background: radial-gradient(circle at 38% 34%, rgba(255,138,72,0.95) 0%, rgba(226,32,12,0.7) 46%, rgba(120,12,30,0.18) 78%, rgba(120,12,30,0) 100%); filter: blur(16px); animation: alBlob 9s ease-in-out infinite; z-index: 0;"></div>
         <p style="position: relative; z-index: 1; margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.06rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Maxwell Mwandigha</p>
         <p style="position: relative; z-index: 1; margin: 0; font-size: 14px; color: rgba(239,232,229,0.72);">Software Engineer</p>
-        <a href="https://www.linkedin.com/in/maxwell-mwandigha-3077a3178/" target="_blank" rel="noopener noreferrer" style="position: relative; z-index: 1; align-self: flex-start; display: inline-flex; align-items: center; gap: 9px; margin-top: 6px; font-size: 14px; color: rgba(238,230,227,0.86);" style-hover="color: #C8F135;">Linked In <span style="font-size: 13px;">↗</span></a>
+        <a href="https://www.linkedin.com/in/maxwell-mwandigha-3077a3178/" target="_blank" rel="noopener noreferrer" style="position: relative; z-index: 1; align-self: flex-start; display: inline-flex; align-items: center; gap: 9px; margin-top: 6px; font-size: 14px; color: rgba(238,230,227,0.86);" style-hover="color: #C8F135;">Linked In <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></a>
       </div>
     </div>
   </section>
@@ -265,10 +275,12 @@ class Component extends DCLogic {
     const btn = document.querySelector('[data-nav-toggle]');
     const bars = document.querySelector('[data-nav-bars]');
     const panel = document.querySelector('[data-nav-mobile]');
+    const wrap = document.querySelector('.nav-wrap');
     if (!btn || !panel) return;
     const setOpen = (open) => {
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
       if (bars) bars.classList.toggle('is-open', open);
+      if (wrap) wrap.classList.toggle('is-open', open);
       panel.classList.toggle('is-open', open);
     };
     btn.addEventListener('click', () => setOpen(btn.getAttribute('aria-expanded') !== 'true'));
