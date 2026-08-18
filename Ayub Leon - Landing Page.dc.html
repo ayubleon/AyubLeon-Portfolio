@@ -459,8 +459,8 @@ class Component extends DCLogic {
       if (document.hidden) return;
       if (!this.userMoved && !reduce) {
         const wt = (now - start) / 1000;
-        this.mouse.tx = 0.5 + Math.sin(wt * 0.24) * 0.16;
-        this.mouse.ty = 0.42 + Math.cos(wt * 0.19) * 0.12;
+        this.mouse.tx = 0.5 + Math.sin(wt * 0.45) * 0.16;
+        this.mouse.ty = 0.42 + Math.cos(wt * 0.35) * 0.12;
       }
       const ease = 0.055;
       this.mouse.x += (this.mouse.tx - this.mouse.x) * ease;
@@ -473,7 +473,7 @@ class Component extends DCLogic {
       gl.uniform2f(this.u.mouse, live ? this.mouse.x : ax, live ? this.mouse.y : ay);
       gl.uniform1f(this.u.glow, (this.props.glowStrength ?? 1) * (live ? 1 : 0.85));
       gl.uniform1f(this.u.hue, this.props.hueShift ?? 0);
-      gl.uniform2f(this.u.anchor, ax, ay);
+      gl.uniform2f(this.u.anchor, live ? this.mouse.x : ax, live ? this.mouse.y : ay);
       gl.uniform1f(this.u.size, this.props.plumeSize ?? 1);
       gl.uniform1f(this.u.dark, this.props.blackLevel ?? 1);
       gl.drawArrays(gl.TRIANGLES, 0, 3);

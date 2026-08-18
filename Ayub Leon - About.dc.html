@@ -512,7 +512,7 @@ class Component extends DCLogic {
       '  float d = fbm(w * 1.2 + vec2(t * 0.5, 0.0));',
       '  float core = exp(-length(st - mo) * 2.6) * 0.85;',
       '  float topGuard = 1.0 - smoothstep(0.30, 0.50, st.y) * 0.40;',
-      '  float e = (d * 1.35 + core * 1.50) * mix(0.42, 1.42, smoothstep(-0.38, 0.42, st.y)) * topGuard;',
+      '  float e = (d * 1.35 + core * 1.50) * mix(0.72, 1.35, smoothstep(-0.55, 0.42, st.y)) * topGuard;',
       '  float m1 = smoothstep(0.42, 1.12, e);',
       '  float m2 = smoothstep(0.74, 1.40, e);',
       '  float m3 = smoothstep(1.02, 1.64, e);',
@@ -573,8 +573,8 @@ class Component extends DCLogic {
       if (r.bottom < -100) return;
       if (!this.userMoved && !reduce) {
         const wt = (now - start) / 1000;
-        this.mouse.tx = 0.55 + Math.sin(wt * 0.24) * 0.14;
-        this.mouse.ty = 0.45 + Math.cos(wt * 0.19) * 0.25;
+        this.mouse.tx = 0.55 + Math.sin(wt * 0.45) * 0.14;
+        this.mouse.ty = 0.30 + Math.cos(wt * 0.35) * 0.35;
       }
       this.mouse.x += (this.mouse.tx - this.mouse.x) * 0.05;
       this.mouse.y += (this.mouse.ty - this.mouse.y) * 0.05;
