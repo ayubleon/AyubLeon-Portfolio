@@ -376,7 +376,7 @@ class Component extends DCLogic {
       '  w += (mo - st) * 0.22;',
       '  float d = fbm(w * 1.35 + vec2(t * 0.6, -t * 0.4));',
       '  float md = length(st - mo);',
-      '  float core = exp(-md * 2.35) * u_glow;',
+      '  float core = exp(-md * 3.8) * u_glow;',
       '  vec2 anc = vec2((u_anchor.x - 0.5) * asp, u_anchor.y - 0.5);',
       '  vec2 dr = anc + vec2(sin(u_time * 0.11) * 0.10, cos(u_time * 0.09) * 0.07);',
       '  float amb = exp(-length(st - dr) * (2.1 / max(u_size, 0.2))) * 0.85;',
