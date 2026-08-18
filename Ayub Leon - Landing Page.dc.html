@@ -68,12 +68,7 @@
     .work-media { display: none !important; }
     .nav-pill { width: calc(100% - 32px) !important; }
     .mobile-gutter { padding-left: 16px !important; padding-right: 16px !important; }
-    [data-work-section] { height: auto !important; }
-    [data-work-pin] { position: static !important; height: auto !important; overflow: visible !important; }
-    [data-work-viewport] { height: 74svh !important; overflow-y: auto !important; scroll-snap-type: y mandatory !important; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-    [data-work-viewport]::-webkit-scrollbar { display: none; }
-    [data-work-list] { position: static !important; top: auto !important; transform: none !important; padding: 55px 0 !important; }
-    [data-work-row] { scroll-snap-align: center; scroll-snap-stop: always; }
+    [data-work-viewport] { height: 74svh !important; }
     .work-row-thumb { display: block !important; margin-top: 14px !important; }
   }
 </style>
@@ -369,7 +364,6 @@ class Component extends DCLogic {
     this.unclipTimer = setTimeout(() => this.unclipHeroMasks(), 2000);
     this.initNavToggle();
     this.initWork();
-    this.initWorkMobileSnap();
     const canvas = this.canvasRef.current;
     if (!canvas) return;
     const gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'high-performance' });
@@ -555,14 +549,15 @@ class Component extends DCLogic {
     this.initHashJump();
     const section = document.querySelector('[data-work-section]');
     const list = document.querySelector('[data-work-list]');
+    const viewport = document.querySelector('[data-work-viewport]');
     if (!section || !list) return;
-    if (window.innerWidth <= 700) return; // mobile uses its own snap-scroll carousel, see initWorkMobileSnap
     const rows = Array.from(section.querySelectorAll('[data-work-row]'));
     const panels = Array.from(section.querySelectorAll('[data-work-panel]'));
     const dots = Array.from(section.querySelectorAll('[data-work-dot]'));
     const counter = section.querySelector('[data-work-counter]');
     const n = rows.length;
-    let current = -1, queued = false;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let current = -1, queued = false, settling = false, settleTimer = null, settleClearTimer = null;
 
     const paint = () => {
       queued = false;
@@ -575,6 +570,16 @@ class Component extends DCLogic {
       const centerOf = (el) => el.offsetTop + el.offsetHeight / 2;
       const y = centerOf(rows[lo]) + (centerOf(rows[hi]) - centerOf(rows[lo])) * t;
       list.style.transform = 'translate3d(0,' + (-y).toFixed(2) + 'px,0)';
+
+      // subtle concave squeeze as each row nears the top/bottom of the masked
+      // viewport on mobile, so the reveal reads as curved rather than a flat scroll
+      if (viewport && window.innerWidth <= 700) {
+        const half = viewport.offsetHeight / 2 || 1;
+        rows.forEach((r) => {
+          const dist = Math.min(Math.abs(centerOf(r) - y) / half, 1);
+          r.style.transform = 'scaleX(' + (1 - 0.20 * dist * dist).toFixed(4) + ')';
+        });
+      }
 
       if (i !== current) {
         current = i;
@@ -601,57 +606,38 @@ class Component extends DCLogic {
       }
     };
 
-    this.onWorkScroll = () => { if (!queued) { queued = true; requestAnimationFrame(paint); } };
+    // mobile: once the user pauses mid-scroll, settle the whole page onto the
+    // nearest project — driven by window scroll (not a nested container), so it
+    // works no matter where on the screen the gesture started, and scrolling past
+    // the first/last project continues into the neighboring section naturally
+    const settleNow = () => {
+      settleTimer = null;
+      const rect = section.getBoundingClientRect();
+      const span = section.offsetHeight - window.innerHeight;
+      if (span <= 0) return;
+      const p = Math.min(Math.max(-rect.top / span, 0), 1);
+      if (p <= 0 || p >= 1) return; // already resting before/after the section, nothing to settle
+      const nearest = Math.round(p * (n - 1));
+      const targetY = section.offsetTop + (nearest / (n - 1)) * span;
+      if (Math.abs(targetY - window.scrollY) < 1) return;
+      settling = true;
+      window.scrollTo({ top: targetY, behavior: reduce ? 'auto' : 'smooth' });
+      clearTimeout(settleClearTimer);
+      settleClearTimer = setTimeout(() => { settling = false; }, 500);
+    };
+
+    this.onWorkScroll = () => {
+      if (!queued) { queued = true; requestAnimationFrame(paint); }
+      if (window.innerWidth <= 700 && !settling) {
+        clearTimeout(settleTimer);
+        settleTimer = setTimeout(settleNow, 140);
+      }
+    };
     window.addEventListener('scroll', this.onWorkScroll, { passive: true });
     window.addEventListener('resize', this.onWorkScroll);
     paint();
 
     return;
-  }
-
-  // mobile: each row is a native scroll-snap slide inside the masked viewport, so a
-  // single swipe advances cleanly to the next project instead of a continuous drag
-  initWorkMobileSnap() {
-    if (window.innerWidth > 700) return;
-    const viewport = document.querySelector('[data-work-viewport]');
-    const rows = Array.from(document.querySelectorAll('[data-work-row]'));
-    if (!viewport || !rows.length) return;
-    this.workSnapViewport = viewport;
-    let current = -1, queued = false;
-
-    const setActive = (i) => {
-      if (i === current) return;
-      current = i;
-      rows.forEach((r, ri) => {
-        const on = ri === i;
-        const q = (sel, c) => { const el = r.querySelector(sel); if (el) el.style.color = c; };
-        q('[data-row-title]', on ? '#ffffff' : 'rgba(255,255,255,0.24)');
-        q('[data-row-num]', on ? '#ffffff' : 'rgba(255,255,255,0.22)');
-        q('[data-row-desc]', on ? 'rgba(255,255,255,0.88)' : 'rgba(255,255,255,0.2)');
-        q('[data-row-meta]', on ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.16)');
-      });
-    };
-
-    const paint = () => {
-      queued = false;
-      const vr = viewport.getBoundingClientRect();
-      const centerY = vr.top + vr.height / 2;
-      const half = vr.height / 2 || 1;
-      let best = current < 0 ? 0 : current, bestDist = Infinity;
-      rows.forEach((r, ri) => {
-        const rr = r.getBoundingClientRect();
-        const d = (rr.top + rr.height / 2) - centerY;
-        const dist = Math.min(Math.abs(d) / half, 1);
-        r.style.transform = 'scaleX(' + (1 - 0.20 * dist * dist).toFixed(4) + ')';
-        if (Math.abs(d) < bestDist) { bestDist = Math.abs(d); best = ri; }
-      });
-      setActive(best);
-    };
-
-    this.onWorkSnapScroll = () => { if (!queued) { queued = true; requestAnimationFrame(paint); } };
-    viewport.addEventListener('scroll', this.onWorkSnapScroll, { passive: true });
-    window.addEventListener('resize', this.onWorkSnapScroll);
-    paint();
   }
 
   initWorkCards() {
@@ -726,8 +712,6 @@ class Component extends DCLogic {
     window.removeEventListener('touchmove', this.onMove);
     window.removeEventListener('scroll', this.onWorkScroll);
     window.removeEventListener('resize', this.onWorkScroll);
-    if (this.workSnapViewport) this.workSnapViewport.removeEventListener('scroll', this.onWorkSnapScroll);
-    window.removeEventListener('resize', this.onWorkSnapScroll);
     window.removeEventListener('resize', this.onNavResize);
   }
 }
