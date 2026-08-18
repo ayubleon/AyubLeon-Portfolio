@@ -459,8 +459,8 @@ class Component extends DCLogic {
       if (document.hidden) return;
       if (!this.userMoved && !reduce) {
         const wt = (now - start) / 1000;
-        this.mouse.tx = 0.5 + Math.sin(wt * 0.17) * 0.16;
-        this.mouse.ty = 0.42 + Math.cos(wt * 0.13) * 0.12;
+        this.mouse.tx = 0.5 + Math.sin(wt * 0.24) * 0.16;
+        this.mouse.ty = 0.42 + Math.cos(wt * 0.19) * 0.12;
       }
       const ease = 0.055;
       this.mouse.x += (this.mouse.tx - this.mouse.x) * ease;
