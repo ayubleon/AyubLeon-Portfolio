@@ -207,8 +207,24 @@ class Component extends DCLogic {
     window.addEventListener('resize', this.onNavResize);
   }
 
+  initMockupVideo() {
+    const video = document.querySelector('video[src*="kenyan-banking-mockup"]');
+    if (!video) return;
+    // the template renderer drops bare boolean attributes like `loop`/`muted` from
+    // this element, so they're set directly on the DOM node here instead
+    video.loop = true;
+    video.muted = true;
+    const resume = () => { if (!document.hidden && video.paused) video.play().catch(() => {}); };
+    video.addEventListener('pause', resume);
+    video.addEventListener('ended', () => { video.currentTime = 0; resume(); });
+    document.addEventListener('visibilitychange', resume);
+    this.onMockupVideoVisibility = resume;
+    resume();
+  }
+
   componentDidMount() {
     this.initNavToggle();
+    this.initMockupVideo();
     const canvas = this.canvasRef.current;
     if (!canvas) return;
     const gl = canvas.getContext('webgl', { antialias: false, alpha: true, powerPreference: 'low-power' });
@@ -307,6 +323,7 @@ class Component extends DCLogic {
     if (this.ro) this.ro.disconnect();
     window.removeEventListener('pointermove', this.onMove);
     window.removeEventListener('resize', this.onNavResize);
+    if (this.onMockupVideoVisibility) document.removeEventListener('visibilitychange', this.onMockupVideoVisibility);
   }
 }
 
