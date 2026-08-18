@@ -78,6 +78,7 @@
   <canvas ref="{{ canvasRef }}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100svh; display: block;"></canvas>
   <div style="position: absolute; top: 0; left: 0; right: 0; height: 100svh; pointer-events: none; background: radial-gradient(120% 90% at 18% 92%, rgba(4,3,3,0.92) 0%, rgba(4,3,3,0.45) 38%, rgba(0,0,0,0) 68%);"></div>
   <div style="position: absolute; top: 0; left: 0; right: 0; height: 100svh; pointer-events: none; background: radial-gradient(58% 40% at 50% 47%, rgba(5,4,4,0.82) 0%, rgba(5,4,4,0.58) 45%, rgba(5,4,4,0) 76%);"></div>
+  <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 22svh; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, #000000 100%);"></div>
 
   <div ref="{{ toastRef }}" role="status" aria-live="polite" style="position: fixed; left: 50%; bottom: 34px; z-index: 60; padding: 1.6px; border-radius: 999px; overflow: hidden; isolation: isolate; box-shadow: 0 30px 70px -26px rgba(0,0,0,0.98); opacity: 0; transform: translate(-50%, 18px); pointer-events: none; transition: opacity .45s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.22,1,.36,1);">
     <div aria-hidden="true" style="position: absolute; left: 50%; top: 50%; width: 260%; aspect-ratio: 1; background: conic-gradient(from 0deg, rgba(255,255,255,0) 0deg, rgba(255,255,255,0) 200deg, #ff5a2b 292deg, #ffd0b8 330deg, #ffffff 348deg, rgba(255,255,255,0) 360deg); animation: alSpin 2.6s linear infinite;"></div>
@@ -399,7 +400,7 @@ class Component extends DCLogic {
       '  float m1 = smoothstep(0.60, 1.36, e);',
       '  float m2 = smoothstep(0.96, 1.62, e);',
       '  float m3 = smoothstep(1.26, 1.86, e);',
-      '  vec3 base = vec3(0.022, 0.018, 0.019);',
+      '  vec3 base = vec3(0.006, 0.005, 0.005);',
       '  vec3 deep = hueShift(vec3(0.30, 0.021, 0.075), u_hue);',
       '  vec3 mid  = hueShift(vec3(0.86, 0.10, 0.035), u_hue);',
       '  vec3 hot  = hueShift(vec3(1.00, 0.42, 0.20), u_hue);',

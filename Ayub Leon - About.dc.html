@@ -126,7 +126,7 @@
   <main>
   <section id="top" class="mobile-gutter" style="position: relative; padding: 132px 40px 0; max-width: 1400px; margin: 0 auto;">
     <canvas ref="{{ canvasRef }}" style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100vw; height: 100%; display: block;"></canvas>
-    <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100vw; bottom: 0; pointer-events: none; background: linear-gradient(180deg, rgba(6,5,5,0) 0%, rgba(6,5,5,0) 52%, rgba(6,5,5,0.55) 78%, #060505 100%);"></div>
+    <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100vw; bottom: 0; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 52%, rgba(0,0,0,0.55) 78%, #000000 100%);"></div>
 
     <p style="position: relative; margin: 0 0 64px; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: none; color: #FFFFFF; text-shadow: 0 1px 18px rgba(4,2,2,0.8)">Get to know me …</p>
 
@@ -495,7 +495,7 @@ class Component extends DCLogic {
     const canvas = this.canvasRef.current;
     if (!canvas) return;
     const gl = canvas.getContext('webgl', { antialias: false, alpha: true, powerPreference: 'low-power' });
-    if (!gl) { canvas.style.background = 'radial-gradient(70% 90% at 62% 0%, #b81c0c 0%, #4a0b12 40%, rgba(6,5,5,0) 75%)'; return; }
+    if (!gl) { canvas.style.background = 'radial-gradient(70% 90% at 62% 0%, #b81c0c 0%, #4a0b12 40%, rgba(0,0,0,0) 75%)'; return; }
     const vs = 'attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }';
     const fs = [
       'precision highp float;',
@@ -519,7 +519,7 @@ class Component extends DCLogic {
       '  float m1 = smoothstep(0.42, 1.12, e);',
       '  float m2 = smoothstep(0.74, 1.40, e);',
       '  float m3 = smoothstep(1.02, 1.64, e);',
-      '  vec3 col = vec3(0.024, 0.019, 0.020);',
+      '  vec3 col = vec3(0.006, 0.005, 0.005);',
       '  col = mix(col, vec3(0.28, 0.020, 0.070), m1);',
       '  col = mix(col, vec3(0.84, 0.11, 0.038), m2 * 0.94);',
       '  col = mix(col, vec3(1.0, 0.40, 0.19), m3 * 0.85);',
