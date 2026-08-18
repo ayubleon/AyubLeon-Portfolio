@@ -68,6 +68,8 @@
     .work-media { display: none !important; }
     .nav-pill { width: calc(100% - 32px) !important; }
     .mobile-gutter { padding-left: 16px !important; padding-right: 16px !important; }
+    [data-work-viewport] { height: 74svh !important; }
+    .work-row-thumb { display: block !important; margin-top: 14px !important; }
   }
 </style>
 </helmet>
@@ -145,7 +147,7 @@
   </div>
 
   <section id="work" data-work-section="1" style="position: relative; z-index: 10; height: 280vh;">
-    <div class="mobile-gutter" style="position: sticky; top: 0; height: 100svh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 40px; max-width: 1400px; margin: 0 auto; padding: 96px 40px 56px;">
+    <div class="mobile-gutter" data-work-pin="1" style="position: sticky; top: 0; height: 100svh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 40px; max-width: 1400px; margin: 0 auto; padding: 96px 40px 56px;">
       <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;">
         <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.7rem, 3.2vw, 2.6rem); font-weight: 700; letter-spacing: -0.04em; color: #f6f0ed;">Featured work</h2>
 
@@ -154,37 +156,49 @@
       <div class="work-grid" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.02fr); gap: 60px; align-items: center;">
         <div data-work-viewport="1" style="position: relative; height: 56svh; overflow: hidden; -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0) 0%, #000 20%, #000 80%, rgba(0,0,0,0) 100%); mask-image: linear-gradient(180deg, rgba(0,0,0,0) 0%, #000 20%, #000 80%, rgba(0,0,0,0) 100%);">
           <div data-work-list="1" style="position: absolute; top: 50%; left: 0; right: 0; display: flex; flex-direction: column; will-change: transform;">
-          <a data-work-row="0" href="BuzzIQ.dc.html" style="display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 26px; align-items: center; padding: 30px 0; color: inherit; text-decoration: none;">
+          <a data-work-row="0" href="BuzzIQ.dc.html" style="display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 14px; align-items: center; padding: 30px 0; color: inherit; text-decoration: none;">
             <span data-row-num="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: rgba(255,255,255,0.22); transition: color .55s cubic-bezier(.22,1,.36,1);">01</span>
             <span style="display: flex; flex-direction: column; gap: 10px;">
               <span data-row-title="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.5rem, 2.4vw, 2.1rem); font-weight: 600; letter-spacing: -0.032em; color: rgba(255,255,255,0.24); transition: color .55s cubic-bezier(.22,1,.36,1);">BuzzIQ</span>
               <span data-row-desc="1" style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 15.5px; line-height: 1.5; color: rgba(255,255,255,0.2); transition: color .55s cubic-bezier(.22,1,.36,1); text-wrap: pretty;">TikTok Shop intelligence platform built to scale creator commerce</span>
               <span data-row-meta="1" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 13.5px; color: rgba(255,255,255,0.16); transition: color .55s cubic-bezier(.22,1,.36,1);"><span>Sole Product Designer</span><span>2025 – 2026</span></span>
             </span>
+            <div class="work-row-thumb" style="grid-column: 1 / -1; display: none; margin-top: 6px; border-radius: 16px; overflow: hidden; aspect-ratio: 16 / 10.4; background: #f4f2f0;">
+              <img src="images/work-buzziq.png" alt="BuzzIQ dashboard and creator detail screens" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+            </div>
           </a>
-          <a data-work-row="1" href="Danadana.dc.html" style="display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 26px; align-items: center; padding: 30px 0; color: inherit; text-decoration: none;">
+          <a data-work-row="1" href="Danadana.dc.html" style="display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 14px; align-items: center; padding: 30px 0; color: inherit; text-decoration: none;">
             <span data-row-num="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: rgba(255,255,255,0.22); transition: color .55s cubic-bezier(.22,1,.36,1);">02</span>
             <span style="display: flex; flex-direction: column; gap: 10px;">
               <span data-row-title="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.5rem, 2.4vw, 2.1rem); font-weight: 600; letter-spacing: -0.032em; color: rgba(255,255,255,0.24); transition: color .55s cubic-bezier(.22,1,.36,1);">Danadana</span>
               <span data-row-desc="1" style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 15.5px; line-height: 1.5; color: rgba(255,255,255,0.2); transition: color .55s cubic-bezier(.22,1,.36,1); text-wrap: pretty;">A crash betting game engineered for high-frequency engagement</span>
               <span data-row-meta="1" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 13.5px; color: rgba(255,255,255,0.16); transition: color .55s cubic-bezier(.22,1,.36,1);"><span>Product Designer</span><span>2024 – 2025</span></span>
             </span>
+            <div class="work-row-thumb" style="grid-column: 1 / -1; display: none; margin-top: 6px; border-radius: 16px; overflow: hidden; aspect-ratio: 16 / 10.4; background: #f4f2f0;">
+              <img src="images/work-danadana.png" alt="Danadana brand key visual" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+            </div>
           </a>
-          <a data-work-row="2" href="Unified Design System.dc.html" style="display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 26px; align-items: center; padding: 30px 0; color: inherit; text-decoration: none;">
+          <a data-work-row="2" href="Unified Design System.dc.html" style="display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 14px; align-items: center; padding: 30px 0; color: inherit; text-decoration: none;">
             <span data-row-num="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: rgba(255,255,255,0.22); transition: color .55s cubic-bezier(.22,1,.36,1);">03</span>
             <span style="display: flex; flex-direction: column; gap: 10px;">
               <span data-row-title="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.5rem, 2.4vw, 2.1rem); font-weight: 600; letter-spacing: -0.032em; color: rgba(255,255,255,0.24); transition: color .55s cubic-bezier(.22,1,.36,1);">Unified Design System</span>
               <span data-row-desc="1" style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 15.5px; line-height: 1.5; color: rgba(255,255,255,0.2); transition: color .55s cubic-bezier(.22,1,.36,1); text-wrap: pretty;">A scalable component framework based on Shad.cn</span>
               <span data-row-meta="1" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 13.5px; color: rgba(255,255,255,0.16); transition: color .55s cubic-bezier(.22,1,.36,1);"><span>Systems Product Designer</span><span>2024 – Present</span></span>
             </span>
+            <div class="work-row-thumb" style="grid-column: 1 / -1; display: none; margin-top: 6px; border-radius: 16px; overflow: hidden; aspect-ratio: 16 / 10.4; background: #f4f2f0;">
+              <img src="images/work-design-system.png" alt="Component documentation pages in light and dark" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+            </div>
           </a>
-          <a data-work-row="3" href="Kenyan Banking Redesign.dc.html" style="display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 26px; align-items: center; padding: 30px 0; color: inherit; text-decoration: none;">
+          <a data-work-row="3" href="Kenyan Banking Redesign.dc.html" style="display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 14px; align-items: center; padding: 30px 0; color: inherit; text-decoration: none;">
             <span data-row-num="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: rgba(255,255,255,0.22); transition: color .55s cubic-bezier(.22,1,.36,1);">04</span>
             <span style="display: flex; flex-direction: column; gap: 10px;">
               <span data-row-title="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.5rem, 2.4vw, 2.1rem); font-weight: 600; letter-spacing: -0.032em; color: rgba(255,255,255,0.24); transition: color .55s cubic-bezier(.22,1,.36,1);">Kenyan Banking Redesign</span>
               <span data-row-desc="1" style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 15.5px; line-height: 1.5; color: rgba(255,255,255,0.2); transition: color .55s cubic-bezier(.22,1,.36,1); text-wrap: pretty;">Overhauling digital banking friction across four major regional apps</span>
               <span data-row-meta="1" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 13.5px; color: rgba(255,255,255,0.16); transition: color .55s cubic-bezier(.22,1,.36,1);"><span>Product Designer</span><span>2025</span></span>
             </span>
+            <div class="work-row-thumb" style="grid-column: 1 / -1; display: none; margin-top: 6px; border-radius: 16px; overflow: hidden; aspect-ratio: 16 / 10.4; background: #f4f2f0;">
+              <img src="images/work-banking.png" alt="Banking app home and card management screens" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+            </div>
           </a>
           </div>
         </div>
