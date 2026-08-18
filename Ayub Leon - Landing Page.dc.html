@@ -371,7 +371,7 @@ class Component extends DCLogic {
       '  float asp = u_res.x / u_res.y;',
       '  vec2 st = vec2((uv.x - 0.5) * asp, uv.y - 0.5);',
       '  vec2 mo = vec2((u_mouse.x - 0.5) * asp, u_mouse.y - 0.5);',
-      '  float t = u_time * 0.09;',
+      '  float t = u_time * 0.15;',
       '  vec2 w = st * 1.15 + vec2(fbm(st * 1.4 + vec2(t, -t * 0.7)), fbm(st * 1.4 + vec2(4.3 - t, t * 0.9))) * 0.85;',
       '  w += (mo - st) * 0.22;',
       '  float d = fbm(w * 1.35 + vec2(t * 0.6, -t * 0.4));',
