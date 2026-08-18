@@ -606,6 +606,32 @@ class Component extends DCLogic {
       }
     };
 
+    // native scrollTo({behavior:'smooth'}) has a fixed, non-tunable easing curve that
+    // visibly clashes with touch momentum on mobile; a hand-rolled tween stays smooth
+    // regardless of distance and can be interrupted cleanly if the user grabs the page again
+    let settleRaf = null;
+    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+    const animateScrollTo = (targetY) => {
+      if (settleRaf) cancelAnimationFrame(settleRaf);
+      const startY = window.scrollY;
+      const delta = targetY - startY;
+      const duration = 420;
+      const startTime = performance.now();
+      settling = true;
+      const step = (now) => {
+        const t = Math.min((now - startTime) / duration, 1);
+        window.scrollTo(0, startY + delta * easeOutCubic(t));
+        if (t < 1) {
+          settleRaf = requestAnimationFrame(step);
+        } else {
+          settleRaf = null;
+          clearTimeout(settleClearTimer);
+          settleClearTimer = setTimeout(() => { settling = false; }, 60);
+        }
+      };
+      settleRaf = requestAnimationFrame(step);
+    };
+
     // mobile: once the user pauses mid-scroll, settle the whole page onto the
     // nearest project — driven by window scroll (not a nested container), so it
     // works no matter where on the screen the gesture started, and scrolling past
@@ -620,10 +646,8 @@ class Component extends DCLogic {
       const nearest = Math.round(p * (n - 1));
       const targetY = section.offsetTop + (nearest / (n - 1)) * span;
       if (Math.abs(targetY - window.scrollY) < 1) return;
-      settling = true;
-      window.scrollTo({ top: targetY, behavior: reduce ? 'auto' : 'smooth' });
-      clearTimeout(settleClearTimer);
-      settleClearTimer = setTimeout(() => { settling = false; }, 500);
+      if (reduce) { window.scrollTo(0, targetY); return; }
+      animateScrollTo(targetY);
     };
 
     this.onWorkScroll = () => {
