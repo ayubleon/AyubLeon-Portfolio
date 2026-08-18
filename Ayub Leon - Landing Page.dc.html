@@ -443,6 +443,7 @@ class Component extends DCLogic {
     this.resize();
 
     this.onMove = (e) => {
+      this.userMoved = true;
       const r = canvas.getBoundingClientRect();
       const pt = e.touches ? e.touches[0] : e;
       this.mouse.tx = (pt.clientX - r.left) / r.width;
@@ -456,6 +457,11 @@ class Component extends DCLogic {
     const draw = (now) => {
       this.raf = requestAnimationFrame(draw);
       if (document.hidden) return;
+      if (!this.userMoved && !reduce) {
+        const wt = (now - start) / 1000;
+        this.mouse.tx = 0.5 + Math.sin(wt * 0.17) * 0.16;
+        this.mouse.ty = 0.42 + Math.cos(wt * 0.13) * 0.12;
+      }
       const ease = 0.055;
       this.mouse.x += (this.mouse.tx - this.mouse.x) * ease;
       this.mouse.y += (this.mouse.ty - this.mouse.y) * ease;

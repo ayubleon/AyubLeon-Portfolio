@@ -277,17 +277,24 @@ class Component extends DCLogic {
     this.ro.observe(canvas);
     resize();
     this.onMove = (e) => {
+      this.userMoved = true;
       const r = canvas.getBoundingClientRect();
       this.mouse.tx = (e.clientX - r.left) / r.width;
       this.mouse.ty = 1 - (e.clientY - r.top) / r.height;
     };
     window.addEventListener('pointermove', this.onMove, { passive: true });
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const start = performance.now();
     const draw = (now) => {
       this.raf = requestAnimationFrame(draw);
       if (document.hidden) return;
       const r = canvas.getBoundingClientRect();
       if (r.bottom < -100) return;
+      if (!this.userMoved && !reduce) {
+        const wt = (now - start) / 1000;
+        this.mouse.tx = 0.6 + Math.sin(wt * 0.17) * 0.14;
+        this.mouse.ty = 0.7 + Math.cos(wt * 0.13) * 0.10;
+      }
       this.mouse.x += (this.mouse.tx - this.mouse.x) * 0.05;
       this.mouse.y += (this.mouse.ty - this.mouse.y) * 0.05;
       gl.uniform2f(uRes, canvas.width, canvas.height);
