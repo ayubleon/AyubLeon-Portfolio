@@ -63,6 +63,7 @@
     .nav-pill { width: calc(100% - 32px) !important; }
     .mobile-gutter { padding-left: 16px !important; padding-right: 16px !important; }
     .case-label-grid { grid-template-columns: 1fr !important; gap: 14px 0 !important; }
+    .case-split-grid { grid-template-columns: 1fr !important; gap: 56px 0 !important; }
     .case-figure-grid { grid-template-columns: 1fr !important; }
   }
 </style>
@@ -179,21 +180,15 @@
       </figure>
     </div>
 
-    <div class="case-label-grid" style="display: grid; grid-template-columns: minmax(0, 0.3fr) minmax(0, 1fr); gap: 40px 72px; margin: 96px 0 0;">
-      <div style="position: sticky; top: 120px; align-self: start;">
+    <div class="case-split-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px 72px; margin: 96px 0 0;">
+      <div style="display: flex; flex-direction: column; gap: 20px;">
         <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: none; color: #FAF2EE">The advantage</p>
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 20px; max-width: 68ch;">
         <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.2rem, 1.9vw, 1.55rem); font-weight: 500; line-height: 1.4; letter-spacing: -0.022em; color: #F8F8F8">The advantage that made it work</h2>
         <p style="margin: 0; font-size: 15.5px; line-height: 1.78; color: rgba(239,232,229,0.86); text-wrap: pretty;">IGNITEAMZ works directly with TikTok Shop creators, so we had a live feedback loop most projects don't get. We could run surveys and A/B tests with actual users, and creators told us directly what features mattered, what stood out, and what was missing. That fed straight back into the designs.</p>
       </div>
-    </div>
 
-    <div class="case-label-grid" style="display: grid; grid-template-columns: minmax(0, 0.3fr) minmax(0, 1fr); gap: 40px 72px; margin: 96px 0 0;">
-      <div style="position: sticky; top: 120px; align-self: start;">
+      <div style="display: flex; flex-direction: column; gap: 20px;">
         <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: none; color: #FAF2EE">Challenges</p>
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 40px; max-width: 68ch;">
         <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.2rem, 1.9vw, 1.55rem); font-weight: 500; line-height: 1.4; letter-spacing: -0.022em; color: #f4eeeb;">Navigating challenges &amp; quality control</h2>
         <div>
           <p style="margin: 0 0 12px; font-family: Poppins, Helvetica, sans-serif; font-size: 1.08rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Protecting system integrity</p>
@@ -208,7 +203,7 @@
 
     <figure style="margin: 96px 0 0; display: flex; flex-direction: column; gap: 12px;">
       <div style="position: relative; aspect-ratio: 1600 / 1144; border-radius: 12px; overflow: hidden; background: #0e0c0b; border: 1px solid rgba(255,255,255,0.07);">
-        <video src="images/buzziq-prototype.mp4" poster="images/buzziq-prototype-poster.jpg" autoplay playsinline preload="metadata" aria-label="High fidelity prototype for BuzzIQ" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block;"></video>
+        <video src="images/buzziq-prototype.mp4" poster="images/buzziq-prototype-poster.jpg" title="Prototype" autoplay playsinline preload="metadata" aria-label="High fidelity prototype for BuzzIQ" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block;"></video>
       </div>
       <figcaption style="margin: 0; font-family: Poppins, Helvetica, Arial, sans-serif; font-size: 11px; line-height: 1.6; letter-spacing: 0.02em; color: rgba(240,232,229,0.5);">03 — High fidelity prototype for BuzzIQ.</figcaption>
     </figure>
