@@ -1,5 +1,10 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/Ayub%20Leon%20-%20Landing%20Page.dc.html" }
+    { "source": "/", "destination": "/Ayub%20Leon%20-%20Landing%20Page.dc.html" },
+    { "source": "/about", "destination": "/Ayub%20Leon%20-%20About.dc.html" },
+    { "source": "/work/buzziq", "destination": "/BuzzIQ.dc.html" },
+    { "source": "/work/danadana", "destination": "/Danadana.dc.html" },
+    { "source": "/work/unified-design-system", "destination": "/Unified%20Design%20System.dc.html" },
+    { "source": "/work/kenyan-banking-redesign", "destination": "/Kenyan%20Banking%20Redesign.dc.html" }
   ]
 }
