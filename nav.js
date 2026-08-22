@@ -117,7 +117,7 @@
       else if (ready) ready.then(start);
     };
   }
-  var playWhoosh = makeSoundPlayer('sounds/whoosh.wav', 0.25);
+  var playWhoosh = makeSoundPlayer('sounds/whoosh.wav', 0.20);
   var playClick = makeSoundPlayer('sounds/click.mp3', 0.6);
 
   function copyEmail(e) {
