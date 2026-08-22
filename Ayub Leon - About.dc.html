@@ -74,9 +74,10 @@
   .photo-stack-card { cursor: grab; will-change: transform; backface-visibility: hidden; }
   .photo-stack-card:active { cursor: grabbing; }
   .photo-stack-wrap { display: none; }
-  .friend-cell { -webkit-tap-highlight-color: transparent; }
-  .friend-cell-fill { position: absolute; inset: 0; border-radius: 16px; background: rgba(255,255,255,0.12); opacity: 0; transform: scale(0.85); transition: opacity .3s ease, transform .5s cubic-bezier(.34,1.56,.64,1); z-index: 0; pointer-events: none; }
-  .friend-cell:hover .friend-cell-fill, .friend-cell:focus-visible .friend-cell-fill { opacity: 1; transform: scale(1); }
+  .friends-card { position: relative; background: #1C1C1E; border-radius: 24px; padding: 12px; overflow: hidden; }
+  .friends-grid { position: relative; z-index: 1; }
+  .friend-cell { position: relative; -webkit-tap-highlight-color: transparent; }
+  .friend-spotlight { position: absolute; left: 0; top: 0; width: 0; height: 0; border-radius: 16px; background: #2A2A2C; opacity: 0; pointer-events: none; z-index: 0; transition: opacity .3s ease; will-change: left, top, width, height, border-radius; }
   @media (max-width: 1100px) {
     .about-hero-grid { grid-template-columns: 1fr !important; justify-items: center; gap: 32px !important; }
     .about-hero-grid > div:first-child { align-items: center !important; text-align: center !important; }
@@ -227,31 +228,28 @@
   <section id="friends" class="mobile-gutter" style="max-width: 1400px; margin: 110px auto 0; padding: 0 40px 120px;">
     <div style="height: 1px; background: rgba(255,255,255,0.12);"></div>
     <p style="margin: 40px 0 32px; font-family: 'Gastroe', 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: clamp(1.8rem, 3.4vw, 2.6rem); color: #f6f0ed;">People I've built with</p>
-    <div style="background: rgba(255,255,255,0.05); border-radius: 24px; padding: 12px;">
+    <div class="friends-card">
+      <div class="friend-spotlight" aria-hidden="true"></div>
       <div class="friends-grid" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));">
         <a class="friend-cell" data-reveal="1" href="https://www.linkedin.com/in/nelsonkuria/" target="_blank" rel="noopener noreferrer" style="position: relative; display: flex; flex-direction: column; gap: 7px; padding: 22px 20px; border-radius: 16px; color: inherit;">
-          <span class="friend-cell-fill" aria-hidden="true"></span>
-          <p style="position: relative; z-index: 1; margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.02rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Nelson Kuria</p>
-          <p style="position: relative; z-index: 1; margin: 0; font-size: 13.5px; line-height: 1.4; color: rgba(239,232,229,0.66);">Backend Developer, PackCommerce · BuzzIQ</p>
-          <span style="position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 13.5px; color: rgba(238,230,227,0.86);">Linked In <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></span>
+          <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.02rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Nelson Kuria</p>
+          <p style="margin: 0; font-size: 13.5px; line-height: 1.4; color: rgba(239,232,229,0.66);">Backend Developer, PackCommerce · BuzzIQ</p>
+          <span style="display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 13.5px; color: rgba(238,230,227,0.86);">Linked In <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></span>
         </a>
         <a class="friend-cell" data-reveal="2" href="https://www.linkedin.com/in/harrison-sunda-2216261a1/" target="_blank" rel="noopener noreferrer" style="position: relative; display: flex; flex-direction: column; gap: 7px; padding: 22px 20px; border-radius: 16px; color: inherit;">
-          <span class="friend-cell-fill" aria-hidden="true"></span>
-          <p style="position: relative; z-index: 1; margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.02rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Harrison Sunda</p>
-          <p style="position: relative; z-index: 1; margin: 0; font-size: 13.5px; line-height: 1.4; color: rgba(239,232,229,0.66);">CEO & Backend Developer, Plexus Core · Danadana</p>
-          <span style="position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 13.5px; color: rgba(238,230,227,0.86);">Linked In <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></span>
+          <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.02rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Harrison Sunda</p>
+          <p style="margin: 0; font-size: 13.5px; line-height: 1.4; color: rgba(239,232,229,0.66);">CEO & Backend Developer, Plexus Core · Danadana</p>
+          <span style="display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 13.5px; color: rgba(238,230,227,0.86);">Linked In <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></span>
         </a>
         <a class="friend-cell" data-reveal="3" href="https://www.linkedin.com/in/abraham-nzau-1a8554106/" target="_blank" rel="noopener noreferrer" style="position: relative; display: flex; flex-direction: column; gap: 7px; padding: 22px 20px; border-radius: 16px; color: inherit;">
-          <span class="friend-cell-fill" aria-hidden="true"></span>
-          <p style="position: relative; z-index: 1; margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.02rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Abraham Nzau</p>
-          <p style="position: relative; z-index: 1; margin: 0; font-size: 13.5px; line-height: 1.4; color: rgba(239,232,229,0.66);">Backend Developer, UI/UX & dev sounding board</p>
-          <span style="position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 13.5px; color: rgba(238,230,227,0.86);">Linked In <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></span>
+          <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.02rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Abraham Nzau</p>
+          <p style="margin: 0; font-size: 13.5px; line-height: 1.4; color: rgba(239,232,229,0.66);">Backend Developer, UI/UX & dev sounding board</p>
+          <span style="display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 13.5px; color: rgba(238,230,227,0.86);">Linked In <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></span>
         </a>
         <a class="friend-cell" data-reveal="4" href="https://www.linkedin.com/in/maxwell-mwandigha-3077a3178/" target="_blank" rel="noopener noreferrer" style="position: relative; display: flex; flex-direction: column; gap: 7px; padding: 22px 20px; border-radius: 16px; color: inherit;">
-          <span class="friend-cell-fill" aria-hidden="true"></span>
-          <p style="position: relative; z-index: 1; margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.02rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Maxwell Mwandigha</p>
-          <p style="position: relative; z-index: 1; margin: 0; font-size: 13.5px; line-height: 1.4; color: rgba(239,232,229,0.66);">Software Engineer, UI/UX & dev sounding board</p>
-          <span style="position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 13.5px; color: rgba(238,230,227,0.86);">Linked In <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></span>
+          <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.02rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Maxwell Mwandigha</p>
+          <p style="margin: 0; font-size: 13.5px; line-height: 1.4; color: rgba(239,232,229,0.66);">Software Engineer, UI/UX & dev sounding board</p>
+          <span style="display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 13.5px; color: rgba(238,230,227,0.86);">Linked In <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></span>
         </a>
       </div>
     </div>
@@ -401,6 +399,90 @@ class Component extends DCLogic {
     this.initPhotoStack();
     this.initReveals();
     this.initParallax();
+    this.initFriendSpotlight();
+  }
+
+  initFriendSpotlight() {
+    const card = document.querySelector('.friends-card');
+    const spotlight = document.querySelector('.friend-spotlight');
+    const cells = Array.from(document.querySelectorAll('.friend-cell'));
+    if (!card || !spotlight || !cells.length) return;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+    let active = false;
+
+    card.addEventListener('mouseleave', () => {
+      active = false;
+      spotlight.style.opacity = '0';
+    });
+
+    const spring = {
+      left: 0, top: 0, width: 0, height: 0,
+      vLeft: 0, vTop: 0, vWidth: 0, vHeight: 0,
+      tLeft: 0, tTop: 0, tWidth: 0, tHeight: 0,
+    };
+    const STIFFNESS = 0.18;
+    const DAMPING = 0.72;
+    let springRaf = null;
+
+    const springTick = () => {
+      let settled = true;
+      ['Left', 'Top', 'Width', 'Height'].forEach((k) => {
+        const key = k.charAt(0).toLowerCase() + k.slice(1);
+        const vKey = 'v' + k;
+        const tKey = 't' + k;
+        spring[vKey] = (spring[vKey] + (spring[tKey] - spring[key]) * STIFFNESS) * DAMPING;
+        spring[key] += spring[vKey];
+        if (Math.abs(spring[vKey]) > 0.05 || Math.abs(spring[tKey] - spring[key]) > 0.3) settled = false;
+      });
+      const dist = Math.abs(spring.tLeft - spring.left) + Math.abs(spring.tTop - spring.top) +
+        Math.abs(spring.tWidth - spring.width) + Math.abs(spring.tHeight - spring.height);
+      spotlight.style.left = spring.left + 'px';
+      spotlight.style.top = spring.top + 'px';
+      spotlight.style.width = Math.max(spring.width, 0) + 'px';
+      spotlight.style.height = Math.max(spring.height, 0) + 'px';
+      spotlight.style.borderRadius = Math.min(16 + dist * 0.14, 44) + 'px';
+      if (!settled) {
+        springRaf = requestAnimationFrame(springTick);
+      } else {
+        springRaf = null;
+        spotlight.style.borderRadius = '16px';
+      }
+    };
+
+    const moveSpotlight = (cell, corner) => {
+      const cardRect = card.getBoundingClientRect();
+      const r = cell.getBoundingClientRect();
+      const box = { left: r.left - cardRect.left, top: r.top - cardRect.top, width: r.width, height: r.height };
+      if (corner) {
+        spring.left = corner.x; spring.top = corner.y; spring.width = 0; spring.height = 0;
+        spring.vLeft = spring.vTop = spring.vWidth = spring.vHeight = 0;
+        spotlight.style.left = spring.left + 'px';
+        spotlight.style.top = spring.top + 'px';
+        spotlight.style.width = '0px';
+        spotlight.style.height = '0px';
+      }
+      spring.tLeft = box.left; spring.tTop = box.top; spring.tWidth = box.width; spring.tHeight = box.height;
+      spotlight.style.opacity = '1';
+      if (!springRaf) springRaf = requestAnimationFrame(springTick);
+    };
+
+    cells.forEach((cell) => {
+      cell.addEventListener('mouseenter', (e) => {
+        if (!active) {
+          const r = cell.getBoundingClientRect();
+          const cardRect = card.getBoundingClientRect();
+          const nearRight = (e.clientX - r.left) > r.width / 2;
+          const nearBottom = (e.clientY - r.top) > r.height / 2;
+          const cornerX = (r.left - cardRect.left) + (nearRight ? r.width : 0);
+          const cornerY = (r.top - cardRect.top) + (nearBottom ? r.height : 0);
+          moveSpotlight(cell, { x: cornerX, y: cornerY });
+          active = true;
+        } else {
+          moveSpotlight(cell, null);
+        }
+      });
+    });
   }
 
   initReveals() {
