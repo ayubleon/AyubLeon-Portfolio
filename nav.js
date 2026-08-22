@@ -81,12 +81,29 @@
     };
   })();
 
-  // fresh Audio instance per play (rather than one shared, rewound
-  // instance) so a rapid open/close doesn't cut the previous whoosh off
+  // plain `new Audio().play()` re-fetches/decodes the file on every call,
+  // which on mobile is slow enough to land audibly behind the animation —
+  // decode once into an AudioBuffer up front so playback is just scheduling
+  // a buffer source, which starts with near-zero latency
+  var AudioCtx = window.AudioContext || window.webkitAudioContext;
+  var audioCtx = AudioCtx ? new AudioCtx() : null;
+  var whooshBuffer = null;
+  if (audioCtx) {
+    fetch('sounds/whoosh.wav')
+      .then(function (r) { return r.arrayBuffer(); })
+      .then(function (data) { return audioCtx.decodeAudioData(data); })
+      .then(function (buf) { whooshBuffer = buf; })
+      .catch(function () {});
+  }
   function playWhoosh() {
-    var audio = new Audio('sounds/whoosh.wav');
-    audio.volume = 0.55;
-    audio.play().catch(function () {});
+    if (!audioCtx || !whooshBuffer) return;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    var src = audioCtx.createBufferSource();
+    src.buffer = whooshBuffer;
+    var gain = audioCtx.createGain();
+    gain.gain.value = 0.55;
+    src.connect(gain).connect(audioCtx.destination);
+    src.start(0);
   }
 
   function copyEmail(e) {
