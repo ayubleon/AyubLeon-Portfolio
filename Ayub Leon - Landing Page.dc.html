@@ -19,6 +19,7 @@
 <link rel="preload" as="script" href="./support.js">
 <script src="./support.js" defer></script>
 <script src="footer.js" defer></script>
+<script src="nav.js" defer></script>
 </head>
 <body>
 <x-dc>
@@ -39,35 +40,11 @@
   ::selection { background: #ff3b12; color: #0a0606; }
   @keyframes alRise { from { transform: translate3d(0, 110%, 0) rotate(1.2deg); } to { transform: translate3d(0,0,0) rotate(0deg); } }
   @keyframes alFade { from { opacity: 0; transform: translate3d(0, 14px, 0); } to { opacity: 1; transform: none; } }
-  @keyframes alNav { from { opacity: 0; transform: translate(-50%, -18px); } to { opacity: 1; transform: translate(-50%, 0); } }
-  @keyframes alCue { 0%, 100% { transform: translateY(0); opacity: .55; } 50% { transform: translateY(5px); opacity: 1; } }
   @keyframes alSpin { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
-  .nav-toggle { display: none; align-items: center; justify-content: center; width: 38px; height: 38px; padding: 0; border: 0; border-radius: 999px; background: rgba(255,255,255,0.08); color: #f6efec; cursor: pointer; -webkit-tap-highlight-color: transparent; flex: 0 0 auto; }
-  .nav-toggle:hover { background: rgba(255,255,255,0.14); }
-  .nav-toggle-bars { position: relative; display: block; width: 17px; height: 1.5px; background: currentColor; transition: background .2s ease .12s; }
-  .nav-toggle-bars::before, .nav-toggle-bars::after { content: ''; position: absolute; left: 0; width: 17px; height: 1.5px; background: currentColor; transition: top .2s ease .12s, transform .25s cubic-bezier(.22,1,.36,1); }
-  .nav-toggle-bars::before { top: -5px; }
-  .nav-toggle-bars::after { top: 5px; }
-  .nav-toggle-bars.is-open { background: transparent; }
-  .nav-toggle-bars.is-open::before { top: 0; transform: rotate(45deg); }
-  .nav-toggle-bars.is-open::after { top: 0; transform: rotate(-45deg); }
-  .nav-wrap { border-radius: 999px; border: 1px solid rgba(255,255,255,0.13); background: rgba(28,14,12,0.22); backdrop-filter: blur(22px) saturate(1.6) brightness(0.78); -webkit-backdrop-filter: blur(22px) saturate(1.6) brightness(0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -1px 0 rgba(0,0,0,0.35), 0 22px 50px -28px rgba(0,0,0,0.9); overflow: hidden; transition: border-radius .4s cubic-bezier(.22,1,.36,1); }
-  .nav-wrap.is-open { border-radius: 28px; }
-  .nav-mobile { display: none; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .45s cubic-bezier(.22,1,.36,1), opacity .35s ease; }
-  .nav-mobile.is-open { grid-template-rows: 1fr; opacity: 1; }
-  .nav-mobile-inner { overflow: hidden; min-height: 0; display: flex; flex-direction: column; gap: 2px; padding: 0 10px; border-top: 0 solid rgba(255,255,255,0.1); transition: padding .3s ease, border-top-width .3s ease; }
-  .nav-mobile.is-open .nav-mobile-inner { padding: 6px 10px 10px; border-top-width: 1px; }
-  .nav-mobile a { padding: 13px 16px; border-radius: 12px; font-size: 15px; color: rgba(246,239,236,0.86); }
-  .nav-mobile a:hover { background: rgba(255,255,255,0.08); color: #fff; }
   @media (max-width: 700px) {
-    .nav-links { display: none !important; }
-    .nav-toggle { display: inline-flex !important; }
-    .nav-mobile { display: grid; }
-    .scroll-cue { display: none !important; }
     .work-grid { grid-template-columns: minmax(0, 1fr) !important; }
     .work-media { display: none !important; }
-    .nav-pill { width: calc(100% - 32px) !important; }
     .mobile-gutter { padding-left: 16px !important; padding-right: 16px !important; }
     [data-work-viewport] { height: 74svh !important; }
     .work-row-thumb { display: block !important; margin-top: 14px !important; }
@@ -81,35 +58,14 @@
   <div style="position: absolute; top: 0; left: 0; right: 0; height: 100svh; pointer-events: none; background: radial-gradient(58% 40% at 50% 47%, rgba(5,4,4,0.82) 0%, rgba(5,4,4,0.58) 45%, rgba(5,4,4,0) 76%);"></div>
   <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 32svh; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 65%, #000000 88%, #000000 100%);"></div>
 
-  <div ref="{{ toastRef }}" role="status" aria-live="polite" style="position: fixed; left: 50%; bottom: 34px; z-index: 60; padding: 1.6px; border-radius: 999px; overflow: hidden; isolation: isolate; box-shadow: 0 30px 70px -26px rgba(0,0,0,0.98); opacity: 0; transform: translate(-50%, 18px); pointer-events: none; transition: opacity .45s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.22,1,.36,1);">
-    <div aria-hidden="true" style="position: absolute; left: 50%; top: 50%; width: 260%; aspect-ratio: 1; background: conic-gradient(from 0deg, rgba(255,255,255,0) 0deg, rgba(255,255,255,0) 200deg, #ff5a2b 292deg, #ffd0b8 330deg, #ffffff 348deg, rgba(255,255,255,0) 360deg); animation: alSpin 2.6s linear infinite;"></div>
-    <div style="position: relative; display: flex; align-items: center; padding: 14px 24px; border-radius: 999px; background: #100908; font-family: 'Schibsted Grotesk', Helvetica, sans-serif; font-size: 14px; letter-spacing: -0.005em; color: #fdf9f7;">
+  <div ref="{{ toastRef }}" role="status" aria-live="polite" style="position: fixed; left: 50%; bottom: 92px; z-index: 60; padding: 1.6px; border-radius: 999px; overflow: hidden; isolation: isolate; box-shadow: 0 30px 70px -26px rgba(0,0,0,0.98); opacity: 0; transform: translate(-50%, 18px); pointer-events: none; transition: opacity .45s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.22,1,.36,1);">
+    <div aria-hidden="true" style="position: absolute; left: 50%; top: 50%; width: 260%; aspect-ratio: 1; background: conic-gradient(from 0deg, rgba(255,255,255,0) 0deg, rgba(255,255,255,0) 200deg, rgba(255,255,255,0.55) 292deg, rgba(255,255,255,0.92) 330deg, #ffffff 348deg, rgba(255,255,255,0) 360deg); animation: alSpin 2.6s linear infinite;"></div>
+    <div style="position: relative; display: flex; align-items: center; padding: 14px 24px; border-radius: 999px; background: #1C1C1E; font-family: 'Schibsted Grotesk', Helvetica, sans-serif; font-size: 14px; letter-spacing: -0.005em; color: #fdf9f7;">
       <span ref="{{ toastTextRef }}" style="font-family: Poppins">Copied to Clipboard</span>
     </div>
   </div>
 
-  <div class="nav-wrap nav-pill" style="position: fixed; top: 22px; left: 50%; transform: translateX(-50%); width: calc(100% - 48px); max-width: 1240px; z-index: 20; animation: alNav 1s cubic-bezier(.22,1,.36,1) .15s both;">
-    <nav style="display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 13px 14px 13px 24px;">
-      <a href="#top" style="font-size: 15px; font-weight: 500; letter-spacing: -0.01em; color: #f6efec; display: flex; align-items: center; gap: 9px;">
-        Ayub Leon
-      </a>
-      <div class="nav-links" style="display: flex; align-items: center; gap: 6px;">
-        <a href="#work" style="font-size: 13.5px; padding: 9px 16px; border-radius: 999px; color: rgba(246,239,236,0.78);" style-hover="background: rgba(255,255,255,0.09); color: #fff;">Work</a>
-        <a href="Ayub Leon - About.dc.html" style="font-size: 13.5px; padding: 9px 16px; border-radius: 999px; color: rgba(246,239,236,0.78);" style-hover="background: rgba(255,255,255,0.09); color: #fff;">About me</a>
-        <a href="#contact" style="font-size: 13.5px; padding: 9px 18px; border-radius: 999px; background: rgba(255,255,255,0.95); color: #120a08; font-weight: 500;" style-hover="background: #fff; color: #000;">Contact</a>
-      </div>
-      <button type="button" class="nav-toggle" data-nav-toggle="1" aria-label="Open menu" aria-expanded="false">
-        <span class="nav-toggle-bars" data-nav-bars="1" aria-hidden="true"></span>
-      </button>
-    </nav>
-    <div class="nav-mobile" data-nav-mobile="1">
-      <div class="nav-mobile-inner">
-        <a href="#work">Work</a>
-        <a href="Ayub Leon - About.dc.html">About me</a>
-        <a href="#contact">Contact</a>
-      </div>
-    </div>
-  </div>
+  <div data-nav-mount="1"></div>
 
   <main>
   <div id="top" class="mobile-gutter" style="position: relative; z-index: 10; min-height: 100svh; display: grid; grid-template-rows: 1fr auto; padding: 118px 24px 26px;">
@@ -131,20 +87,6 @@
           <span style="width: 34px; height: 1px; background: linear-gradient(270deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.45) 100%);"></span>
         </div>
       </div>
-    </div>
-
-    <div style="display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 14px 20px; min-width: 0; padding-top: 34px; border-top: 1px solid rgba(255,255,255,0.09); font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase; color: rgba(238,230,227,0.55); animation: alFade 1.2s cubic-bezier(.22,1,.36,1) 1.05s both;">
-      <span></span>
-      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; min-width: 0;">
-
-        <a href="mailto:ayubleon9@gmail.com" onClick="{{ copyEmail }}" style="letter-spacing: 0.13em; font-family: Poppins; text-transform: none" style-hover="color: #73C41E;">Email</a><span style="opacity: .3;">/</span>
-        <a href="https://www.linkedin.com/in/ayubleon" target="_blank" rel="noopener noreferrer" style="letter-spacing: 0.13em; font-family: Poppins; text-transform: none" style-hover="color: #73C41E;">LinkedIn</a>
-        <span style="opacity: .3;">/</span>
-        <a href="Ayub%20Leon%20-%20Resume.pdf" target="_blank" rel="noopener noreferrer" style="letter-spacing: 0.13em; font-family: Poppins; text-transform: none" style-hover="color: #73C41E;">Resume</a>
-        <span style="opacity: .3;">/</span>
-        <a href="https://www.behance.net/ayubleon" target="_blank" rel="noopener noreferrer" style="letter-spacing: 0.13em; font-family: Poppins; text-transform: none" style-hover="color: #73C41E;">Behance</a>
-      </div>
-      <span class="scroll-cue" style="display: flex; align-items: center; gap: 8px; text-transform: capitalize">Scroll <span style="display: inline-block; animation: alCue 2.2s ease-in-out infinite;">↓</span></span>
     </div>
   </div>
 
@@ -233,33 +175,6 @@
       </div>
     </div>
   </section>
-
-  <section id="contact" class="mobile-gutter" style="position: relative; z-index: 10; max-width: 1400px; margin: 0 auto; padding: 40px 40px 120px;">
-    <div class="mobile-gutter" style="display: flex; flex-direction: column; align-items: center; gap: 30px; padding: 96px 40px 104px; border-radius: 22px; border: 1px solid rgba(255,255,255,0.1); background: radial-gradient(120% 130% at 50% 118%, rgba(214,26,10,0.22) 0%, rgba(140,14,32,0.1) 42%, rgba(255,255,255,0.014) 74%); text-align: center;">
-      <h2 style="margin: 0; max-width: 22ch; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.7rem, 3.2vw, 2.6rem); font-weight: 700; line-height: 1.06; letter-spacing: -0.04em; color: #f8f2ef; text-wrap: balance;">Let's ship something real!</h2>
-      <p style="margin: 0; max-width: 62ch; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(15px, 1.3vw, 16.5px); line-height: 1.72; color: rgba(244,238,235,0.84); text-wrap: pretty;">I'm currently open to full-time roles, contract work, and high-impact product builds. If you need a designer who takes ownership from first sketch to final QA, let's talk.</p>
-
-      <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; margin-top: 10px;">
-        <a data-glass="1" href="mailto:ayubleon9@gmail.com" onClick="{{ copyEmail }}" style="position: relative; display: inline-flex; align-items: center; gap: 9px; padding: 11px 24px; border-radius: 999px; overflow: hidden; isolation: isolate; background: rgba(255,255,255,0.05); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.16), inset 0 1px 0 rgba(255,255,255,0.14); color: #f8f2ef; font-family: Poppins, Helvetica, sans-serif; font-size: 15px; font-weight: 500; letter-spacing: -0.005em;" style-hover="background: rgba(255,255,255,0.09);">
-          <span data-glass-shimmer="1" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 200px; height: 200px; margin: -100px 0 0 -100px; pointer-events: none; opacity: 0; transition: opacity .35s ease; background: radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.18) 38%, rgba(255,255,255,0) 66%);"></span>
-          <span data-glass-face="1" aria-hidden="true" style="position: absolute; inset: 1.2px; border-radius: 999px; background: rgba(14,9,8,0.86); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);"></span>
-          <span style="position: relative; display: inline-flex; align-items: center; gap: 9px;">Copy email</span>
-        </a>
-        <a data-glass="1" href="https://www.linkedin.com/in/ayubleon" target="_blank" rel="noopener noreferrer" style="position: relative; display: inline-flex; align-items: center; gap: 9px; padding: 11px 24px; border-radius: 999px; overflow: hidden; isolation: isolate; background: rgba(255,255,255,0.05); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.16), inset 0 1px 0 rgba(255,255,255,0.14); color: #f8f2ef; font-family: Poppins, Helvetica, sans-serif; font-size: 15px; font-weight: 500; letter-spacing: -0.005em;" style-hover="background: rgba(255,255,255,0.09);">
-          <span data-glass-shimmer="1" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 200px; height: 200px; margin: -100px 0 0 -100px; pointer-events: none; opacity: 0; transition: opacity .35s ease; background: radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.18) 38%, rgba(255,255,255,0) 66%);"></span>
-          <span data-glass-face="1" aria-hidden="true" style="position: absolute; inset: 1.2px; border-radius: 999px; background: rgba(14,9,8,0.86); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);"></span>
-          <span style="position: relative; display: inline-flex; align-items: center; gap: 9px;">LinkedIn <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></span>
-        </a>
-        <a data-glass="1" href="Ayub%20Leon%20-%20Resume.pdf" target="_blank" rel="noopener noreferrer" style="position: relative; display: inline-flex; align-items: center; gap: 9px; padding: 11px 24px; border-radius: 999px; overflow: hidden; isolation: isolate; background: rgba(255,255,255,0.05); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.16), inset 0 1px 0 rgba(255,255,255,0.14); color: #f8f2ef; font-family: Poppins, Helvetica, sans-serif; font-size: 15px; font-weight: 500; letter-spacing: -0.005em;" style-hover="background: rgba(255,255,255,0.09);">
-          <span data-glass-shimmer="1" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 200px; height: 200px; margin: -100px 0 0 -100px; pointer-events: none; opacity: 0; transition: opacity .35s ease; background: radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.18) 38%, rgba(255,255,255,0) 66%);"></span>
-          <span data-glass-face="1" aria-hidden="true" style="position: absolute; inset: 1.2px; border-radius: 999px; background: rgba(14,9,8,0.86); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);"></span>
-          <span style="position: relative; display: inline-flex; align-items: center; gap: 9px;">Resume <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></span>
-        </a>
-      </div>
-
-      <p style="margin: 8px 0 0; font-family: Poppins, Helvetica, sans-serif; font-size: 13.5px; color: rgba(244,238,235,0.5);">ayubleon9@gmail.com</p>
-    </div>
-  </section>
   </main>
   <div data-footer-mount="1"></div>
 </div>
@@ -344,28 +259,9 @@ class Component extends DCLogic {
     h1.querySelectorAll(':scope > span').forEach((mask) => { mask.style.overflow = 'visible'; });
   }
 
-  initNavToggle() {
-    const btn = document.querySelector('[data-nav-toggle]');
-    const bars = document.querySelector('[data-nav-bars]');
-    const panel = document.querySelector('[data-nav-mobile]');
-    const wrap = document.querySelector('.nav-wrap');
-    if (!btn || !panel) return;
-    const setOpen = (open) => {
-      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      if (bars) bars.classList.toggle('is-open', open);
-      if (wrap) wrap.classList.toggle('is-open', open);
-      panel.classList.toggle('is-open', open);
-    };
-    btn.addEventListener('click', () => setOpen(btn.getAttribute('aria-expanded') !== 'true'));
-    panel.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
-    this.onNavResize = () => { if (window.innerWidth > 700) setOpen(false); };
-    window.addEventListener('resize', this.onNavResize);
-  }
-
   componentDidMount() {
     this.applyFonts();
     this.unclipTimer = setTimeout(() => this.unclipHeroMasks(), 2000);
-    this.initNavToggle();
     this.initWork();
     const canvas = this.canvasRef.current;
     if (!canvas) return;
@@ -515,40 +411,7 @@ class Component extends DCLogic {
     window.addEventListener('hashchange', this.onHash);
   }
 
-  initGlass() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    document.querySelectorAll('[data-glass]').forEach((btn) => {
-      const sh = btn.querySelector('[data-glass-shimmer]');
-      if (!sh) return;
-      const p = { x: 0, y: 0, tx: 0, ty: 0 };
-      let raf = null, on = false;
-      const tick = () => {
-        p.x += (p.tx - p.x) * 0.2;
-        p.y += (p.ty - p.y) * 0.2;
-        sh.style.left = p.x + 'px';
-        sh.style.top = p.y + 'px';
-        if (on || Math.abs(p.tx - p.x) > 0.4) { raf = requestAnimationFrame(tick); } else { raf = null; }
-      };
-      btn.addEventListener('pointerenter', (e) => {
-        const r = btn.getBoundingClientRect();
-        p.x = p.tx = e.clientX - r.left;
-        p.y = p.ty = e.clientY - r.top;
-        on = true;
-        sh.style.opacity = '1';
-        if (!raf) raf = requestAnimationFrame(tick);
-      });
-      btn.addEventListener('pointermove', (e) => {
-        const r = btn.getBoundingClientRect();
-        p.tx = e.clientX - r.left;
-        p.ty = e.clientY - r.top;
-        if (!raf) raf = requestAnimationFrame(tick);
-      });
-      btn.addEventListener('pointerleave', () => { on = false; sh.style.opacity = '0'; });
-    });
-  }
-
   initWork() {
-    this.initGlass();
     this.initHashJump();
     const section = document.querySelector('[data-work-section]');
     const list = document.querySelector('[data-work-list]');
