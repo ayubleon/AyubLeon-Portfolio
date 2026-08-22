@@ -87,24 +87,38 @@
   // a buffer source, which starts with near-zero latency
   var AudioCtx = window.AudioContext || window.webkitAudioContext;
   var audioCtx = AudioCtx ? new AudioCtx() : null;
-  var whooshBuffer = null;
-  if (audioCtx) {
-    fetch('sounds/whoosh.wav')
-      .then(function (r) { return r.arrayBuffer(); })
-      .then(function (data) { return audioCtx.decodeAudioData(data); })
-      .then(function (buf) { whooshBuffer = buf; })
-      .catch(function () {});
+  function makeSoundPlayer(url, volume) {
+    var buffer = null;
+    var ready = null;
+    if (audioCtx) {
+      ready = fetch(url)
+        .then(function (r) { return r.arrayBuffer(); })
+        .then(function (data) { return audioCtx.decodeAudioData(data); })
+        .then(function (buf) { buffer = buf; })
+        .catch(function () {});
+    }
+    function start() {
+      if (!buffer) return;
+      var src = audioCtx.createBufferSource();
+      src.buffer = buffer;
+      var gain = audioCtx.createGain();
+      gain.gain.value = volume;
+      src.connect(gain).connect(audioCtx.destination);
+      src.start(0);
+    }
+    // on a freshly loaded page the fetch+decode may still be in flight —
+    // resume the (possibly still-locked) context on this gesture regardless,
+    // and queue the actual start for the moment decoding finishes instead of
+    // silently dropping the very first click/tap of each page
+    return function play() {
+      if (!audioCtx) return;
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      if (buffer) start();
+      else if (ready) ready.then(start);
+    };
   }
-  function playWhoosh() {
-    if (!audioCtx || !whooshBuffer) return;
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    var src = audioCtx.createBufferSource();
-    src.buffer = whooshBuffer;
-    var gain = audioCtx.createGain();
-    gain.gain.value = 0.55;
-    src.connect(gain).connect(audioCtx.destination);
-    src.start(0);
-  }
+  var playWhoosh = makeSoundPlayer('sounds/whoosh.wav', 0.12);
+  var playClick = makeSoundPlayer('sounds/click.mp3', 0.6);
 
   function copyEmail(e) {
     e.preventDefault();
@@ -205,8 +219,23 @@
       toggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
     };
 
+    el.querySelectorAll('.site-nav-link').forEach(function (link) {
+      link.addEventListener('click', function (e) {
+        playClick();
+        var href = link.getAttribute('href') || '';
+        // in-page anchors (e.g. "#work") don't unload the document, so
+        // there's nothing to race — only links to another page need a
+        // brief hold so the click sound isn't cut off by the navigation
+        if (href.charAt(0) === '#') return;
+        if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        e.preventDefault();
+        setTimeout(function () { window.location.href = href; }, 140);
+      });
+    });
+
     toggleBtn.addEventListener('click', function (e) {
       e.stopPropagation();
+      playClick();
       setOpen(!card.classList.contains('is-open'));
     });
     if (closeBtn) closeBtn.addEventListener('click', function () { setOpen(false); });
