@@ -9,8 +9,6 @@
     ".al-badge-inner{position:relative;width:var(--face-w);height:var(--face-h);transform-style:preserve-3d;will-change:transform;transition:transform 1s cubic-bezier(.65,0,.35,1);}",
     ".al-badge-face{position:absolute;top:0;left:0;width:var(--face-w);height:var(--face-h);backface-visibility:hidden;}",
     ".al-badge-face svg{display:block;width:100%;height:100%;}",
-    ".al-badge-face path{transition:fill .25s ease;}",
-    ".al-badge:hover .al-badge-face-front path,.al-badge:hover .al-badge-face-back path{fill:#73C41E;}",
     ".al-badge-face-front{transform:translateZ(var(--r));}",
     ".al-badge-face-right{transform:rotateY(90deg) translateZ(var(--r));}",
     ".al-badge-face-back{transform:rotateY(180deg) translateZ(var(--r));}",
@@ -60,6 +58,46 @@
     loadSvgText('images/badge-portrait.svg').then(function (svg) {
       portraitFaces.forEach(function (f) { f.innerHTML = svg; });
     });
+  }
+
+  // decode once into an AudioBuffer up front (mirrors nav.js's whoosh/click
+  // sounds) so playback on hover starts with near-zero latency instead of
+  // fetching/decoding fresh on every mouseenter
+  var AudioCtx = window.AudioContext || window.webkitAudioContext;
+  var audioCtx = AudioCtx ? new AudioCtx() : null;
+  var hoverBuffer = null;
+  if (audioCtx) {
+    fetch('sounds/hover-drop.mp3')
+      .then(function (r) { return r.arrayBuffer(); })
+      .then(function (data) { return audioCtx.decodeAudioData(data); })
+      .then(function (buf) { hoverBuffer = buf; })
+      .catch(function () {});
+  }
+  function playHoverDrop() {
+    if (!audioCtx || !hoverBuffer) return;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    var src = audioCtx.createBufferSource();
+    src.buffer = hoverBuffer;
+    var gain = audioCtx.createGain();
+    gain.gain.value = 0.6;
+    src.connect(gain).connect(audioCtx.destination);
+    src.start(0);
+  }
+  // browsers only unlock a suspended AudioContext on a real user gesture
+  // (click/tap/keypress) — hovering the badge doesn't count as one, so
+  // resuming only inside playHoverDrop() can leave it permanently silent if
+  // a hover happens to be the very first interaction on the page. Grab the
+  // first genuine gesture anywhere on the page to unlock it early instead.
+  if (audioCtx) {
+    var unlockAudio = function () {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      document.removeEventListener('pointerdown', unlockAudio);
+      document.removeEventListener('keydown', unlockAudio);
+      document.removeEventListener('touchstart', unlockAudio);
+    };
+    document.addEventListener('pointerdown', unlockAudio);
+    document.addEventListener('keydown', unlockAudio);
+    document.addEventListener('touchstart', unlockAudio);
   }
 
   // the first wheel/touch/key scroll attempt is held (preventDefault) for
@@ -114,6 +152,7 @@
     window.addEventListener('touchmove', guard, { passive: false });
     window.addEventListener('keydown', guardKey, { passive: false });
     badgeEl.addEventListener('mouseenter', spinOnce);
+    badgeEl.addEventListener('mouseenter', playHoverDrop);
   }
 
   function fill(el) {
