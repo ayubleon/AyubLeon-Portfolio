@@ -18,12 +18,7 @@
     ".site-contact-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border:0;border-radius:50%;background:rgba(255,255,255,0.06);color:#f4eeeb;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .25s ease;}",
     ".site-contact-close:hover{background:#2A2A2C;}",
     ".site-contact-close svg{overflow:visible;}",
-    ".site-close-ray{transform-box:view-box;transform-origin:7px 7px;transition:transform .4s cubic-bezier(.22,1,.36,1),opacity .4s ease,stroke .15s ease;}",
-    ".site-contact-close.is-sparking .site-close-ray{stroke:#73C41E;}",
-    ".site-contact-close.is-sparking .site-close-ray[data-ray=\"tl\"]{transform:translate(-11px,-11px) scale(0.3);opacity:0;}",
-    ".site-contact-close.is-sparking .site-close-ray[data-ray=\"tr\"]{transform:translate(11px,-11px) scale(0.3);opacity:0;}",
-    ".site-contact-close.is-sparking .site-close-ray[data-ray=\"bl\"]{transform:translate(-11px,11px) scale(0.3);opacity:0;}",
-    ".site-contact-close.is-sparking .site-close-ray[data-ray=\"br\"]{transform:translate(11px,11px) scale(0.3);opacity:0;}",
+    ".site-close-ray{opacity:1;}",
     ".site-contact-header{display:flex;align-items:center;gap:12px;}",
     ".site-contact-avatar{width:48px;height:48px;border-radius:50%;background:#fff;display:block;flex:0 0 auto;}",
     ".site-contact-name{margin:0;font-family:'Gastroe','Instrument Serif',Georgia,serif;font-weight:400;font-size:20px;color:#fff;}",
@@ -51,6 +46,52 @@
     '<path class="site-close-ray" data-ray="bl" d="M7 7L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
     '<path class="site-close-ray" data-ray="br" d="M7 7L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
   '</svg>';
+
+  var CLOSE_RAY_D = { tl: 'M7 7L1 1', tr: 'M7 7L13 1', bl: 'M7 7L1 13', br: 'M7 7L13 13' };
+  var CLOSE_RAY_DIR = { tl: [-1, -1], tr: [1, -1], bl: [-1, 1], br: [1, 1] };
+
+  // driven by directly rewriting each ray's `d` (and opacity/stroke) on
+  // every frame rather than a CSS transform — CSS transform-origin on SVG
+  // children needs transform-box support that isn't consistent everywhere,
+  // so plain attribute math here is what actually renders reliably
+  function sparkClose(closeBtn, onDone) {
+    var rays = closeBtn.querySelectorAll('.site-close-ray');
+    var duration = 380;
+    var travel = 9;
+    var t0 = null;
+    rays.forEach(function (r) { r.setAttribute('stroke', '#73C41E'); });
+    function frame(now) {
+      if (t0 === null) t0 = now;
+      var t = Math.min((now - t0) / duration, 1);
+      var eased = 1 - Math.pow(1 - t, 2);
+      rays.forEach(function (r) {
+        var dir = CLOSE_RAY_DIR[r.dataset.ray];
+        var dx = dir[0] * eased * travel;
+        var dy = dir[1] * eased * travel;
+        var sx = (7 + dx).toFixed(2);
+        var sy = (7 + dy).toFixed(2);
+        var ex = (7 + dir[0] * 6 + dx).toFixed(2);
+        var ey = (7 + dir[1] * 6 + dy).toFixed(2);
+        r.setAttribute('d', 'M' + sx + ' ' + sy + 'L' + ex + ' ' + ey);
+        r.style.opacity = String(1 - eased);
+      });
+      if (t < 1) {
+        requestAnimationFrame(frame);
+      } else if (onDone) {
+        onDone();
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function resetCloseRays(closeBtn) {
+    var rays = closeBtn.querySelectorAll('.site-close-ray');
+    rays.forEach(function (r) {
+      r.setAttribute('d', CLOSE_RAY_D[r.dataset.ray]);
+      r.setAttribute('stroke', 'currentColor');
+      r.style.opacity = '1';
+    });
+  }
 
   function fallbackCopy(text, done) {
     var ta = document.createElement('textarea');
@@ -193,18 +234,8 @@
       setOpen(!card.classList.contains('is-open'));
     });
     if (closeBtn) closeBtn.addEventListener('click', function () {
-      // spark the X's 4 rays outward, then close the card underneath;
-      // reset the rays instantly (no transition) once the card has
-      // faded out so the button is a normal X again next time it opens
-      closeBtn.classList.add('is-sparking');
       setOpen(false);
-      setTimeout(function () {
-        var rays = closeBtn.querySelectorAll('.site-close-ray');
-        rays.forEach(function (r) { r.style.transition = 'none'; });
-        closeBtn.classList.remove('is-sparking');
-        closeBtn.offsetHeight;
-        rays.forEach(function (r) { r.style.transition = ''; });
-      }, 420);
+      sparkClose(closeBtn, function () { resetCloseRays(closeBtn); });
     });
     if (backdrop) backdrop.addEventListener('click', function () { setOpen(false); });
     document.addEventListener('keydown', function (e) {
