@@ -81,6 +81,14 @@
     };
   })();
 
+  // fresh Audio instance per play (rather than one shared, rewound
+  // instance) so a rapid open/close doesn't cut the previous whoosh off
+  function playWhoosh() {
+    var audio = new Audio('sounds/whoosh.wav');
+    audio.volume = 0.55;
+    audio.play().catch(function () {});
+  }
+
   function copyEmail(e) {
     e.preventDefault();
     var email = 'ayubleon9@gmail.com';
@@ -158,6 +166,7 @@
     };
 
     var setOpen = function (open) {
+      playWhoosh();
       if (open) {
         card.style.transition = 'none';
         card.style.transform = closedTransformFromAvatar();
