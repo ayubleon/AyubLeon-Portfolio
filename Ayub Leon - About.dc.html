@@ -28,6 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600&amp;family=Instrument+Serif:ital@0;1&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
 <style>
+  @font-face { font-family: 'Gastroe'; src: url('fonts/Gastroe-Demo.otf') format('opentype'); font-weight: 400; font-style: normal; font-display: swap; }
   html, body { margin: 0; padding: 0; background: #000000; }
   body { -webkit-font-smoothing: antialiased; }
   * { box-sizing: border-box; }
@@ -52,15 +53,6 @@
     75%  { transform: translate3d(4%, 14%, 0) scale(1.22); }
     100% { transform: translate3d(10%, 8%, 0) scale(1.1); }
   }
-  @keyframes alBlobSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-  @keyframes alBlobSpinR { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
-  @keyframes alBlob {
-    0%   { border-radius: 62% 38% 44% 56% / 54% 44% 56% 46%; }
-    25%  { border-radius: 42% 58% 62% 38% / 44% 62% 38% 56%; }
-    50%  { border-radius: 56% 44% 38% 62% / 62% 38% 62% 38%; }
-    75%  { border-radius: 38% 62% 56% 44% / 40% 56% 44% 60%; }
-    100% { border-radius: 62% 38% 44% 56% / 54% 44% 56% 46%; }
-  }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation-duration: .01ms !important; transition: none !important; } }
   .nav-toggle { display: none; align-items: center; justify-content: center; width: 38px; height: 38px; padding: 0; border: 0; border-radius: 999px; background: rgba(255,255,255,0.08); color: #f6efec; cursor: pointer; -webkit-tap-highlight-color: transparent; flex: 0 0 auto; }
   .nav-toggle:hover { background: rgba(255,255,255,0.14); }
@@ -82,20 +74,32 @@
   .photo-stack-card { cursor: grab; will-change: transform; backface-visibility: hidden; }
   .photo-stack-card:active { cursor: grabbing; }
   .photo-stack-wrap { display: none; }
+  .friend-cell { -webkit-tap-highlight-color: transparent; }
+  .friend-cell-fill { position: absolute; inset: 0; border-radius: 16px; background: rgba(255,255,255,0.12); opacity: 0; transform: scale(0.85); transition: opacity .3s ease, transform .5s cubic-bezier(.34,1.56,.64,1); z-index: 0; pointer-events: none; }
+  .friend-cell:hover .friend-cell-fill, .friend-cell:focus-visible .friend-cell-fill { opacity: 1; transform: scale(1); }
+  @media (max-width: 1100px) {
+    .about-hero-grid { grid-template-columns: 1fr !important; justify-items: center; gap: 32px !important; }
+    .about-hero-grid > div:first-child { align-items: center !important; text-align: center !important; }
+    .about-hero-photos { width: 100%; }
+  }
   @media (max-width: 700px) {
     .nav-links { display: none !important; }
     .nav-toggle { display: inline-flex !important; }
     .nav-mobile { display: grid; }
-    .about-hero-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
-    .about-hero-photos { grid-template-columns: 1fr !important; }
+    #top { min-height: auto !important; padding-top: 100px !important; padding-bottom: 40px !important; }
+    .about-hero-card { padding: 32px 24px 36px !important; gap: 32px !important; }
     .about-hero-photo-1 { display: none !important; }
+    .about-hero-photos { grid-template-columns: 1fr !important; }
+    .about-hero-grid { grid-template-columns: 1fr !important; justify-items: center; gap: 28px !important; }
+    .about-hero-grid > div:first-child { align-items: center !important; text-align: center !important; }
+    .about-hero-photos { width: 100%; }
     .story-grid-1 { grid-template-columns: 1fr !important; gap: 32px !important; }
     .story-photo-wrap { width: 100% !important; height: auto !important; aspect-ratio: 4 / 3.15; }
     .story-photo-wrap img { width: 100% !important; height: 100% !important; }
     .story-photo-trio { display: none !important; }
     .photo-stack-wrap { display: block; }
     .story-grid-2 { grid-template-columns: 1fr !important; gap: 32px !important; }
-    [data-blob] { display: none !important; }
+    .friends-grid { grid-template-columns: 1fr !important; }
     .nav-pill { width: calc(100% - 32px) !important; }
     .mobile-gutter { padding-left: 16px !important; padding-right: 16px !important; }
   }
@@ -125,45 +129,35 @@
   </div>
 
   <main>
-  <section id="top" class="mobile-gutter" style="position: relative; padding: 132px 40px 0; max-width: 1400px; margin: 0 auto;">
-    <canvas ref="{{ canvasRef }}" style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100vw; height: 100%; display: block;"></canvas>
-    <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100vw; bottom: 0; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.7) 75%, #000000 92%, #000000 100%);"></div>
+  <section id="top" class="mobile-gutter" style="position: relative; padding: 64px; min-height: 100svh; display: flex;">
+    <div class="about-hero-card" style="position: relative; flex: 1 1 auto; display: flex; flex-direction: column; justify-content: flex-start; gap: clamp(24px, 3vh, 48px); background: #ffffff; border-radius: 28px; padding: 54px;">
+      <h1 style="margin: 0; font-family: 'Gastroe', 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: clamp(2.4rem, 11.91vw, 180px); line-height: 1; letter-spacing: -0.01em; color: #14120f;">About me</h1>
 
-    <p style="position: relative; margin: 0 0 64px; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: none; color: #FFFFFF; text-shadow: 0 1px 18px rgba(4,2,2,0.8)">Get to know me …</p>
-
-    <div class="about-hero-grid" style="position: relative; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: 40px; align-items: end;">
-      <div style="position: relative;">
-        <h1 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-weight: 700; font-size: clamp(3.4rem, 9vw, 8.6rem); line-height: 0.92; letter-spacing: -0.045em; color: #f4eeeb;">
-          <span style="display: block; overflow: hidden; padding-bottom: 0.1em;"><span style="display: block; animation: alRise 1.2s cubic-bezier(.19,1,.22,1) .3s both;">Ayub</span></span>
-          <span style="display: block; overflow: hidden; padding-bottom: 0.1em;"><span style="display: block; animation: alRise 1.2s cubic-bezier(.19,1,.22,1) .42s both;">Leon</span></span>
-        </h1>
-
-      </div>
-
-      <div class="about-hero-photos" style="display: grid; grid-template-columns: minmax(0, 0.82fr) minmax(0, 1fr); gap: 22px; align-items: end;">
-        <div class="about-hero-photo-1" data-reveal="1" data-parallax="0.10" style="position: relative; aspect-ratio: 3 / 4; margin-bottom: 26px; border-radius: 12px; overflow: hidden; background: #0e0c0b; box-shadow: 0 30px 70px -40px rgba(0,0,0,0.9);">
-          <img src="images/image-1.png" alt="The pier at the coast" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 8px">
+      <div class="about-hero-grid" style="display: grid; grid-template-columns: minmax(0, 0.58fr) minmax(0, 1.42fr); align-items: end; gap: 40px;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+          <img src="images/ayub-avatar.svg" alt="Ayub Leon" style="width: 174px; height: 242px; margin-bottom: -45px; display: block; object-fit: contain;">
+          <p style="margin: 0; max-width: 24ch; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1rem, 1.5vw, 23px); font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; color: #14120f; text-wrap: pretty;">How I got here, paired with some frames from my last trip home to <span style="font-family: 'Gastroe', 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: clamp(1.2rem, 1.9vw, 29px);">Mombasa</span></p>
         </div>
-        <div data-reveal="2" data-parallax="-0.05" style="position: relative; aspect-ratio: 3 / 4.05; border-radius: 12px; overflow: hidden; background: #0e0c0b; box-shadow: 0 30px 70px -40px rgba(0,0,0,0.9);">
-          <img src="images/image-2.png" alt="Ayub Leon" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 8px">
+
+        <div class="about-hero-photos" style="display: grid; grid-template-columns: minmax(0, 0.82fr) minmax(0, 1fr); align-items: end; gap: 22px;">
+          <div class="about-hero-photo-1" data-reveal="1" data-parallax="0.10" style="position: relative; aspect-ratio: 3 / 4; border-radius: 8px; overflow: hidden; background: #e9e5df;">
+            <img src="images/image-1.png" alt="The pier at the coast" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+          </div>
+          <div class="about-hero-photo-2" data-reveal="2" data-parallax="-0.05" style="position: relative; aspect-ratio: 3 / 4.05; border-radius: 8px; overflow: hidden; background: #e9e5df;">
+            <img src="images/image-2.png" alt="Ayub Leon" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block; transform: scaleX(-1);">
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="mobile-gutter" style="max-width: 1400px; margin: 96px auto 0; padding: 0 40px;">
-    <div style="height: 1px; background: rgba(255,255,255,0.12);"></div>
-    <p style="margin: 40px 0 54px; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: none; color: #FFFFFF">My story</p>
-
-
-
+  <section class="mobile-gutter" style="max-width: 1400px; margin: 150px auto 0; padding: 0 40px;">
     <div class="story-grid-1" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px 72px; align-items: start;">
-      <div class="story-photo-wrap" data-reveal="1" data-parallax="0.06" style="position: relative; aspect-ratio: 4 / 3.15; border-radius: 12px; overflow: hidden; background: #0e0c0b; width: 606px; height: 381px">
-        <img src="images/image-3.png" alt="Boats on the shore in Mombasa" loading="lazy" style="width: 608px; height: 384px; object-fit: cover; display: block; border-radius: 8px">
+      <div class="story-photo-wrap" data-reveal="1" data-parallax="0.06" style="position: relative; aspect-ratio: 4 / 3.15; border-radius: 12px; overflow: hidden; background: #0e0c0b; width: 100%; height: auto;">
+        <img src="images/image-3.png" alt="Boats on the shore in Mombasa" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 8px">
       </div>
 
-      <div data-reveal="2" style="display: flex; flex-direction: column; gap: 46px;">
-        <h2 style="margin: 0; max-width: 26ch; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.25rem, 1.9vw, 1.7rem); font-weight: 500; line-height: 1.32; letter-spacing: -0.02em; color: #f2ece9; text-wrap: pretty;">How I got here, paired with some frames from my last trip home to <em style="font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-weight: 400; color: #FFFFFF">Mombasa</em></h2>
+      <div data-reveal="2">
         <div>
           <p style="margin: 0 0 10px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(240,232,229,0.42);">1</p>
           <h3 style="margin: 0 0 8px; font-family: Poppins, Helvetica, sans-serif; font-size: 1.16rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">The Accidental Beginning</h3>
@@ -228,31 +222,33 @@
 
   <section id="friends" class="mobile-gutter" style="max-width: 1400px; margin: 110px auto 0; padding: 0 40px 120px;">
     <div style="height: 1px; background: rgba(255,255,255,0.12);"></div>
-    <p style="margin: 40px 0 54px; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: none; color: #FFFFFF">People I've Built With</p>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 46px 40px;">
-      <div data-friend="1" data-reveal="1" style="position: relative; display: flex; flex-direction: column; gap: 7px; padding: 4px 2px;">
-        <div data-blob="1" style="position: absolute; left: 0; top: 0; width: 190px; height: 190px; margin: -95px 0 0 -95px; pointer-events: none; opacity: 0; transform: scale(0.55); transition: opacity .5s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); background: radial-gradient(circle at 38% 34%, rgba(255,138,72,0.95) 0%, rgba(226,32,12,0.7) 46%, rgba(120,12,30,0.18) 78%, rgba(120,12,30,0) 100%); filter: blur(16px); animation: alBlob 9s ease-in-out infinite; z-index: 0;"></div>
-        <p style="position: relative; z-index: 1; margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.06rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Nelson Kuria</p>
-        <p style="position: relative; z-index: 1; margin: 0; font-size: 14px; color: rgba(239,232,229,0.72);">Backend Developer, PackCommerce · BuzzIQ</p>
-        <a href="https://www.linkedin.com/in/nelsonkuria/" target="_blank" rel="noopener noreferrer" style="position: relative; z-index: 1; align-self: flex-start; display: inline-flex; align-items: center; gap: 9px; margin-top: 6px; font-size: 14px; color: rgba(238,230,227,0.86);" style-hover="color: #73C41E;">Linked In <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></a>
-      </div>
-      <div data-friend="1" data-reveal="2" style="position: relative; display: flex; flex-direction: column; gap: 7px; padding: 4px 2px;">
-        <div data-blob="1" style="position: absolute; left: 0; top: 0; width: 190px; height: 190px; margin: -95px 0 0 -95px; pointer-events: none; opacity: 0; transform: scale(0.55); transition: opacity .5s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); background: radial-gradient(circle at 38% 34%, rgba(255,138,72,0.95) 0%, rgba(226,32,12,0.7) 46%, rgba(120,12,30,0.18) 78%, rgba(120,12,30,0) 100%); filter: blur(16px); animation: alBlob 9s ease-in-out infinite; z-index: 0;"></div>
-        <p style="position: relative; z-index: 1; margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.06rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Harrison Sunda</p>
-        <p style="position: relative; z-index: 1; margin: 0; font-size: 14px; color: rgba(239,232,229,0.72);">CEO & Backend Developer, Plexus Core · Danadana</p>
-        <a href="https://www.linkedin.com/in/harrison-sunda-2216261a1/" target="_blank" rel="noopener noreferrer" style="position: relative; z-index: 1; align-self: flex-start; display: inline-flex; align-items: center; gap: 9px; margin-top: 6px; font-size: 14px; color: rgba(238,230,227,0.86);" style-hover="color: #73C41E;">Linked In <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></a>
-      </div>
-      <div data-friend="1" data-reveal="3" style="position: relative; display: flex; flex-direction: column; gap: 7px; padding: 4px 2px;">
-        <div data-blob="1" style="position: absolute; left: 0; top: 0; width: 190px; height: 190px; margin: -95px 0 0 -95px; pointer-events: none; opacity: 0; transform: scale(0.55); transition: opacity .5s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); background: radial-gradient(circle at 38% 34%, rgba(255,138,72,0.95) 0%, rgba(226,32,12,0.7) 46%, rgba(120,12,30,0.18) 78%, rgba(120,12,30,0) 100%); filter: blur(16px); animation: alBlob 9s ease-in-out infinite; z-index: 0;"></div>
-        <p style="position: relative; z-index: 1; margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.06rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Abraham Nzau</p>
-        <p style="position: relative; z-index: 1; margin: 0; font-size: 14px; color: rgba(239,232,229,0.72);">Backend Developer, UI/UX & dev sounding board</p>
-        <a href="https://www.linkedin.com/in/abraham-nzau-1a8554106/" target="_blank" rel="noopener noreferrer" style="position: relative; z-index: 1; align-self: flex-start; display: inline-flex; align-items: center; gap: 9px; margin-top: 6px; font-size: 14px; color: rgba(238,230,227,0.86);" style-hover="color: #73C41E;">Linked In <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></a>
-      </div>
-      <div data-friend="1" data-reveal="4" style="position: relative; display: flex; flex-direction: column; gap: 7px; padding: 4px 2px;">
-        <div data-blob="1" style="position: absolute; left: 0; top: 0; width: 190px; height: 190px; margin: -95px 0 0 -95px; pointer-events: none; opacity: 0; transform: scale(0.55); transition: opacity .5s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); background: radial-gradient(circle at 38% 34%, rgba(255,138,72,0.95) 0%, rgba(226,32,12,0.7) 46%, rgba(120,12,30,0.18) 78%, rgba(120,12,30,0) 100%); filter: blur(16px); animation: alBlob 9s ease-in-out infinite; z-index: 0;"></div>
-        <p style="position: relative; z-index: 1; margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.06rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Maxwell Mwandigha</p>
-        <p style="position: relative; z-index: 1; margin: 0; font-size: 14px; color: rgba(239,232,229,0.72);">Software Engineer, UI/UX & dev sounding board</p>
-        <a href="https://www.linkedin.com/in/maxwell-mwandigha-3077a3178/" target="_blank" rel="noopener noreferrer" style="position: relative; z-index: 1; align-self: flex-start; display: inline-flex; align-items: center; gap: 9px; margin-top: 6px; font-size: 14px; color: rgba(238,230,227,0.86);" style-hover="color: #73C41E;">Linked In <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></a>
+    <p style="margin: 40px 0 32px; font-family: 'Gastroe', 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: clamp(1.8rem, 3.4vw, 2.6rem); color: #f6f0ed;">People I've built with</p>
+    <div style="background: rgba(255,255,255,0.05); border-radius: 24px; padding: 12px;">
+      <div class="friends-grid" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));">
+        <a class="friend-cell" data-reveal="1" href="https://www.linkedin.com/in/nelsonkuria/" target="_blank" rel="noopener noreferrer" style="position: relative; display: flex; flex-direction: column; gap: 7px; padding: 22px 20px; border-radius: 16px; color: inherit;">
+          <span class="friend-cell-fill" aria-hidden="true"></span>
+          <p style="position: relative; z-index: 1; margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.02rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Nelson Kuria</p>
+          <p style="position: relative; z-index: 1; margin: 0; font-size: 13.5px; line-height: 1.4; color: rgba(239,232,229,0.66);">Backend Developer, PackCommerce · BuzzIQ</p>
+          <span style="position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 13.5px; color: rgba(238,230,227,0.86);">Linked In <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></span>
+        </a>
+        <a class="friend-cell" data-reveal="2" href="https://www.linkedin.com/in/harrison-sunda-2216261a1/" target="_blank" rel="noopener noreferrer" style="position: relative; display: flex; flex-direction: column; gap: 7px; padding: 22px 20px; border-radius: 16px; color: inherit;">
+          <span class="friend-cell-fill" aria-hidden="true"></span>
+          <p style="position: relative; z-index: 1; margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.02rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Harrison Sunda</p>
+          <p style="position: relative; z-index: 1; margin: 0; font-size: 13.5px; line-height: 1.4; color: rgba(239,232,229,0.66);">CEO & Backend Developer, Plexus Core · Danadana</p>
+          <span style="position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 13.5px; color: rgba(238,230,227,0.86);">Linked In <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></span>
+        </a>
+        <a class="friend-cell" data-reveal="3" href="https://www.linkedin.com/in/abraham-nzau-1a8554106/" target="_blank" rel="noopener noreferrer" style="position: relative; display: flex; flex-direction: column; gap: 7px; padding: 22px 20px; border-radius: 16px; color: inherit;">
+          <span class="friend-cell-fill" aria-hidden="true"></span>
+          <p style="position: relative; z-index: 1; margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.02rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Abraham Nzau</p>
+          <p style="position: relative; z-index: 1; margin: 0; font-size: 13.5px; line-height: 1.4; color: rgba(239,232,229,0.66);">Backend Developer, UI/UX & dev sounding board</p>
+          <span style="position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 13.5px; color: rgba(238,230,227,0.86);">Linked In <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></span>
+        </a>
+        <a class="friend-cell" data-reveal="4" href="https://www.linkedin.com/in/maxwell-mwandigha-3077a3178/" target="_blank" rel="noopener noreferrer" style="position: relative; display: flex; flex-direction: column; gap: 7px; padding: 22px 20px; border-radius: 16px; color: inherit;">
+          <span class="friend-cell-fill" aria-hidden="true"></span>
+          <p style="position: relative; z-index: 1; margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.02rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Maxwell Mwandigha</p>
+          <p style="position: relative; z-index: 1; margin: 0; font-size: 13.5px; line-height: 1.4; color: rgba(239,232,229,0.66);">Software Engineer, UI/UX & dev sounding board</p>
+          <span style="position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 13.5px; color: rgba(238,230,227,0.86);">Linked In <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></span>
+        </a>
       </div>
     </div>
   </section>
@@ -265,13 +261,10 @@
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.canvasRef = React.createRef();
-    this.echoRef = React.createRef();
-    this.mouse = { x: 0.55, y: 0.6, tx: 0.55, ty: 0.6 };
   }
 
   renderVals() {
-    return { canvasRef: this.canvasRef, echoRef: this.echoRef };
+    return {};
   }
 
   initNavToggle() {
@@ -402,50 +395,8 @@ class Component extends DCLogic {
   componentDidMount() {
     this.initNavToggle();
     this.initPhotoStack();
-    this.initShader();
     this.initReveals();
     this.initParallax();
-    this.initBlobs();
-  }
-
-  initBlobs() {
-    const cards = Array.from(document.querySelectorAll('[data-friend]'));
-    cards.forEach((card) => {
-      const blob = card.querySelector('[data-blob]');
-      if (!blob) return;
-      const pos = { x: 0, y: 0, tx: 0, ty: 0 };
-      let raf = null, active = false;
-      const clampTo = (e) => {
-        const r = card.getBoundingClientRect();
-        const pad = 0;
-        pos.tx = Math.min(Math.max(e.clientX - r.left, pad), Math.max(pad, r.width - pad));
-        pos.ty = Math.min(Math.max(e.clientY - r.top, pad), Math.max(pad, r.height - pad));
-      };
-      const tick = () => {
-        pos.x += (pos.tx - pos.x) * 0.14;
-        pos.y += (pos.ty - pos.y) * 0.14;
-        blob.style.left = pos.x + 'px';
-        blob.style.top = pos.y + 'px';
-        if (active || Math.abs(pos.tx - pos.x) > 0.4) { raf = requestAnimationFrame(tick); } else { raf = null; }
-      };
-      card.addEventListener('pointerenter', (e) => {
-        clampTo(e);
-        pos.x = pos.tx; pos.y = pos.ty;
-        active = true;
-        blob.style.opacity = '0.88';
-        blob.style.transform = 'scale(1)';
-        if (!raf) raf = requestAnimationFrame(tick);
-      });
-      card.addEventListener('pointermove', (e) => {
-        clampTo(e);
-        if (!raf) raf = requestAnimationFrame(tick);
-      });
-      card.addEventListener('pointerleave', () => {
-        active = false;
-        blob.style.opacity = '0';
-        blob.style.transform = 'scale(0.55)';
-      });
-    });
   }
 
   initReveals() {
@@ -472,7 +423,6 @@ class Component extends DCLogic {
   initParallax() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const items = Array.from(document.querySelectorAll('[data-parallax]')).map((el) => ({ el, k: parseFloat(el.dataset.parallax) }));
-    const echo = this.echoRef.current;
     let queued = false;
     this.onScroll = () => {
       if (queued) return;
@@ -486,116 +436,14 @@ class Component extends DCLogic {
           el.style.setProperty('--y', '0');
           el.style.transform = 'translate3d(0,' + (-p * k * 100).toFixed(2) + 'px,0)';
         });
-        if (echo) echo.style.transform = 'translate3d(' + (-window.scrollY * 0.05).toFixed(2) + 'px, 0, 0)';
       });
     };
     window.addEventListener('scroll', this.onScroll, { passive: true });
     this.onScroll();
   }
 
-  initShader() {
-    const canvas = this.canvasRef.current;
-    if (!canvas) return;
-    const gl = canvas.getContext('webgl', { antialias: false, alpha: true, powerPreference: 'low-power' });
-    if (!gl) { canvas.style.background = 'radial-gradient(70% 90% at 62% 0%, #b81c0c 0%, #4a0b12 40%, rgba(0,0,0,0) 75%)'; return; }
-    const vs = 'attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }';
-    const fs = [
-      'precision highp float;',
-      'uniform vec2 u_res; uniform float u_time; uniform vec2 u_mouse;',
-      'float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }',
-      'float noise(vec2 p){ vec2 i = floor(p); vec2 f = fract(p); vec2 u = f*f*(3.0-2.0*f);',
-      '  return mix(mix(hash(i), hash(i+vec2(1.0,0.0)), u.x), mix(hash(i+vec2(0.0,1.0)), hash(i+vec2(1.0,1.0)), u.x), u.y); }',
-      'float fbm(vec2 p){ float v = 0.0; float a = 0.5; for(int i = 0; i < 4; i++){ v += a * noise(p); p = p * 2.03 + 7.3; a *= 0.5; } return v; }',
-      'void main(){',
-      '  vec2 uv = gl_FragCoord.xy / u_res;',
-      '  float asp = u_res.x / u_res.y;',
-      '  vec2 st = vec2((uv.x - 0.5) * asp, uv.y - 0.5);',
-      '  vec2 mo = vec2((u_mouse.x - 0.5) * asp, u_mouse.y - 0.5);',
-      '  float t = u_time * 0.13;',
-      '  vec2 w = st * 1.05 + vec2(fbm(st * 1.3 + vec2(t, -t)), fbm(st * 1.3 + vec2(3.1 - t, t))) * 0.8;',
-      '  w += (mo - st) * 0.18;',
-      '  float d = fbm(w * 1.2 + vec2(t * 0.5, 0.0));',
-      '  float core = exp(-length(st - mo) * 2.6) * 0.85;',
-      '  float topGuard = 1.0 - smoothstep(0.30, 0.50, st.y) * 0.40;',
-      '  float e = (d * 1.35 + core * 1.50) * mix(0.72, 1.35, smoothstep(-0.55, 0.42, st.y)) * topGuard;',
-      '  float m1 = smoothstep(0.42, 1.12, e);',
-      '  float m2 = smoothstep(0.74, 1.40, e);',
-      '  float m3 = smoothstep(1.02, 1.64, e);',
-      '  vec3 col = vec3(0.006, 0.005, 0.005);',
-      '  col = mix(col, vec3(0.28, 0.020, 0.070), m1);',
-      '  col = mix(col, vec3(0.84, 0.11, 0.038), m2 * 0.94);',
-      '  col = mix(col, vec3(1.0, 0.40, 0.19), m3 * 0.85);',
-      '  col *= mix(0.30, 1.0, smoothstep(1.30, 0.26, length(st * vec2(0.9, 1.1))));',
-      '  float g = hash(gl_FragCoord.xy + fract(u_time) * 91.3);',
-      '  col += (g - 0.5) * 0.024;',
-      '  col = col / (col + 1.05) * 1.24;',
-      '  float a = clamp(max(max(col.r, col.g), col.b) * 3.4, 0.0, 1.0);',
-      '  gl_FragColor = vec4(pow(max(col, 0.0), vec3(0.92)), a);',
-      '}'
-    ].join('\n');
-    const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
-    const prog = gl.createProgram();
-    gl.attachShader(prog, sh(gl.VERTEX_SHADER, vs));
-    gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fs));
-    gl.linkProgram(prog);
-    gl.useProgram(prog);
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    const buf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(prog, 'p');
-    gl.enableVertexAttribArray(loc);
-    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    const uRes = gl.getUniformLocation(prog, 'u_res');
-    const uTime = gl.getUniformLocation(prog, 'u_time');
-    const uMouse = gl.getUniformLocation(prog, 'u_mouse');
-
-    const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      const w = Math.max(1, Math.round(canvas.clientWidth * dpr));
-      const h = Math.max(1, Math.round(canvas.clientHeight * dpr));
-      if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; gl.viewport(0, 0, w, h); }
-    };
-    this.ro = new ResizeObserver(resize);
-    this.ro.observe(canvas);
-    resize();
-
-    this.onMove = (e) => {
-      this.userMoved = true;
-      const r = canvas.getBoundingClientRect();
-      this.mouse.tx = (e.clientX - r.left) / r.width;
-      this.mouse.ty = 1 - (e.clientY - r.top) / r.height;
-    };
-    window.addEventListener('pointermove', this.onMove, { passive: true });
-
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const start = performance.now();
-    const draw = (now) => {
-      this.raf = requestAnimationFrame(draw);
-      if (document.hidden) return;
-      const r = canvas.getBoundingClientRect();
-      if (r.bottom < -100) return;
-      if (!this.userMoved && !reduce) {
-        const wt = (now - start) / 1000;
-        this.mouse.tx = 0.55 + Math.sin(wt * 0.45) * 0.14;
-        this.mouse.ty = 0.30 + Math.cos(wt * 0.35) * 0.35;
-      }
-      this.mouse.x += (this.mouse.tx - this.mouse.x) * 0.05;
-      this.mouse.y += (this.mouse.ty - this.mouse.y) * 0.05;
-      gl.uniform2f(uRes, canvas.width, canvas.height);
-      gl.uniform1f(uTime, (now - start) / 1000);
-      gl.uniform2f(uMouse, this.mouse.x, this.mouse.y);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-    };
-    this.raf = requestAnimationFrame(draw);
-  }
-
   componentWillUnmount() {
-    cancelAnimationFrame(this.raf);
-    if (this.ro) this.ro.disconnect();
     if (this.io) this.io.disconnect();
-    window.removeEventListener('pointermove', this.onMove);
     window.removeEventListener('scroll', this.onScroll);
     window.removeEventListener('resize', this.onNavResize);
   }
