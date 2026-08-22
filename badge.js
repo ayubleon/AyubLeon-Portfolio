@@ -6,9 +6,7 @@
   // on a flush, gapless edge
   var CSS = [
     ".al-badge{position:fixed;top:28px;left:28px;z-index:45;perspective:900px;--face-h:130px;--face-w:43.64px;--r:21.82px;}",
-    ".al-badge-inner{position:relative;width:var(--face-w);height:var(--face-h);transform-style:preserve-3d;will-change:transform;}",
-    ".al-badge-inner.is-spinning{animation:alBadgeSpin 1s cubic-bezier(.65,0,.35,1);}",
-    "@keyframes alBadgeSpin{from{transform:rotateY(0deg);}to{transform:rotateY(360deg);}}",
+    ".al-badge-inner{position:relative;width:var(--face-w);height:var(--face-h);transform-style:preserve-3d;will-change:transform;transition:transform 1s cubic-bezier(.65,0,.35,1);}",
     ".al-badge-face{position:absolute;top:0;left:0;width:var(--face-w);height:var(--face-h);backface-visibility:hidden;}",
     ".al-badge-face img{display:block;width:100%;height:100%;}",
     ".al-badge-face-front{transform:translateZ(var(--r));}",
@@ -16,7 +14,7 @@
     ".al-badge-face-back{transform:rotateY(180deg) translateZ(var(--r));}",
     ".al-badge-face-left{transform:rotateY(270deg) translateZ(var(--r));}",
     "@media (max-width:700px){.al-badge{top:18px;left:18px;--face-h:92px;--face-w:30.89px;--r:15.44px;}}",
-    "@media (prefers-reduced-motion: reduce){.al-badge-inner.is-spinning{animation:none;}}",
+    "@media (prefers-reduced-motion: reduce){.al-badge-inner{transition:none;}}",
     "@media (max-width:1400px){.al-badge{display:none;}}"
   ].join('');
   var styleTag = document.createElement('style');
@@ -48,6 +46,7 @@
   }
 
   function initSpin(badgeEl, inner) {
+    var angle = 0;
     var spinning = false;
     var scrollTriggered = false;
     var lockUntil = 0;
@@ -55,10 +54,10 @@
     function spinOnce() {
       if (spinning) return;
       spinning = true;
-      inner.classList.add('is-spinning');
+      angle += 90;
+      inner.style.transform = 'rotateY(' + angle + 'deg)';
       setTimeout(function () {
         spinning = false;
-        inner.classList.remove('is-spinning');
       }, SPIN_MS);
     }
 
