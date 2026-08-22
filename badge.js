@@ -5,10 +5,12 @@
   // (front/back = name, left/right = portrait) so every quarter-turn lands
   // on a flush, gapless edge
   var CSS = [
-    ".al-badge{position:fixed;top:28px;left:28px;z-index:45;perspective:900px;--face-h:130px;--face-w:43.64px;--r:21.82px;}",
+    ".al-badge{position:fixed;top:28px;left:28px;z-index:45;perspective:900px;display:block;cursor:pointer;-webkit-tap-highlight-color:transparent;--face-h:130px;--face-w:43.64px;--r:21.82px;}",
     ".al-badge-inner{position:relative;width:var(--face-w);height:var(--face-h);transform-style:preserve-3d;will-change:transform;transition:transform 1s cubic-bezier(.65,0,.35,1);}",
     ".al-badge-face{position:absolute;top:0;left:0;width:var(--face-w);height:var(--face-h);backface-visibility:hidden;}",
-    ".al-badge-face img{display:block;width:100%;height:100%;}",
+    ".al-badge-face svg{display:block;width:100%;height:100%;}",
+    ".al-badge-face path{transition:fill .25s ease;}",
+    ".al-badge:hover .al-badge-face-front path,.al-badge:hover .al-badge-face-back path{fill:#73C41E;}",
     ".al-badge-face-front{transform:translateZ(var(--r));}",
     ".al-badge-face-right{transform:rotateY(90deg) translateZ(var(--r));}",
     ".al-badge-face-back{transform:rotateY(180deg) translateZ(var(--r));}",
@@ -21,15 +23,44 @@
   styleTag.textContent = CSS;
   document.head.appendChild(styleTag);
 
-  var BADGE_HTML =
-    '<div class="al-badge" aria-hidden="true">' +
-      '<div class="al-badge-inner" data-badge-inner>' +
-        '<div class="al-badge-face al-badge-face-front"><img src="images/badge-name.svg" alt=""></div>' +
-        '<div class="al-badge-face al-badge-face-right"><img src="images/badge-portrait.svg" alt=""></div>' +
-        '<div class="al-badge-face al-badge-face-back"><img src="images/badge-name.svg" alt=""></div>' +
-        '<div class="al-badge-face al-badge-face-left"><img src="images/badge-portrait.svg" alt=""></div>' +
-      '</div>' +
-    '</div>';
+  function homeHref() {
+    var root = document.querySelector('[data-screen-label]');
+    var label = root ? root.getAttribute('data-screen-label') : '';
+    return label === 'Hero' ? '#top' : 'Ayub%20Leon%20-%20Landing%20Page.dc.html';
+  }
+
+  function badgeHTML() {
+    return (
+      '<a class="al-badge" href="' + homeHref() + '" aria-label="Go to home">' +
+        '<div class="al-badge-inner" data-badge-inner>' +
+          '<div class="al-badge-face al-badge-face-front" data-face="name"></div>' +
+          '<div class="al-badge-face al-badge-face-right" data-face="portrait"></div>' +
+          '<div class="al-badge-face al-badge-face-back" data-face="name"></div>' +
+          '<div class="al-badge-face al-badge-face-left" data-face="portrait"></div>' +
+        '</div>' +
+      '</a>'
+    );
+  }
+
+  // faces start empty and get the actual SVG markup injected once fetched
+  // (rather than <img src>) so the hover rule above can reach into the
+  // paths directly — an <img> renders its SVG in an opaque sub-document
+  // that page CSS can't touch at all
+  var svgTextCache = {};
+  function loadSvgText(url) {
+    if (!svgTextCache[url]) svgTextCache[url] = fetch(url).then(function (r) { return r.text(); });
+    return svgTextCache[url];
+  }
+  function fillFaces(el) {
+    var nameFaces = el.querySelectorAll('[data-face="name"]');
+    var portraitFaces = el.querySelectorAll('[data-face="portrait"]');
+    loadSvgText('images/badge-name.svg').then(function (svg) {
+      nameFaces.forEach(function (f) { f.innerHTML = svg; });
+    });
+    loadSvgText('images/badge-portrait.svg').then(function (svg) {
+      portraitFaces.forEach(function (f) { f.innerHTML = svg; });
+    });
+  }
 
   // the first wheel/touch/key scroll attempt is held (preventDefault) for
   // the animation's duration instead of letting the page move, then
@@ -87,7 +118,8 @@
 
   function fill(el) {
     if (el.childElementCount > 0) return;
-    el.innerHTML = BADGE_HTML;
+    el.innerHTML = badgeHTML();
+    fillFaces(el);
     initSpin(el.querySelector('.al-badge'), el.querySelector('[data-badge-inner]'));
   }
 
