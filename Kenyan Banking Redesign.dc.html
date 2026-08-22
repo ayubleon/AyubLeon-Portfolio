@@ -18,6 +18,7 @@
 <style>html, body { background: #000000; margin: 0; }</style>
 <link rel="preload" as="script" href="./support.js">
 <script src="./support.js" defer></script>
+<script src="footer.js" defer></script>
 </head>
 <body>
 <x-dc>
@@ -33,7 +34,7 @@
   html { scroll-behavior: smooth; }
   a { color: rgba(238,230,227,0.72); text-decoration: none; transition: color .35s cubic-bezier(.22,1,.36,1); }
   a:hover { color: #fff8f4; }
-  a:focus-visible, button:focus-visible { outline: 2px solid #C8F135; outline-offset: 3px; border-radius: 4px; }
+  a:focus-visible, button:focus-visible { outline: 2px solid #73C41E; outline-offset: 3px; border-radius: 4px; }
   a:active, button:active { opacity: 0.7; }
   ::selection { background: #ff3b12; color: #0a0606; }
   @keyframes alNav { from { opacity: 0; transform: translate(-50%, -18px); } to { opacity: 1; transform: translate(-50%, 0); } }
@@ -191,7 +192,7 @@
       </figure>
       <div style="grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 18px; margin-top: 8px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1);">
         <p style="margin: 0; max-width: 64ch; font-size: 15.5px; line-height: 1.75; color: rgba(239,232,229,0.86); text-wrap: pretty;">What's shown here is the first working draft; the app went through several rounds of revision after it. The full write-up of how I got there is on Behance.</p>
-        <a href="https://www.behance.net/gallery/206702515/UIUX-I-M-Bank-Mobile-Banking-App" target="_blank" rel="noopener" style="font-size: 15px; color: #C8F135; border-bottom: 1px solid rgba(200,241,53,0.45); padding-bottom: 2px;" style-hover="color: #dcff62; border-bottom-color: #dcff62;">Read the case study →</a>
+        <a href="https://www.behance.net/gallery/206702515/UIUX-I-M-Bank-Mobile-Banking-App" target="_blank" rel="noopener" style="font-size: 15px; color: #73C41E; border-bottom: 1px solid rgba(115,196,30,0.45); padding-bottom: 2px;" style-hover="color: #91ff1e; border-bottom-color: #91ff1e;">Read the case study →</a>
       </div>
     </div>
   </section>
@@ -200,12 +201,12 @@
     <div style="padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1);">
       <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: none; color: #FFFFFF">More work</p>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 30px;">
-        <a href="Building a shadcn System from Scratch.dc.html" style="display: flex; flex-direction: column; gap: 12px; padding: 30px 32px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.09); color: inherit;" style-hover="border-color: rgba(200,241,53,0.55); background: rgba(255,255,255,0.03);">
+        <a href="Building a shadcn System from Scratch.dc.html" style="display: flex; flex-direction: column; gap: 12px; padding: 30px 32px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.09); color: inherit;" style-hover="border-color: rgba(115,196,30,0.55); background: rgba(255,255,255,0.03);">
           <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: none; color: rgba(239,232,229,0.45)">← Previous</p>
           <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.4rem; font-weight: 600; letter-spacing: -0.025em; color: #f4eeeb;">Building a shadcn System from Scratch</p>
           <p style="margin: 0; font-size: 14px; line-height: 1.55; color: rgba(239,232,229,0.66);">A shadcn component system built from scratch as a personal project, later adapted to power BuzzIQ</p>
         </a>
-        <a href="BuzzIQ.dc.html" style="display: flex; flex-direction: column; gap: 12px; padding: 30px 32px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.09); color: inherit; text-align: right;" style-hover="border-color: rgba(200,241,53,0.55); background: rgba(255,255,255,0.03);">
+        <a href="BuzzIQ.dc.html" style="display: flex; flex-direction: column; gap: 12px; padding: 30px 32px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.09); color: inherit; text-align: right;" style-hover="border-color: rgba(115,196,30,0.55); background: rgba(255,255,255,0.03);">
           <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: none; color: rgba(239,232,229,0.45)">Next →</p>
           <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.4rem; font-weight: 600; letter-spacing: -0.025em; color: #f4eeeb;">BuzzIQ</p>
           <p style="margin: 0; font-size: 14px; line-height: 1.55; color: rgba(239,232,229,0.66);">TikTok Shop intelligence platform built for IGNITEAMZ, a US-based creator commerce company</p>
@@ -213,7 +214,9 @@
       </div>
     </div>
   </section>
+
   </main>
+  <div data-footer-mount="1"></div>
 </div>
 
 </x-dc>

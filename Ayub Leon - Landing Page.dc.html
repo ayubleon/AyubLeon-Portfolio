@@ -18,6 +18,7 @@
 <style>html, body { background: #000000; margin: 0; }</style>
 <link rel="preload" as="script" href="./support.js">
 <script src="./support.js" defer></script>
+<script src="footer.js" defer></script>
 </head>
 <body>
 <x-dc>
@@ -33,7 +34,7 @@
   html { scroll-behavior: smooth; }
   a { color: rgba(238,230,227,0.72); text-decoration: none; transition: color .35s cubic-bezier(.22,1,.36,1), opacity .35s ease; }
   a:hover { color: #fff8f4; }
-  a:focus-visible, button:focus-visible { outline: 2px solid #C8F135; outline-offset: 3px; border-radius: 4px; }
+  a:focus-visible, button:focus-visible { outline: 2px solid #73C41E; outline-offset: 3px; border-radius: 4px; }
   a:active, button:active { opacity: 0.7; }
   ::selection { background: #ff3b12; color: #0a0606; }
   @keyframes alRise { from { transform: translate3d(0, 110%, 0) rotate(1.2deg); } to { transform: translate3d(0,0,0) rotate(0deg); } }
@@ -136,12 +137,12 @@
       <span></span>
       <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; min-width: 0;">
 
-        <a href="mailto:ayubleon9@gmail.com" onClick="{{ copyEmail }}" style="letter-spacing: 0.13em; font-family: Poppins; text-transform: none" style-hover="color: #C8F135;">Email</a><span style="opacity: .3;">/</span>
-        <a href="https://www.linkedin.com/in/ayubleon" target="_blank" rel="noopener noreferrer" style="letter-spacing: 0.13em; font-family: Poppins; text-transform: none" style-hover="color: #C8F135;">LinkedIn</a>
+        <a href="mailto:ayubleon9@gmail.com" onClick="{{ copyEmail }}" style="letter-spacing: 0.13em; font-family: Poppins; text-transform: none" style-hover="color: #73C41E;">Email</a><span style="opacity: .3;">/</span>
+        <a href="https://www.linkedin.com/in/ayubleon" target="_blank" rel="noopener noreferrer" style="letter-spacing: 0.13em; font-family: Poppins; text-transform: none" style-hover="color: #73C41E;">LinkedIn</a>
         <span style="opacity: .3;">/</span>
-        <a href="Ayub%20Leon%20-%20Resume.pdf" target="_blank" rel="noopener noreferrer" style="letter-spacing: 0.13em; font-family: Poppins; text-transform: none" style-hover="color: #C8F135;">Resume</a>
+        <a href="Ayub%20Leon%20-%20Resume.pdf" target="_blank" rel="noopener noreferrer" style="letter-spacing: 0.13em; font-family: Poppins; text-transform: none" style-hover="color: #73C41E;">Resume</a>
         <span style="opacity: .3;">/</span>
-        <a href="https://www.behance.net/ayubleon" target="_blank" rel="noopener noreferrer" style="letter-spacing: 0.13em; font-family: Poppins; text-transform: none" style-hover="color: #C8F135;">Behance</a>
+        <a href="https://www.behance.net/ayubleon" target="_blank" rel="noopener noreferrer" style="letter-spacing: 0.13em; font-family: Poppins; text-transform: none" style-hover="color: #73C41E;">Behance</a>
       </div>
       <span class="scroll-cue" style="display: flex; align-items: center; gap: 8px; text-transform: capitalize">Scroll <span style="display: inline-block; animation: alCue 2.2s ease-in-out infinite;">↓</span></span>
     </div>
@@ -260,6 +261,7 @@
     </div>
   </section>
   </main>
+  <div data-footer-mount="1"></div>
 </div>
 
 </x-dc>
@@ -328,7 +330,7 @@ class Component extends DCLogic {
     document.querySelectorAll('h1, h2, h3, [data-work-title]').forEach((el) => { el.style.fontFamily = display; });
     document.querySelectorAll('p, a, span, li').forEach((el) => {
       const f = el.style.fontFamily || '';
-      if (f.indexOf('JetBrains') !== -1 || f.indexOf('Instrument Serif') !== -1) return;
+      if (f.indexOf('JetBrains') !== -1 || f.indexOf('Instrument Serif') !== -1 || f.indexOf('Gastroe') !== -1) return;
       el.style.fontFamily = body;
     });
   }
