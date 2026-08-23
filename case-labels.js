@@ -37,12 +37,22 @@
 
   function patch() {
     document.querySelectorAll('p[style*="letter-spacing: 0.18em"]').forEach(function (p) {
+      // classify each element exactly once — patch() reruns on every
+      // MutationObserver tick through the settle window, and once we've
+      // already muted an uppercase label's color ourselves, a second pass
+      // can't tell it apart from a label that shipped muted in the source
+      if (p.dataset.alLabelPatched) return;
+      p.dataset.alLabelPatched = '1';
       var style = p.getAttribute('style') || '';
-      // already-correct labels (Role, Client, Timeline, prev/next, etc.)
-      // read back with this exact browser-normalized rgba string — anything
-      // else in this style family (rendered as rgb(...) regardless of
-      // whether the source file used a hex value) needs patching
-      if (style.indexOf(MUTED) !== -1) return;
+      // already-correct sentence-case labels (Role, Client/Type, Timeline,
+      // Platforms, Project contributors, Previous/Next) read back with
+      // this exact browser-normalized rgba string — they keep Poppins and
+      // the muted color, just lose the wide tracking back to the font's
+      // own default spacing
+      if (style.indexOf(MUTED) !== -1) {
+        p.style.letterSpacing = 'normal';
+        return;
+      }
       p.style.color = MUTED;
       p.style.textTransform = 'uppercase';
     });

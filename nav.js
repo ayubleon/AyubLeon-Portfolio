@@ -6,8 +6,11 @@
     ".site-nav-link:hover{color:#fff;background:#2A2A2C;}",
     ".site-nav-link.is-active{color:#fff;background:#2A2A2C;font-weight:600;}",
     ".site-nav-divider{width:1px;align-self:stretch;margin:8px 6px;background:rgba(255,255,255,0.14);}",
-    ".site-nav-avatar-btn{border:0;padding:0;margin:0;background:none;cursor:pointer;border-radius:50%;flex:0 0 auto;display:flex;-webkit-tap-highlight-color:transparent;}",
+    ".site-nav-avatar-btn{position:relative;border:0;padding:0;margin:0;background:none;cursor:pointer;border-radius:50%;flex:0 0 auto;display:flex;-webkit-tap-highlight-color:transparent;}",
     ".site-nav-avatar{width:42px;height:42px;border-radius:50%;background:#fff;display:block;flex:0 0 auto;padding:3px;pointer-events:none;}",
+    ".site-nav-tooltip{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,4px);background:#1C1C1E;color:#f4eeeb;font-family:Poppins,Helvetica,sans-serif;font-size:12.5px;font-weight:500;letter-spacing:-0.005em;padding:6px 11px;border-radius:14px;white-space:nowrap;border:1px solid rgba(255,255,255,0.12);box-shadow:0 10px 24px -10px rgba(0,0,0,0.7);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;}",
+    ".site-nav-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1C1C1E;}",
+    ".site-nav-avatar-btn:hover .site-nav-tooltip,.site-nav-avatar-btn:focus-visible .site-nav-tooltip{opacity:1;transform:translate(-50%,0);}",
     "@media (max-width:700px){.site-nav-dock{bottom:16px;gap:4px;}.site-nav-link{padding:11px 16px;font-size:13px;}}",
     ".site-contact-backdrop{position:fixed;inset:0;z-index:39;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .35s ease;}",
     ".site-contact-backdrop.is-open{opacity:1;pointer-events:auto;}",
@@ -152,6 +155,7 @@
         '<a class="' + cls('about') + '" href="' + links.about + '">About</a>' +
         '<span class="site-nav-divider" aria-hidden="true"></span>' +
         '<button type="button" class="site-nav-avatar-btn" data-contact-toggle aria-haspopup="dialog" aria-expanded="false" aria-label="Contact Ayub Leon">' +
+          '<span class="site-nav-tooltip" aria-hidden="true">Contact me</span>' +
           '<img class="site-nav-avatar" src="images/ayub-avatar.svg" alt="">' +
         '</button>' +
       '</nav>' +
