@@ -2,6 +2,14 @@
   var CSS = [
     "@keyframes siteNavRise{from{opacity:0;transform:translateX(-50%) translateY(16px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}",
     ".site-nav-dock{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:4px;padding:8px;border-radius:999px;border:1px solid rgba(255,255,255,0.13);background:#1C1C1E;box-shadow:inset 0 1px 0 rgba(255,255,255,0.16),inset 0 -1px 0 rgba(0,0,0,0.35),0 22px 50px -28px rgba(0,0,0,0.9);animation:siteNavRise .8s cubic-bezier(.22,1,.36,1) .1s both;}",
+    // same border-only cursor-tracked glow as the case-study "More work"
+    // cards: a real sibling span (not ::before — see case-labels.js for
+    // why), masked to just the border ring, lit by a radial-gradient
+    // following --mx/--my, fixed to a tight 70px radius so the highlight
+    // stays a localized point on this wide pill rather than spreading
+    // edge-to-edge like the farthest-corner sizing used on the cards
+    ".site-nav-glow{position:absolute;inset:0;border-radius:inherit;padding:1px;background:radial-gradient(70px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,0.95) 0%,transparent 65%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:0;transition:opacity .3s ease;}",
+    "@media (prefers-reduced-motion: reduce){.site-nav-glow{display:none;}}",
     ".site-nav-link{padding:12px 22px;border-radius:999px;font-size:14.5px;font-weight:500;color:rgba(246,239,236,0.7);transition:background .25s ease,color .25s ease;}",
     ".site-nav-link:hover{color:#fff;background:#2A2A2C;}",
     ".site-nav-link.is-active{color:#fff;background:#2A2A2C;font-weight:600;}",
@@ -150,6 +158,7 @@
     function cls(key) { return 'site-nav-link' + (links.active === key ? ' is-active' : ''); }
     return (
       '<nav class="site-nav-dock" aria-label="Primary">' +
+        '<span class="site-nav-glow" data-nav-glow aria-hidden="true"></span>' +
         '<a class="' + cls('home') + '" href="' + links.home + '">Home</a>' +
         '<a class="' + cls('work') + '" href="' + links.work + '">Work</a>' +
         '<a class="' + cls('about') + '" href="' + links.about + '">About</a>' +
@@ -252,10 +261,28 @@
     if (emailLink) emailLink.addEventListener('click', copyEmail);
   }
 
+  function initNavGlow(el) {
+    var dock = el.querySelector('.site-nav-dock');
+    var glow = el.querySelector('[data-nav-glow]');
+    if (!dock || !glow) return;
+    dock.addEventListener('mousemove', function (e) {
+      var rect = dock.getBoundingClientRect();
+      glow.style.setProperty('--mx', ((e.clientX - rect.left) / rect.width) * 100 + '%');
+      glow.style.setProperty('--my', ((e.clientY - rect.top) / rect.height) * 100 + '%');
+    });
+    dock.addEventListener('mouseenter', function () {
+      glow.style.opacity = '1';
+    });
+    dock.addEventListener('mouseleave', function () {
+      glow.style.opacity = '0';
+    });
+  }
+
   function fill(el) {
     if (el.childElementCount > 0) return;
     el.innerHTML = navHTML(pageLinks());
     initContactCard(el);
+    initNavGlow(el);
   }
 
   function fillAll() {
