@@ -100,13 +100,19 @@
     document.addEventListener('touchstart', unlockAudio);
   }
 
-  // the first wheel/touch/key scroll attempt is held (preventDefault) for
-  // the animation's duration instead of letting the page move, then
-  // released so scrolling continues as normal; hovering spins it too, and
-  // can repeat on every hover since it isn't gating anything; once the page
-  // is scrolled all the way down, every further swipe/wheel/key tick spins
-  // it again (naturally rate-limited to one spin per gesture by `spinning`)
+  // the first wheel/touch scroll attempt is held (preventDefault) and
+  // dragged 1:1 with the scroll motion instead of snapping instantly —
+  // letting go past DRAG_THRESHOLD*COMMIT_RATIO of real scroll effort
+  // completes the turn, letting go short of it springs back to the
+  // starting face; hovering and keyboard scroll keys still do an instant
+  // full spin (no natural "hold and release" gesture to drag). Once the
+  // page is scrolled all the way down, every further swipe/wheel tick can
+  // drag another turn the same way (rate-limited by `spinning`/`dragging`).
   var SPIN_MS = 1000;
+  var DRAG_THRESHOLD = 200;   // px of cumulative scroll effort for a full turn
+  var COMMIT_RATIO = 0.5;     // past this fraction, letting go completes the turn
+  var DRAG_IDLE_MS = 220;     // gap since the last scroll tick that counts as "letting go"
+  var SETTLE_MS = 320;        // full-arc duration for the commit/revert snap
   var SCROLL_KEYS = { ' ': 1, 'Spacebar': 1, 'PageDown': 1, 'PageUp': 1, 'ArrowDown': 1, 'ArrowUp': 1, 'Home': 1, 'End': 1 };
 
   function isAtBottom() {
@@ -118,10 +124,14 @@
     var angle = 0;
     var spinning = false;
     var scrollTriggered = false;
-    var lockUntil = 0;
+
+    var dragging = false;
+    var dragDelta = 0;
+    var idleTimer = null;
+    var lastTouchY = null;
 
     function spinOnce() {
-      if (spinning) return;
+      if (spinning || dragging) return;
       spinning = true;
       angle += 90;
       inner.style.transform = 'rotateY(' + angle + 'deg)';
@@ -130,26 +140,105 @@
       }, SPIN_MS);
     }
 
-    function guard(e) {
-      if (!scrollTriggered) {
-        scrollTriggered = true;
-        spinOnce();
-        lockUntil = Date.now() + SPIN_MS;
+    function startDrag() {
+      dragging = true;
+      dragDelta = 0;
+      scrollTriggered = true;
+      inner.style.transition = 'none';
+    }
+
+    function updateDrag(delta) {
+      dragDelta += delta;
+      if (dragDelta < 0) dragDelta = 0;
+      if (dragDelta > DRAG_THRESHOLD) dragDelta = DRAG_THRESHOLD;
+      var progress = dragDelta / DRAG_THRESHOLD;
+      inner.style.transform = 'rotateY(' + (angle + progress * 90) + 'deg)';
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(endDrag, DRAG_IDLE_MS);
+    }
+
+    // resolves the held gesture once scroll ticks stop arriving: past the
+    // commit ratio it finishes the turn, short of it it springs back —
+    // either way the snap duration scales with the remaining arc so a
+    // near-complete drag settles fast and a barely-started one does too
+    function endDrag() {
+      if (!dragging) return;
+      var progress = dragDelta / DRAG_THRESHOLD;
+      var commit = progress >= COMMIT_RATIO;
+      var remaining = commit ? 1 - progress : progress;
+      var duration = Math.max(120, remaining * SETTLE_MS);
+      dragging = false;
+      dragDelta = 0;
+      if (commit) angle += 90;
+      inner.style.transition = 'transform ' + duration + 'ms cubic-bezier(.22,1,.36,1)';
+      inner.style.transform = 'rotateY(' + angle + 'deg)';
+      setTimeout(function () {
+        inner.style.transition = '';
+      }, duration);
+    }
+
+    // the drag/threshold gate applies to every turn a scroll can trigger —
+    // the very first scroll on the page, and every repeat once the page is
+    // scrolled all the way down — so real scroll effort is always required
+    // to complete a turn, not just on that first attempt. at the bottom
+    // this must only catch further downward attempts (delta > 0) — since
+    // isAtBottom() only goes false once the page has actually moved away
+    // from the bottom, hijacking upward scroll ticks there too would
+    // preventDefault() every attempt to leave the bottom and trap the page
+    function canTrigger(delta) {
+      if (!scrollTriggered) return true;
+      return isAtBottom() && delta > 0;
+    }
+    function guard(e, delta) {
+      if (dragging) {
+        e.preventDefault();
+        updateDrag(delta);
+        return;
+      }
+      if (spinning) {
         e.preventDefault();
         return;
       }
-      if (Date.now() < lockUntil) {
+      if (canTrigger(delta)) {
+        startDrag();
+        e.preventDefault();
+        updateDrag(delta);
+      }
+    }
+    function guardWheel(e) { guard(e, e.deltaY); }
+    function guardTouch(e) {
+      var t = e.touches && e.touches[0];
+      if (!t || lastTouchY == null) return;
+      var delta = lastTouchY - t.clientY;
+      lastTouchY = t.clientY;
+      guard(e, delta);
+    }
+    function guardTouchStart(e) {
+      var t = e.touches && e.touches[0];
+      lastTouchY = t ? t.clientY : null;
+    }
+    function guardTouchEnd() {
+      lastTouchY = null;
+    }
+    function guardKey(e) {
+      if (!SCROLL_KEYS[e.key]) return;
+      if (dragging || spinning) {
+        e.preventDefault();
+        return;
+      }
+      if (!scrollTriggered) {
+        scrollTriggered = true;
+        spinOnce();
         e.preventDefault();
         return;
       }
       if (isAtBottom()) spinOnce();
     }
-    function guardKey(e) {
-      if (SCROLL_KEYS[e.key]) guard(e);
-    }
 
-    window.addEventListener('wheel', guard, { passive: false });
-    window.addEventListener('touchmove', guard, { passive: false });
+    window.addEventListener('wheel', guardWheel, { passive: false });
+    window.addEventListener('touchstart', guardTouchStart, { passive: true });
+    window.addEventListener('touchmove', guardTouch, { passive: false });
+    window.addEventListener('touchend', guardTouchEnd, { passive: true });
     window.addEventListener('keydown', guardKey, { passive: false });
     badgeEl.addEventListener('mouseenter', spinOnce);
     badgeEl.addEventListener('mouseenter', playHoverDrop);
