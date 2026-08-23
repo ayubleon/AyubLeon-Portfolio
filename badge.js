@@ -65,19 +65,19 @@
   // fetching/decoding fresh on every mouseenter
   var AudioCtx = window.AudioContext || window.webkitAudioContext;
   var audioCtx = AudioCtx ? new AudioCtx() : null;
-  var hoverBuffer = null;
+  var tapBuffer = null;
   if (audioCtx) {
-    fetch('sounds/hover-drop.mp3')
+    fetch('sounds/icon-tap.mp3')
       .then(function (r) { return r.arrayBuffer(); })
       .then(function (data) { return audioCtx.decodeAudioData(data); })
-      .then(function (buf) { hoverBuffer = buf; })
+      .then(function (buf) { tapBuffer = buf; })
       .catch(function () {});
   }
-  function playHoverDrop() {
-    if (!audioCtx || !hoverBuffer) return;
+  function playIconTap() {
+    if (!audioCtx || !tapBuffer) return;
     if (audioCtx.state === 'suspended') audioCtx.resume();
     var src = audioCtx.createBufferSource();
-    src.buffer = hoverBuffer;
+    src.buffer = tapBuffer;
     var gain = audioCtx.createGain();
     gain.gain.value = 0.6;
     src.connect(gain).connect(audioCtx.destination);
@@ -85,7 +85,7 @@
   }
   // browsers only unlock a suspended AudioContext on a real user gesture
   // (click/tap/keypress) — hovering the badge doesn't count as one, so
-  // resuming only inside playHoverDrop() can leave it permanently silent if
+  // resuming only inside playIconTap() can leave it permanently silent if
   // a hover happens to be the very first interaction on the page. Grab the
   // first genuine gesture anywhere on the page to unlock it early instead.
   if (audioCtx) {
@@ -241,7 +241,7 @@
     window.addEventListener('touchend', guardTouchEnd, { passive: true });
     window.addEventListener('keydown', guardKey, { passive: false });
     badgeEl.addEventListener('mouseenter', spinOnce);
-    badgeEl.addEventListener('mouseenter', playHoverDrop);
+    badgeEl.addEventListener('mouseenter', playIconTap);
   }
 
   function fill(el) {

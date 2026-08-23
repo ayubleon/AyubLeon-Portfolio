@@ -22,7 +22,7 @@
     "@media (max-width:700px){.site-nav-dock{bottom:16px;gap:4px;}.site-nav-link{padding:11px 16px;font-size:13px;}}",
     ".site-contact-backdrop{position:fixed;inset:0;z-index:39;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .35s ease;}",
     ".site-contact-backdrop.is-open{opacity:1;pointer-events:auto;}",
-    ".site-contact-card{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) rotate(2deg) scale(0.4);width:min(300px,calc(100vw - 32px));background:#1C1C1E;border:1px solid rgba(255,255,255,0.13);border-radius:28px;padding:68px 24px 24px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.16),inset 0 -1px 0 rgba(0,0,0,0.35),0 30px 70px -26px rgba(0,0,0,0.9);z-index:41;opacity:0;pointer-events:none;transition:opacity .35s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.16,1,.3,1);" +
+    ".site-contact-card{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) rotate(2deg) scale(0.4);width:min(300px,calc(100vw - 32px));background:#1C1C1E;border:1px solid rgba(255,255,255,0.13);border-radius:18px;padding:68px 24px 24px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.16),inset 0 -1px 0 rgba(0,0,0,0.35),0 30px 70px -26px rgba(0,0,0,0.9);z-index:41;opacity:0;pointer-events:none;transition:opacity .35s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.16,1,.3,1);" +
     // nametag lanyard-hole: punch a fixed-size pill out of the card so
     // whatever sits behind it (the blurred page backdrop) shows through,
     // via the same dual-layer mask-composite:exclude technique used for
@@ -35,8 +35,8 @@
     ".site-contact-card.is-open{opacity:1;pointer-events:auto;}",
     "@media (max-width:700px){.site-contact-card{width:min(300px,calc(100vw - 64px));}}",
     "@keyframes siteContactToastSpin{from{transform:translate(-50%,-50%) rotate(0deg);}to{transform:translate(-50%,-50%) rotate(360deg);}}",
-    ".site-contact-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border:0;border-radius:50%;background:rgba(255,255,255,0.06);color:#f4eeeb;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .25s ease;}",
-    ".site-contact-close:hover{background:#2A2A2C;}",
+    ".site-contact-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border:0;background:none;color:#8E8D8E;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:color .25s ease;}",
+    ".site-contact-close:hover{color:#fff;}",
     ".site-contact-header{display:flex;align-items:center;gap:16px;}",
     ".site-contact-avatar-flip{position:relative;width:76px;height:76px;flex:0 0 auto;border:0;padding:0;margin:0;background:none;cursor:pointer;perspective:400px;-webkit-tap-highlight-color:transparent;}",
     ".site-contact-avatar-face{position:absolute;inset:0;border-radius:50%;backface-visibility:hidden;-webkit-backface-visibility:hidden;transition:transform .6s cubic-bezier(.22,1,.36,1);transform:rotateY(0deg);}",
@@ -144,6 +144,7 @@
   }
   var playWhoosh = makeSoundPlayer('sounds/whoosh.wav', 0.20);
   var playClick = makeSoundPlayer('sounds/click.mp3', 0.6);
+  var playIconTap = makeSoundPlayer('sounds/icon-tap.mp3', 0.6);
 
   function copyEmail(e) {
     e.preventDefault();
@@ -276,6 +277,16 @@
       avatarFlip.addEventListener('click', function (e) {
         e.stopPropagation();
         avatarFlip.classList.toggle('is-flipped');
+      });
+      // turns to the photo on its own as the cursor enters, and back on
+      // the way out — click still toggles it too, for touch devices where
+      // hover never fires
+      avatarFlip.addEventListener('mouseenter', function () {
+        playIconTap();
+        avatarFlip.classList.add('is-flipped');
+      });
+      avatarFlip.addEventListener('mouseleave', function () {
+        avatarFlip.classList.remove('is-flipped');
       });
     }
     document.addEventListener('keydown', function (e) {
