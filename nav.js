@@ -22,14 +22,28 @@
     "@media (max-width:700px){.site-nav-dock{bottom:16px;gap:4px;}.site-nav-link{padding:11px 16px;font-size:13px;}}",
     ".site-contact-backdrop{position:fixed;inset:0;z-index:39;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .35s ease;}",
     ".site-contact-backdrop.is-open{opacity:1;pointer-events:auto;}",
-    ".site-contact-card{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) rotate(2deg) scale(0.4);width:min(340px,calc(100vw - 32px));background:#1C1C1E;border:1px solid rgba(255,255,255,0.13);border-radius:28px;padding:24px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.16),inset 0 -1px 0 rgba(0,0,0,0.35),0 30px 70px -26px rgba(0,0,0,0.9);z-index:41;opacity:0;pointer-events:none;transition:opacity .35s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.16,1,.3,1);}",
+    ".site-contact-card{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) rotate(2deg) scale(0.4);width:min(300px,calc(100vw - 32px));background:#1C1C1E;border:1px solid rgba(255,255,255,0.13);border-radius:28px;padding:68px 24px 24px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.16),inset 0 -1px 0 rgba(0,0,0,0.35),0 30px 70px -26px rgba(0,0,0,0.9);z-index:41;opacity:0;pointer-events:none;transition:opacity .35s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.16,1,.3,1);" +
+    // nametag lanyard-hole: punch a fixed-size pill out of the card so
+    // whatever sits behind it (the blurred page backdrop) shows through,
+    // via the same dual-layer mask-composite:exclude technique used for
+    // the border-ring glows elsewhere — layer A is an opaque full-box
+    // rect, layer B is a small pill SVG at a fixed pixel size/position;
+    // exclude keeps everything except where the two overlap
+    "-webkit-mask:linear-gradient(#000 0 0) border-box,url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMDAnIGhlaWdodD0nMTQnPjxyZWN0IHdpZHRoPScxMDAnIGhlaWdodD0nMTQnIHJ4PSc3JyBmaWxsPSdibGFjaycvPjwvc3ZnPg==) center 23px/100px 14px no-repeat;" +
+    "mask:linear-gradient(#000 0 0) border-box,url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMDAnIGhlaWdodD0nMTQnPjxyZWN0IHdpZHRoPScxMDAnIGhlaWdodD0nMTQnIHJ4PSc3JyBmaWxsPSdibGFjaycvPjwvc3ZnPg==) center 23px/100px 14px no-repeat;" +
+    "-webkit-mask-composite:xor;mask-composite:exclude;}",
     ".site-contact-card.is-open{opacity:1;pointer-events:auto;}",
-    "@media (max-width:700px){.site-contact-card{width:calc(100vw - 64px);}}",
+    "@media (max-width:700px){.site-contact-card{width:min(300px,calc(100vw - 64px));}}",
     "@keyframes siteContactToastSpin{from{transform:translate(-50%,-50%) rotate(0deg);}to{transform:translate(-50%,-50%) rotate(360deg);}}",
     ".site-contact-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border:0;border-radius:50%;background:rgba(255,255,255,0.06);color:#f4eeeb;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .25s ease;}",
     ".site-contact-close:hover{background:#2A2A2C;}",
-    ".site-contact-header{display:flex;align-items:center;gap:12px;}",
-    ".site-contact-avatar{width:48px;height:48px;border-radius:50%;background:#fff;display:block;flex:0 0 auto;}",
+    ".site-contact-header{display:flex;align-items:center;gap:16px;}",
+    ".site-contact-avatar-flip{position:relative;width:76px;height:76px;flex:0 0 auto;border:0;padding:0;margin:0;background:none;cursor:pointer;perspective:400px;-webkit-tap-highlight-color:transparent;}",
+    ".site-contact-avatar-face{position:absolute;inset:0;border-radius:50%;backface-visibility:hidden;-webkit-backface-visibility:hidden;transition:transform .6s cubic-bezier(.22,1,.36,1);transform:rotateY(0deg);}",
+    ".site-contact-avatar-face-back{transform:rotateY(180deg);}",
+    ".site-contact-avatar-flip.is-flipped .site-contact-avatar-face-front{transform:rotateY(-180deg);}",
+    ".site-contact-avatar-flip.is-flipped .site-contact-avatar-face-back{transform:rotateY(0deg);}",
+    ".site-contact-avatar{width:76px;height:76px;border-radius:50%;background:#fff;display:block;object-fit:cover;}",
     ".site-contact-name{margin:0;font-family:'Gastroe','Instrument Serif',Georgia,serif;font-weight:400;font-size:20px;color:#fff;}",
     ".site-contact-role{margin:2px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size:13px;font-weight:500;color:#73C41E;}",
     ".site-contact-blurb{margin:18px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size:13.5px;line-height:1.55;color:rgba(244,238,235,0.82);}",
@@ -172,7 +186,10 @@
       '<div class="site-contact-card" data-contact-card role="dialog" aria-modal="false" aria-label="Contact Ayub Leon">' +
         '<button type="button" class="site-contact-close" data-contact-close aria-label="Close">' + CLOSE_SVG + '</button>' +
         '<div class="site-contact-header">' +
-          '<img class="site-contact-avatar" src="images/ayub-avatar.svg" alt="Ayub Leon">' +
+          '<button type="button" class="site-contact-avatar-flip" data-avatar-flip aria-label="Flip photo">' +
+            '<span class="site-contact-avatar-face site-contact-avatar-face-front"><img class="site-contact-avatar" src="images/ayub-avatar.svg" alt="Ayub Leon"></span>' +
+            '<span class="site-contact-avatar-face site-contact-avatar-face-back"><img class="site-contact-avatar" src="images/ayub-photo.png" alt="Ayub Leon"></span>' +
+          '</button>' +
           '<div>' +
             '<p class="site-contact-name">Ayub Leon</p>' +
             '<p class="site-contact-role">Product Designer</p>' +
@@ -253,6 +270,14 @@
     });
     if (closeBtn) closeBtn.addEventListener('click', function () { setOpen(false); });
     if (backdrop) backdrop.addEventListener('click', function () { setOpen(false); });
+
+    var avatarFlip = el.querySelector('[data-avatar-flip]');
+    if (avatarFlip) {
+      avatarFlip.addEventListener('click', function (e) {
+        e.stopPropagation();
+        avatarFlip.classList.toggle('is-flipped');
+      });
+    }
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') setOpen(false);
     });
