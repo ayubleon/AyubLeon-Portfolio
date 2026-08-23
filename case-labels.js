@@ -25,12 +25,18 @@
   // the nav dock — and stay the same color on hover (the cursor-tracked
   // border glow is the only hover feedback). Locked with !important so the
   // card's own built-in style-hover attribute (which used to fade the
-  // background and turn the border green) can't touch them.
+  // background and turn the border green) can't touch them. Removing that
+  // attribute at the source isn't enough on its own — support.js compiles
+  // it into a real ".scp1:hover{...!important}" rule in its OWN stylesheet,
+  // injected later (React mounts after this script runs), and with equal
+  // specificity the later rule wins ties regardless of !important on both
+  // sides. Doubling the class selector here bumps specificity above
+  // ".scp1:hover" so this wins outright, independent of insertion order.
   var shimmerStyle = document.createElement('style');
   shimmerStyle.textContent = [
     ".al-glass-card{position:relative;}",
     ".al-glass-glow{position:absolute;inset:0;border-radius:inherit;padding:1px;background:radial-gradient(farthest-corner circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,0.95) 0%,transparent 65%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:0;transition:opacity .3s ease;}",
-    ".al-glass-card, .al-glass-card:hover{background:#1C1C1E !important;border:1px solid rgba(255,255,255,0.16) !important;}",
+    ".al-glass-card.al-glass-card, .al-glass-card.al-glass-card:hover{background:#1C1C1E !important;border:1px solid rgba(255,255,255,0.16) !important;}",
     "@media (prefers-reduced-motion: reduce){.al-glass-glow{display:none;}}"
   ].join('');
   document.head.appendChild(shimmerStyle);
