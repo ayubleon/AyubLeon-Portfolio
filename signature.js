@@ -25,12 +25,32 @@
     target.insertAdjacentElement('afterend', img);
   }
 
-  place();
+  // same template-lock, same fix — "People I've built with" ships with the
+  // page's serif heading font; match it to the footer's PAGES/CONTACTS/
+  // RESOURCES eyebrow-label style instead
+  function fixFriendsHeading() {
+    var heading = Array.from(document.querySelectorAll('p')).find(function (p) {
+      return p.textContent.trim() === "People I've built with";
+    });
+    if (!heading) return;
+    heading.style.fontFamily = 'Poppins, Helvetica, sans-serif';
+    heading.style.fontSize = '11px';
+    heading.style.letterSpacing = '0.18em';
+    heading.style.color = 'rgba(239,232,229,0.45)';
+    heading.style.textTransform = 'uppercase';
+  }
 
-  var observer = new MutationObserver(place);
+  function patch() {
+    place();
+    fixFriendsHeading();
+  }
+
+  patch();
+
+  var observer = new MutationObserver(patch);
   observer.observe(document.body, { childList: true, subtree: true });
   window.addEventListener('load', function () {
-    place();
+    patch();
     setTimeout(function () { observer.disconnect(); }, 5000);
   });
 })();
