@@ -1,0 +1,97 @@
+(function () {
+  // case study pages are rebuilt by support.js from its own internal
+  // template on load (same as the About page), discarding raw style edits
+  // — so patch the section-title labels (Overview, My role, Challenges,
+  // More work, etc.) via live DOM manipulation instead, matching them to
+  // the muted color already used for the Role/Client/Timeline meta-labels
+  // and to the About page's "PEOPLE I'VE BUILT WITH" treatment. Keep
+  // re-patching through the settle window since support.js can rebuild in
+  // more than one wave.
+
+  var MUTED = 'rgba(239, 232, 229, 0.45)';
+
+  // border-only glow that tracks the cursor: a real span (not a ::before —
+  // this exact card element inexplicably wouldn't pick up class- or
+  // var()-driven opacity changes on a pseudo-element while a plain test
+  // div with identical rules worked fine, so a real, directly-styleable
+  // element sidesteps whatever that was) clipped to just the border band
+  // via the double-mask "exclude" technique (padding-box minus
+  // content-box), lit by a radial-gradient centered on --mx/--my (updated
+  // from mousemove below). "farthest-corner" sizing means the glow's reach
+  // always scales to the card's own dimensions, so it still touches the
+  // border even when the cursor is near the middle, instead of a fixed
+  // pixel radius that falls short on larger cards.
+  // Fill/border are solid (no blur) — the same #1C1C1E card grey used by
+  // the nav dock — and stay the same color on hover (the cursor-tracked
+  // border glow is the only hover feedback). Locked with !important so the
+  // card's own built-in style-hover attribute (which used to fade the
+  // background and turn the border green) can't touch them.
+  var shimmerStyle = document.createElement('style');
+  shimmerStyle.textContent = [
+    ".al-glass-card{position:relative;}",
+    ".al-glass-glow{position:absolute;inset:0;border-radius:inherit;padding:1px;background:radial-gradient(farthest-corner circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,0.95) 0%,transparent 65%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:0;transition:opacity .3s ease;}",
+    ".al-glass-card, .al-glass-card:hover{background:#1C1C1E !important;border:1px solid rgba(255,255,255,0.16) !important;}",
+    "@media (prefers-reduced-motion: reduce){.al-glass-glow{display:none;}}"
+  ].join('');
+  document.head.appendChild(shimmerStyle);
+
+  function patch() {
+    document.querySelectorAll('p[style*="letter-spacing: 0.18em"]').forEach(function (p) {
+      var style = p.getAttribute('style') || '';
+      // already-correct labels (Role, Client, Timeline, prev/next, etc.)
+      // read back with this exact browser-normalized rgba string — anything
+      // else in this style family (rendered as rgb(...) regardless of
+      // whether the source file used a hex value) needs patching
+      if (style.indexOf(MUTED) !== -1) return;
+      p.style.color = MUTED;
+      p.style.textTransform = 'uppercase';
+    });
+  }
+
+  // the "More work" nav cards (next/previous project) currently have no
+  // fill at all — just a hairline border — so give them the site's
+  // standard solid card treatment plus a cursor-tracked border glow
+  function glassifyMoreWorkCards() {
+    document.querySelectorAll('a[style*="border: 1px solid rgba(255, 255, 255, 0.09)"]').forEach(function (card) {
+      if (card.dataset.glassCard) return;
+      card.dataset.glassCard = '1';
+      card.classList.add('al-glass-card');
+      card.style.setProperty('box-shadow', '0 8px 32px -8px rgba(0,0,0,0.5)');
+      // this is the card's own built-in hover directive (fades the
+      // background, turns the border green) — drop it at the source so
+      // there's nothing left to fight the !important rule above
+      card.removeAttribute('style-hover');
+
+      var glow = document.createElement('span');
+      glow.className = 'al-glass-glow';
+      glow.setAttribute('aria-hidden', 'true');
+      card.insertBefore(glow, card.firstChild);
+
+      card.addEventListener('mousemove', function (e) {
+        var rect = card.getBoundingClientRect();
+        glow.style.setProperty('--mx', ((e.clientX - rect.left) / rect.width) * 100 + '%');
+        glow.style.setProperty('--my', ((e.clientY - rect.top) / rect.height) * 100 + '%');
+      });
+      card.addEventListener('mouseenter', function () {
+        glow.style.opacity = '1';
+      });
+      card.addEventListener('mouseleave', function () {
+        glow.style.opacity = '0';
+      });
+    });
+  }
+
+  function patchAll() {
+    patch();
+    glassifyMoreWorkCards();
+  }
+
+  patchAll();
+
+  var observer = new MutationObserver(patchAll);
+  observer.observe(document.body, { childList: true, subtree: true });
+  window.addEventListener('load', function () {
+    patchAll();
+    setTimeout(function () { observer.disconnect(); }, 5000);
+  });
+})();
