@@ -1,4 +1,11 @@
 (function () {
+  // only cap the boats photo's height above the site's own 700px breakpoint
+  // (where .story-grid-1 switches to a single column and the side-by-side
+  // row-height mismatch this fixes doesn't exist in the first place)
+  var styleTag = document.createElement('style');
+  styleTag.textContent = '@media (min-width:701px){.story-photo-wrap{max-height:340px;}}';
+  document.head.appendChild(styleTag);
+
   // the About page's <main> content is rebuilt by support.js from its own
   // internal template on load, discarding any element placed there
   // directly in the static HTML (even an empty mount div, even a change to
