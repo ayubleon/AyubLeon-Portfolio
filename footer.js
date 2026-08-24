@@ -60,18 +60,18 @@
             '</div>' +
             '<div class="footer-nav-cols" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:48px;flex:0 1 380px;min-width:0;">' +
               '<div style="display:flex;flex-direction:column;gap:14px;">' +
-                '<p style="margin:0;font-family:Poppins;font-size:11px;letter-spacing:0.18em;color:var(--al-section-title,rgba(239,232,229,0.66))">PAGES</p>' +
+                '<p style="margin:0;font-family:Poppins;font-size:11px;color:var(--al-section-title,rgba(239,232,229,0.66))">PAGES</p>' +
                 '<a class="site-footer-link" href="' + links.home + '">Home</a>' +
                 '<a class="site-footer-link" href="' + links.work + '">Work</a>' +
                 '<a class="site-footer-link" href="' + links.about + '">About</a>' +
               '</div>' +
               '<div style="display:flex;flex-direction:column;gap:14px;">' +
-                '<p style="margin:0;font-family:Poppins;font-size:11px;letter-spacing:0.18em;color:var(--al-section-title,rgba(239,232,229,0.66))">CONTACTS</p>' +
+                '<p style="margin:0;font-family:Poppins;font-size:11px;color:var(--al-section-title,rgba(239,232,229,0.66))">CONTACTS</p>' +
                 '<a class="site-footer-link" href="mailto:ayubleon9@gmail.com" data-copy-email>Copy Email</a>' +
                 '<a class="site-footer-link" href="https://www.linkedin.com/in/ayubleon" target="_blank" rel="noopener noreferrer">Linked In</a>' +
               '</div>' +
               '<div style="display:flex;flex-direction:column;gap:14px;">' +
-                '<p style="margin:0;font-family:Poppins;font-size:11px;letter-spacing:0.18em;color:var(--al-section-title,rgba(239,232,229,0.66))">RESOURCES</p>' +
+                '<p style="margin:0;font-family:Poppins;font-size:11px;color:var(--al-section-title,rgba(239,232,229,0.66))">RESOURCES</p>' +
                 '<a class="site-footer-link" href="Ayub%20Leon%20-%20Resume.pdf" target="_blank" rel="noopener noreferrer">Download Resume</a>' +
               '</div>' +
             '</div>' +

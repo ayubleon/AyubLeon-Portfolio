@@ -6,10 +6,10 @@
   // Timeline, etc.) via live DOM manipulation instead, matching them all
   // to the shared section-title color also used by the footer's PAGES/
   // CONTACTS/RESOURCES and the About page's "PEOPLE I'VE BUILT WITH"
-  // treatment. Only the case/tracking treatment differs between the two
-  // groups now, not the color — see ALREADY_MUTED below. Keep
-  // re-patching through the settle window since support.js can rebuild
-  // in more than one wave.
+  // treatment. Both groups also lose the source's wide 0.18em tracking —
+  // only case (uppercase vs sentence-case) still tells them apart, not
+  // color or tracking — see ALREADY_MUTED below. Keep re-patching through
+  // the settle window since support.js can rebuild in more than one wave.
 
   // kept as a literal rather than var(...): this string is also used below
   // to detect labels the browser already serialized with this exact color,
@@ -70,10 +70,8 @@
       // sentence case, just lose the wide tracking back to the font's own
       // default spacing. Everything else gets the full section-title
       // treatment: uppercase, wide tracking kept as shipped
-      if (style.indexOf(ALREADY_MUTED) !== -1) {
-        p.style.letterSpacing = 'normal';
-        return;
-      }
+      p.style.letterSpacing = 'normal';
+      if (style.indexOf(ALREADY_MUTED) !== -1) return;
       p.style.textTransform = 'uppercase';
     });
   }
