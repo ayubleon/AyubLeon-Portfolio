@@ -185,20 +185,28 @@
 
     var avatarFlip = el.querySelector('[data-avatar-flip]');
     if (avatarFlip) {
+      // touch devices fire a synthetic mouseenter right before click on
+      // first tap, so with both handlers always active a tap added
+      // is-flipped via mouseenter and then immediately removed it again
+      // via click's toggle — leaving the photo needing a second tap to
+      // actually flip. Splitting on real hover support avoids the two
+      // handlers fighting over the same tap: hover-capable pointers get
+      // the mouseenter/mouseleave behavior, everything else (touch) gets
+      // a plain click toggle
+      var supportsHover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
       avatarFlip.addEventListener('click', function (e) {
         e.stopPropagation();
-        avatarFlip.classList.toggle('is-flipped');
+        if (!supportsHover) avatarFlip.classList.toggle('is-flipped');
       });
-      // turns to the photo on its own as the cursor enters, and back on
-      // the way out — click still toggles it too, for touch devices where
-      // hover never fires
-      avatarFlip.addEventListener('mouseenter', function () {
-        playIconTap();
-        avatarFlip.classList.add('is-flipped');
-      });
-      avatarFlip.addEventListener('mouseleave', function () {
-        avatarFlip.classList.remove('is-flipped');
-      });
+      if (supportsHover) {
+        avatarFlip.addEventListener('mouseenter', function () {
+          playIconTap();
+          avatarFlip.classList.add('is-flipped');
+        });
+        avatarFlip.addEventListener('mouseleave', function () {
+          avatarFlip.classList.remove('is-flipped');
+        });
+      }
     }
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') setOpen(false);
