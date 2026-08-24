@@ -197,6 +197,13 @@
     ".al-pv-more-row{display:flex;align-items:center;gap:20px;padding:22px 4px;border-bottom:1px solid rgba(0,0,0,0.1);color:inherit;text-decoration:none;transition:opacity .2s ease;}",
     ".al-pv-more-row:first-child{border-top:1px solid rgba(0,0,0,0.1);}",
     ".al-pv-more-row:hover{opacity:0.6;}",
+    // the row for whatever project is already open — clicking it is a
+    // no-op (the document click handler below returns early when the
+    // clicked href matches currentIndex), so it's marked inert (default
+    // cursor, no hover-dim) rather than left looking like every other
+    // navigable row
+    ".al-pv-more-row-current{cursor:default;}",
+    ".al-pv-more-row-current:hover{opacity:1;}",
     // black-on-white, the reverse of the dark-card close button elsewhere
     // on the site — this one only ever sits on the white center card
     ".al-pv-close{position:absolute;top:20px;right:20px;z-index:4;width:36px;height:36px;border-radius:50%;border:0;padding:0;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .2s ease;}",
@@ -345,7 +352,7 @@
   // plain list of all four projects in the same canonical order used
   // everywhere else — identified by the "More work" label itself rather
   // than a class, since the source markup doesn't give that grid one
-  function rebuildMoreWork(inner) {
+  function rebuildMoreWork(inner, currentHref) {
     var label = Array.from(inner.querySelectorAll('p')).find(function (p) {
       return p.textContent.trim() === 'More work';
     });
@@ -354,13 +361,17 @@
     grid.innerHTML = '';
     grid.style.display = 'block';
     ORDER.forEach(function (projectHref, i) {
+      var isCurrent = projectHref === currentHref;
       var row = document.createElement('a');
       row.href = projectHref;
-      row.className = 'al-pv-more-row';
+      row.className = 'al-pv-more-row' + (isCurrent ? ' al-pv-more-row-current' : '');
+      if (isCurrent) row.setAttribute('aria-current', 'true');
       row.innerHTML =
         '<span style="flex:0 0 auto;width:28px;font-family:Poppins,Helvetica,sans-serif;font-size:13px;color:#636262;">' + String(i + 1).padStart(2, '0') + '</span>' +
-        '<span data-pv-more-title style="flex:1 1 auto;font-family:Poppins,Helvetica,sans-serif;font-size:1.15rem;font-weight:600;color:#000;"></span>' +
-        '<span aria-hidden="true" style="flex:0 0 auto;color:#636262;">&rarr;</span>';
+        '<span data-pv-more-title style="flex:1 1 auto;font-family:Poppins,Helvetica,sans-serif;font-size:1rem;font-weight:500;color:' + (isCurrent ? 'var(--al-green,#73C41E)' : '#000') + ';"></span>' +
+        (isCurrent ?
+          '<span aria-hidden="true" style="flex:0 0 auto;font-family:Poppins,Helvetica,sans-serif;font-size:12px;color:var(--al-green,#73C41E);">Currently viewing</span>' :
+          '<span aria-hidden="true" style="flex:0 0 auto;color:#636262;">&rarr;</span>');
       grid.appendChild(row);
       loadProject(projectHref).then(function (data) {
         row.querySelector('[data-pv-more-title]').textContent = data.title;
@@ -416,7 +427,7 @@
         v.loop = true;
         v.play().catch(function () {});
       });
-      rebuildMoreWork(inner);
+      rebuildMoreWork(inner, href);
       fixMediaCrops(inner);
       fixCaseStudyLinkLayout(inner);
     });
