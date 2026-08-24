@@ -18,6 +18,28 @@
   ].join('');
   document.head.appendChild(tokenStyle);
 
+  // reveals the page (see the body{opacity:0} + .al-ready rule each page's
+  // own inline <style> ships with) once fonts have swapped in and the
+  // initial load has settled, instead of the page flashing through an
+  // unstyled/incomplete state first — that gap is invisible on a fast
+  // local server but real on a cold, real-network first visit. A hard
+  // fallback still reveals the page after 2.5s regardless, so a hung font
+  // load (or anything else that never resolves) can't leave it invisible.
+  var REVEAL_DELAY_MS = 120;
+  var REVEAL_FALLBACK_MS = 2500;
+  function reveal() {
+    document.body.classList.add('al-ready');
+  }
+  var fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+  var pageLoaded = new Promise(function (resolve) {
+    if (document.readyState === 'complete') resolve();
+    else window.addEventListener('load', resolve);
+  });
+  Promise.all([fontsReady, pageLoaded]).then(function () {
+    setTimeout(reveal, REVEAL_DELAY_MS);
+  });
+  setTimeout(reveal, REVEAL_FALLBACK_MS);
+
   // self-healing mount/patch runner: support.js can rebuild the page's
   // <main> content from its own internal template after first paint, in
   // one or more waves — this re-runs `runFn` on every DOM mutation until a
