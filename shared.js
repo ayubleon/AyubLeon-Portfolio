@@ -1,16 +1,6 @@
 (function () {
   window.AL = window.AL || {};
 
-  // The loading-screen intro used to live here, built by this deferred
-  // script. That's structurally too late: a deferred script only runs
-  // after the browser has already parsed (and painted) the page's raw
-  // HTML, and after support.js — deferred too, but ordered before this
-  // file — has done its own initial rebuild of <main>. Both of those paint
-  // before this script gets a turn, so the real page flashed through
-  // (twice) before the overlay could ever appear. It's now an inline,
-  // non-deferred snippet at the very top of <body> on the two pages that
-  // use it (Landing Page, About) instead — see the top of those files.
-
   // design tokens used across nav.js/footer.js/badge.js/signature.js/
   // case-labels.js — one definition instead of the same literals
   // hand-repeated in every file's own CSS string
