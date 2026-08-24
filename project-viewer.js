@@ -216,6 +216,17 @@
     ".al-pv-card[data-role=center] a:hover{color:#000;}",
     ".al-pv-card[data-role=center] a:focus-visible,.al-pv-card[data-role=center] button:focus-visible{outline:2px solid var(--al-green,#73C41E);outline-offset:3px;border-radius:4px;}",
     ".al-pv-card[data-role=center] ::selection{background:#ff3b12;color:#fff;}",
+    // the case-study pages' body copy runs a size or two larger than the
+    // About page's own — 17.5px/15.5px/15px against About's consistent
+    // 14.5px body-paragraph size. Matched here at every width, not just
+    // mobile, by targeting the exact inline font-size values the source
+    // markup uses (attribute substring selectors on raw, unnormalized
+    // inline styles — reliable here since these pages don't vary that
+    // value) rather than by role/selector, since the same size shows up
+    // across differently-purposed elements (hero subhead, body
+    // paragraphs, meta-grid values) that don't share a class
+    ".al-pv-card[data-role=center] [data-pv-inner] [style*=\"font-size: 17.5px\"],.al-pv-card[data-role=center] [data-pv-inner] [style*=\"font-size: 15px\"]{font-size:14.5px !important;}",
+    ".al-pv-card[data-role=center] [data-pv-inner] [style*=\"font-size: 15.5px\"]{font-size:14.5px !important;line-height:1.72 !important;}",
     // the "More work" section is rebuilt into a plain list of all four
     // projects (see rebuildMoreWork below) rather than the source's own
     // prev/next card pair, so it needs its own row styling instead of the
@@ -278,20 +289,7 @@
       // narrow phone, so it's lowered here — same auto-fit behavior,
       // just with room to place a pair side by side when the screen
       // allows it, matching the source pages' own equivalent rule
-      ".al-pv-card[data-role=center] [data-pv-inner] div[style*=\"grid-template-columns: repeat(auto-fit, minmax(190px, 1fr))\"]{grid-template-columns:repeat(auto-fit,minmax(130px,1fr)) !important;}" +
-      // the case-study pages' body copy runs a size or two larger than
-      // the About page's own — 17.5px/15.5px/15px against About's
-      // consistent 14.5px body-paragraph size — which barely reads as a
-      // difference on these pages' own wide desktop columns but stands
-      // out once both are seen at the same phone width. Matched here by
-      // targeting the exact inline font-size values the source markup
-      // uses (attribute substring selectors on raw, unnormalized inline
-      // styles — reliable here since these pages don't vary that value)
-      // rather than by role/selector, since the same size shows up
-      // across differently-purposed elements (hero subhead, body
-      // paragraphs, meta-grid values) that don't share a class
-      ".al-pv-card[data-role=center] [data-pv-inner] [style*=\"font-size: 17.5px\"],.al-pv-card[data-role=center] [data-pv-inner] [style*=\"font-size: 15px\"]{font-size:14.5px !important;}" +
-      ".al-pv-card[data-role=center] [data-pv-inner] [style*=\"font-size: 15.5px\"]{font-size:14.5px !important;line-height:1.72 !important;}}",
+      ".al-pv-card[data-role=center] [data-pv-inner] div[style*=\"grid-template-columns: repeat(auto-fit, minmax(190px, 1fr))\"]{grid-template-columns:repeat(auto-fit,minmax(130px,1fr)) !important;}}",
     "@media (prefers-reduced-motion: reduce){.al-pv-overlay,.al-pv-card{transition:none !important;}}"
   ].join('');
   document.head.appendChild(style);
