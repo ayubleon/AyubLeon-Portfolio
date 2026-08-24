@@ -180,6 +180,17 @@
   if (AL.audioCtx) {
     var unlockAudio = function () {
       if (AL.audioCtx.state === 'suspended') AL.audioCtx.resume();
+      // iOS Safari specifically: calling resume() alone can leave the
+      // context reporting "running" while still producing no audible
+      // output, until an actual buffer source has been created and
+      // started synchronously inside this same real-gesture handler —
+      // a documented WebKit quirk, not covered by resume() on its own.
+      // A single silent sample does that unlock with nothing audible
+      var silent = AL.audioCtx.createBuffer(1, 1, 22050);
+      var src = AL.audioCtx.createBufferSource();
+      src.buffer = silent;
+      src.connect(AL.audioCtx.destination);
+      src.start(0);
       document.removeEventListener('pointerdown', unlockAudio);
       document.removeEventListener('keydown', unlockAudio);
       document.removeEventListener('touchstart', unlockAudio);
