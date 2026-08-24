@@ -52,12 +52,14 @@
   function fillFaces(el) {
     var nameFaces = el.querySelectorAll('[data-face="name"]');
     var portraitFaces = el.querySelectorAll('[data-face="portrait"]');
+    // a failed fetch (offline, network hiccup) should just leave these
+    // faces blank, not surface as an unhandled promise rejection
     loadSvgText('images/badge-name.svg').then(function (svg) {
       nameFaces.forEach(function (f) { f.innerHTML = svg; });
-    });
+    }).catch(function () {});
     loadSvgText('images/badge-portrait.svg').then(function (svg) {
       portraitFaces.forEach(function (f) { f.innerHTML = svg; });
-    });
+    }).catch(function () {});
   }
 
   var playIconTap = AL.makeSoundPlayer('sounds/icon-tap.mp3', 0.6);
@@ -82,6 +84,7 @@
                                // block the page from scrolling for its entire momentum
                                // tail instead of just the deliberate part of it
   var SETTLE_MS = 320;        // full-arc duration for the commit/revert snap
+  var MIN_SETTLE_MS = 120;    // floor on that duration so a near-finished drag still gets a visible snap
   var SCROLL_KEYS = { ' ': 1, 'Spacebar': 1, 'PageDown': 1, 'PageUp': 1, 'ArrowDown': 1, 'ArrowUp': 1, 'Home': 1, 'End': 1 };
 
   function isAtBottom() {
@@ -155,7 +158,7 @@
       var progress = dragDelta / DRAG_THRESHOLD;
       var commit = progress >= COMMIT_RATIO;
       var remaining = commit ? 1 - progress : progress;
-      var duration = Math.max(120, remaining * SETTLE_MS);
+      var duration = Math.max(MIN_SETTLE_MS, remaining * SETTLE_MS);
       dragging = false;
       dragDelta = 0;
       if (commit) angle += 90;
@@ -263,5 +266,5 @@
     document.querySelectorAll('[data-badge-mount]').forEach(fill);
   }
 
-  AL.selfHeal(fillAll, 3000);
+  AL.selfHeal(fillAll);
 })();

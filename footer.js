@@ -12,7 +12,11 @@
 
   function copyEmail(e) {
     e.preventDefault();
-    AL.copyText('ayubleon9@gmail.com', function () { AL.showToast('Copied to Clipboard'); });
+    AL.copyText(
+      'ayubleon9@gmail.com',
+      function () { AL.showToast('Copied to Clipboard'); },
+      function () { AL.showToast("Couldn't copy — email is ayubleon9@gmail.com", { glow: false }); }
+    );
   }
 
   // sizes the wordmark so its rendered width is always exactly 80% of the
@@ -102,5 +106,5 @@
     document.querySelectorAll('[data-footer-mount]').forEach(fill);
   }
 
-  AL.selfHeal(fillAll, 3000);
+  AL.selfHeal(fillAll);
 })();

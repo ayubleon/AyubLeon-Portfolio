@@ -39,7 +39,7 @@
   shimmerStyle.textContent = [
     ".al-glass-card{position:relative;}",
     ".al-glass-glow{position:absolute;inset:0;border-radius:inherit;padding:1px;background:radial-gradient(farthest-corner circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,0.95) 0%,transparent 65%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:0;transition:opacity .3s ease;}",
-    ".al-glass-card.al-glass-card, .al-glass-card.al-glass-card:hover{background:var(--al-card,#1C1C1E) !important;border:1px solid var(--al-border-light,rgba(255,255,255,0.16)) !important;}",
+    ".al-glass-card.al-glass-card, .al-glass-card.al-glass-card:hover{background:var(--al-card,#1C1C1E) !important;border:1px solid var(--al-border-strong,rgba(255,255,255,0.16)) !important;}",
     "@media (prefers-reduced-motion: reduce){.al-glass-glow{display:none;}}"
   ].join('');
   document.head.appendChild(shimmerStyle);

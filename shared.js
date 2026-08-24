@@ -13,7 +13,7 @@
     "--al-green-hover:#8fe030;",
     "--al-text-muted:rgba(239,232,229,0.45);",
     "--al-border:rgba(255,255,255,0.13);",
-    "--al-border-light:rgba(255,255,255,0.16);",
+    "--al-border-strong:rgba(255,255,255,0.16);",
     "}"
   ].join('');
   document.head.appendChild(tokenStyle);
@@ -37,22 +37,32 @@
   };
 
   // clipboard copy with a document.execCommand fallback for contexts
-  // without navigator.clipboard (older Safari, non-secure origins)
-  AL.fallbackCopy = function (text, done) {
+  // without navigator.clipboard (older Safari, non-secure origins).
+  // execCommand can fail silently (returns false) as well as throw, so
+  // both are treated as failure and reported via `fail` rather than just
+  // dropped — otherwise a user who clicks "copy" and gets nothing has no
+  // way to know it didn't work.
+  AL.fallbackCopy = function (text, done, fail) {
     var ta = document.createElement('textarea');
     ta.value = text;
     ta.style.position = 'fixed';
     ta.style.opacity = '0';
     document.body.appendChild(ta);
     ta.select();
-    try { document.execCommand('copy'); done(); } catch (err) {}
+    var copied = false;
+    try { copied = document.execCommand('copy'); } catch (err) {}
     document.body.removeChild(ta);
+    if (copied) {
+      done();
+    } else if (fail) {
+      fail();
+    }
   };
-  AL.copyText = function (text, done) {
+  AL.copyText = function (text, done, fail) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(done).catch(function () { AL.fallbackCopy(text, done); });
+      navigator.clipboard.writeText(text).then(done).catch(function () { AL.fallbackCopy(text, done, fail); });
     } else {
-      AL.fallbackCopy(text, done);
+      AL.fallbackCopy(text, done, fail);
     }
   };
 
@@ -70,7 +80,7 @@
     wrap.setAttribute('aria-live', 'polite');
     wrap.style.cssText = 'position:fixed;left:50%;bottom:92px;z-index:60;padding:1.6px;border-radius:999px;overflow:hidden;isolation:isolate;box-shadow:0 30px 70px -26px rgba(0,0,0,0.98);opacity:0;transform:translate(-50%,18px);pointer-events:none;transition:opacity .45s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1);';
     wrap.innerHTML =
-      '<div aria-hidden="true" style="position:absolute;left:50%;top:50%;width:260%;aspect-ratio:1;background:conic-gradient(from 0deg, rgba(255,255,255,0) 0deg, rgba(255,255,255,0) 200deg, rgba(255,255,255,0.55) 292deg, rgba(255,255,255,0.92) 330deg, #ffffff 348deg, rgba(255,255,255,0) 360deg);animation:alToastSpin 2.6s linear infinite;"></div>' +
+      '<div data-toast-glow aria-hidden="true" style="position:absolute;left:50%;top:50%;width:260%;aspect-ratio:1;background:conic-gradient(from 0deg, rgba(255,255,255,0) 0deg, rgba(255,255,255,0) 200deg, rgba(255,255,255,0.55) 292deg, rgba(255,255,255,0.92) 330deg, #ffffff 348deg, rgba(255,255,255,0) 360deg);animation:alToastSpin 2.6s linear infinite;"></div>' +
       '<div style="position:relative;display:flex;align-items:center;padding:14px 24px;border-radius:999px;background:var(--al-card,#1C1C1E);font-family:\'Schibsted Grotesk\',Helvetica,sans-serif;font-size:14px;letter-spacing:-0.005em;color:#fdf9f7;">' +
         '<span data-toast-text style="font-family:Poppins">Copied to Clipboard</span>' +
       '</div>';
@@ -79,10 +89,15 @@
     return wrap;
   }
   var toastTimer;
-  AL.showToast = function (msg) {
+  // `opts.glow` (default true) toggles the spinning conic-gradient border —
+  // off for error messages, since that shimmer reads as a celebratory
+  // "success" cue and would be misleading on a failure toast
+  AL.showToast = function (msg, opts) {
     var wrap = ensureToast();
     var textEl = wrap.querySelector('[data-toast-text]');
     if (textEl) textEl.textContent = msg;
+    var glowEl = wrap.querySelector('[data-toast-glow]');
+    if (glowEl) glowEl.style.display = (opts && opts.glow === false) ? 'none' : '';
     wrap.style.opacity = '1';
     wrap.style.transform = 'translate(-50%, 0)';
     clearTimeout(toastTimer);
