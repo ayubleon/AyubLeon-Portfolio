@@ -78,13 +78,9 @@
     .about-hero-grid > div:first-child { align-items: center !important; text-align: center !important; }
     .about-hero-photos { width: 100%; }
   }
-  @media (min-width: 701px) and (max-width: 1100px) {
-    .about-hero-grid > div:first-child p { font-size: 26px !important; max-width: 38ch !important; }
-    .about-hero-grid > div:first-child p span { font-size: 33px !important; }
-  }
   @media (max-width: 700px) {
     #top { min-height: auto !important; padding-top: 100px !important; padding-bottom: 40px !important; }
-    .about-hero-card { padding: 32px 24px 36px !important; gap: 32px !important; }
+    .about-hero-card { padding: 32px 24px 36px !important; }
     .about-hero-photo-1 { display: none !important; }
     .about-hero-photos { grid-template-columns: 1fr !important; }
     .about-hero-grid { grid-template-columns: 1fr !important; justify-items: center; gap: 28px !important; }
@@ -108,13 +104,13 @@
 
   <main>
   <section id="top" class="mobile-gutter" style="position: relative; max-width: 1400px; margin: 0 auto; padding: 40px; display: flex;">
-    <div class="about-hero-card" style="position: relative; flex: 1 1 auto; display: flex; flex-direction: column; justify-content: flex-start; gap: clamp(24px, 3vh, 48px); background: var(--al-card-light,#FDFBF8); border-radius: 18px; padding: 54px;">
+    <div class="about-hero-card" style="position: relative; flex: 1 1 auto; display: flex; flex-direction: column; justify-content: flex-start; gap: clamp(14px, 3vw, 48px); background: var(--al-card-light,#FDFBF8); border-radius: 18px; padding: 54px;">
       <h1 style="margin: 0; font-family: 'Gastroe', 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: clamp(2.4rem, 11.91vw, 180px); line-height: 1; letter-spacing: -0.01em; color: #14120f;">About me</h1>
 
       <div class="about-hero-grid" style="display: grid; grid-template-columns: minmax(0, 0.58fr) minmax(0, 1.42fr); align-items: end; gap: 40px;">
         <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
-          <img src="images/ayub-avatar.svg" alt="Ayub Leon" style="width: 174px; height: 242px; margin-bottom: -45px; display: block; object-fit: contain;">
-          <p style="margin: 0; max-width: 24ch; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1rem, 1.5vw, 23px); font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; color: #14120f; text-wrap: pretty;">How I got here, paired with some frames from my last trip home to <span style="font-family: 'Gastroe', 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: clamp(1.2rem, 1.9vw, 29px);">Mombasa</span></p>
+          <img src="images/ayub-avatar.svg" alt="Ayub Leon" style="width: clamp(145px, 40vw, 174px); aspect-ratio: 174 / 242; margin-bottom: clamp(-45px, -10.3vw, -38px); display: block; object-fit: contain;">
+          <p style="margin: 0; max-width: 40ch; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(0.94rem, 1.5vw, 23px); font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; color: #14120f; text-wrap: pretty;">How I got here, paired with some frames from my last trip home to <span style="font-family: 'Gastroe', 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: clamp(1.2rem, 1.9vw, 29px);">Mombasa</span></p>
         </div>
 
         <div class="about-hero-photos" style="display: grid; grid-template-columns: minmax(0, 0.82fr) minmax(0, 1fr); align-items: end; gap: 22px;">
