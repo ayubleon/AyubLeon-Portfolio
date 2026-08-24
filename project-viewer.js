@@ -63,11 +63,14 @@
   // columns, not this narrower card. Fixed, smaller sizes here instead
   // of just capping the clamp(), consistent with how the rest of this
   // card's typography (body copy, meta-grid values) is already fixed
-  // rather than fluid
+  // rather than fluid. Headings match the About page's own numbered
+  // story titles exactly — 1.16rem at -0.015em tracking — kept
+  // deliberately above the 0.95rem subheadings so the two tiers stay
+  // visually distinct
   function shrinkCardHeadings(html) {
     return html
-      .replace(/font-size:\s*clamp\(1\.2rem,\s*1\.9vw,\s*1\.55rem\)/gi, 'font-size: 1.25rem')
-      .replace(/font-size:\s*clamp\(1\.2rem,\s*1\.9vw,\s*1\.62rem\)/gi, 'font-size: 1.25rem')
+      .replace(/font-size:\s*clamp\(1\.2rem,\s*1\.9vw,\s*1\.55rem\);(\s*font-weight:\s*500;\s*line-height:\s*1\.4;\s*)letter-spacing:\s*-0\.022em/gi, 'font-size: 1.16rem;$1letter-spacing: -0.015em')
+      .replace(/font-size:\s*clamp\(1\.2rem,\s*1\.9vw,\s*1\.62rem\);(\s*font-weight:\s*500;\s*line-height:\s*1\.4;\s*)letter-spacing:\s*-0\.022em/gi, 'font-size: 1.16rem;$1letter-spacing: -0.015em')
       .replace(/font-size:\s*1\.08rem(;\s*font-weight:\s*500;\s*letter-spacing:\s*-0\.015em;)/gi, 'font-size: 0.95rem$1');
   }
 
@@ -195,7 +198,13 @@
     // recognizer, which can otherwise claim a horizontal drag started
     // over this scrollable content as an ambiguous scroll gesture and
     // swallow it before touchmove ever reports it as a deliberate swipe
-    ".al-pv-card[data-role=center] .al-pv-card-inner{overflow-y:auto;overflow-x:hidden;color:#000;font-family:Poppins,Helvetica,Arial,sans-serif;touch-action:pan-y;}",
+    // matches the About page's own site-wide default: on the real
+    // case-study page this same body copy inherits Schibsted Grotesk
+    // from a wrapper that lives outside <main>, so outside what gets
+    // extracted into this card — Poppins was standing in as a fallback
+    // for that lost inheritance, which left every paragraph, meta-grid
+    // value, and inline link in the wrong typeface here specifically
+    ".al-pv-card[data-role=center] .al-pv-card-inner{overflow-y:auto;overflow-x:hidden;color:#000;font-family:'Schibsted Grotesk',Helvetica,Arial,sans-serif;touch-action:pan-y;}",
     // pointer-events:auto only while open — this scrollable inner needs
     // it re-enabled since the closed overlay's pointer-events:none
     // wouldn't otherwise reach through a nested pointer-events override.
