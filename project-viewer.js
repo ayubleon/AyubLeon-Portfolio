@@ -240,6 +240,14 @@
       ".al-pv-card[data-role=center] .case-split-grid{grid-template-columns:1fr !important;gap:56px 0 !important;}" +
       ".al-pv-card[data-role=center] .case-figure-grid{grid-template-columns:1fr !important;}" +
       ".al-pv-card[data-role=center] .mobile-gutter{padding-left:16px !important;padding-right:16px !important;}" +
+      // the Role/Client/Timeline/Platforms/Project contributors grid has
+      // no class of its own — it already auto-fits into however many
+      // 190px-minimum columns fit, no override needed for that part on
+      // its own. That minimum is just too wide for 2 to ever fit on a
+      // narrow phone, so it's lowered here — same auto-fit behavior,
+      // just with room to place a pair side by side when the screen
+      // allows it, matching the source pages' own equivalent rule
+      ".al-pv-card[data-role=center] [data-pv-inner] div[style*=\"grid-template-columns: repeat(auto-fit, minmax(190px, 1fr))\"]{grid-template-columns:repeat(auto-fit,minmax(130px,1fr)) !important;}" +
       // the case-study pages' body copy runs a size or two larger than
       // the About page's own — 17.5px/15.5px/15px against About's
       // consistent 14.5px body-paragraph size — which barely reads as a

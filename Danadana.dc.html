@@ -50,6 +50,14 @@
     .case-label-grid { grid-template-columns: 1fr !important; gap: 14px 0 !important; }
     .case-split-grid { grid-template-columns: 1fr !important; gap: 56px 0 !important; }
     .case-figure-grid { grid-template-columns: 1fr !important; }
+    /* the Role/Client/Timeline/Platforms/Project contributors grid below
+       has no class of its own — it already auto-fits into however many
+       190px-minimum columns the available width allows, no override
+       needed for that part. On a narrow phone that 190px minimum is
+       simply too wide for 2 to ever fit, so it's lowered here — same
+       auto-fit behavior, just with room to actually place a pair
+       side by side when the screen allows it */
+    div[style*="grid-template-columns: repeat(auto-fit, minmax(190px, 1fr))"] { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important; }
   }
 </style>
 </helmet>
