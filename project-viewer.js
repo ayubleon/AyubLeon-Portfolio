@@ -145,7 +145,7 @@
     // card itself ends up being. Center is white — the focused project
     // reads as a bright surface lifted above the black page — while
     // prev/next keep the dark card grey, receding behind it
-    ".al-pv-card[data-role=center]{transform:translate(-50%,-50%);opacity:1;z-index:3;background:#fff;}",
+    ".al-pv-card[data-role=center]{transform:translate(-50%,-50%);opacity:1;z-index:3;background:var(--al-card-light,#FDFBF8);}",
     // shorter than center — top:50% + translateY(-50%) still centers each
     // card on its own (smaller) box, so this alone is enough to inset it
     // evenly top and bottom, matching a stacked-behind card rather than
@@ -188,7 +188,7 @@
     // defaults — kept scoped to .al-pv-card so nothing leaks site-wide
     ".al-pv-card[data-role=center] a{color:#636262;text-decoration:none;transition:color .35s cubic-bezier(.22,1,.36,1);}",
     ".al-pv-card[data-role=center] a:hover{color:#000;}",
-    ".al-pv-card[data-role=center] a:focus-visible,.al-pv-card[data-role=center] button:focus-visible{outline:2px solid #73C41E;outline-offset:3px;border-radius:4px;}",
+    ".al-pv-card[data-role=center] a:focus-visible,.al-pv-card[data-role=center] button:focus-visible{outline:2px solid var(--al-green,#73C41E);outline-offset:3px;border-radius:4px;}",
     ".al-pv-card[data-role=center] ::selection{background:#ff3b12;color:#fff;}",
     // the "More work" section is rebuilt into a plain list of all four
     // projects (see rebuildMoreWork below) rather than the source's own
@@ -218,7 +218,7 @@
     // it shows through as a visible dark edge wherever the cover-fit image
     // doesn't fully hide it, and as an outright letterboxed bar around the
     // prototype video, which uses object-fit:contain instead of cover
-    ".al-pv-card[data-role=center] [data-pv-inner] div:has(> img),.al-pv-card[data-role=center] [data-pv-inner] div:has(> video){box-shadow:0 6px 24px -6px rgba(0,0,0,0.14);background:#fff !important;border:none !important;}",
+    ".al-pv-card[data-role=center] [data-pv-inner] div:has(> img),.al-pv-card[data-role=center] [data-pv-inner] div:has(> video){box-shadow:0 6px 24px -6px rgba(0,0,0,0.14);background:var(--al-card-light,#FDFBF8) !important;border:none !important;}",
     // the center card takes almost the full screen, only trimmed enough
     // to leave a slim margin on each side — the same existing PEEK_PCT
     // math naturally clips prev/next down to a thin grey sliver in just

@@ -2,13 +2,17 @@
   window.AL = window.AL || {};
 
   // design tokens used across nav.js/footer.js/badge.js/signature.js/
-  // case-labels.js — one definition instead of the same literals
-  // hand-repeated in every file's own CSS string
+  // case-labels.js/project-viewer.js — one definition instead of the same
+  // literals hand-repeated in every file's own CSS string
   var tokenStyle = document.createElement('style');
   tokenStyle.textContent = [
     ":root{",
     "--al-card:#1C1C1E;",
     "--al-card-hover:#2A2A2C;",
+    // the light-surface counterpart to --al-card — used by the About
+    // page's hero card and the project-viewer white card, an off-white
+    // rather than pure #fff
+    "--al-card-light:#FDFBF8;",
     "--al-green:#73C41E;",
     "--al-green-hover:#8fe030;",
     "--al-text-muted:rgba(239,232,229,0.45);",
