@@ -152,11 +152,20 @@
     // resume the (possibly still-locked) context on this gesture regardless,
     // and queue the actual start for the moment decoding finishes instead of
     // silently dropping the very first click/tap/hover of each page
-    return function play() {
-      if (!AL.audioCtx) return;
-      if (AL.audioCtx.state === 'suspended') AL.audioCtx.resume();
+    function startWhenReady() {
       if (buffer) start();
       else if (ready) ready.then(start);
+    }
+    return function play() {
+      if (!AL.audioCtx) return;
+      // starting a buffer source while the context is still (technically)
+      // suspended, even a moment after calling resume() on it, silently
+      // drops the sound on some mobile WebKit versions instead of queuing
+      // it for once resume() actually finishes — so on that path, wait for
+      // resume()'s own promise before starting, rather than firing both in
+      // the same tick
+      if (AL.audioCtx.state === 'suspended') AL.audioCtx.resume().then(startWhenReady);
+      else startWhenReady();
     };
   };
   // browsers only unlock a suspended AudioContext on a real user gesture

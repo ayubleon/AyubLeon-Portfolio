@@ -18,7 +18,13 @@
     ".site-nav-avatar{width:42px;height:42px;border-radius:50%;background:#fff;display:block;flex:0 0 auto;padding:3px;pointer-events:none;}",
     ".site-nav-tooltip{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,4px);background:var(--al-card,#1C1C1E);color:#f4eeeb;font-family:Poppins,Helvetica,sans-serif;font-size:12.5px;font-weight:500;letter-spacing:-0.005em;padding:6px 11px;border-radius:14px;white-space:nowrap;border:1px solid rgba(255,255,255,0.12);box-shadow:0 10px 24px -10px rgba(0,0,0,0.7);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;}",
     ".site-nav-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--al-card,#1C1C1E);}",
-    ".site-nav-avatar-btn:hover .site-nav-tooltip,.site-nav-avatar-btn:focus-visible .site-nav-tooltip{opacity:1;transform:translate(-50%,0);}",
+    // scoped to real hover support: on touch, a tap applies :hover too
+    // (often "stuck" until the next tap elsewhere), popping this up as an
+    // unwanted side effect of just tapping the button rather than an
+    // actual hover. Keyboard focus stays unconditional — that's a
+    // deliberate, non-hover way to reach this button
+    "@media (hover:hover) and (pointer:fine){.site-nav-avatar-btn:hover .site-nav-tooltip{opacity:1;transform:translate(-50%,0);}}",
+    ".site-nav-avatar-btn:focus-visible .site-nav-tooltip{opacity:1;transform:translate(-50%,0);}",
     "@media (max-width:700px){.site-nav-dock{bottom:16px;gap:4px;}.site-nav-link{padding:11px 16px;font-size:13px;}}",
     ".site-contact-backdrop{position:fixed;inset:0;z-index:39;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .35s ease;}",
     ".site-contact-backdrop.is-open{opacity:1;pointer-events:auto;}",
