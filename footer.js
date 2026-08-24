@@ -1,6 +1,5 @@
 (function () {
   var CSS = [
-    "@font-face{font-family:'Gastroe';src:url('fonts/Gastroe-Demo.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}",
     ".site-footer-link{font-size:14px;font-weight:400;color:rgba(244,238,235,0.88);text-decoration:none;transition:color .3s cubic-bezier(.22,1,.36,1),font-weight .3s cubic-bezier(.22,1,.36,1);}",
     ".site-footer-link:hover{color:#fff;font-weight:600;}",
     "@media (max-width:700px){.footer-nav-cols{gap:24px!important;}}",
@@ -29,17 +28,20 @@
   // the wordmark's true rendered width at a given font-size is to measure
   // it independently of layout
   var measureCanvas = null;
-  function measureTextWidth(text, fontSizePx, fontFamily) {
+  function measureTextWidth(text, fontSizePx, fontFamily, fontWeight) {
     if (!measureCanvas) measureCanvas = document.createElement('canvas');
     var ctx = measureCanvas.getContext('2d');
-    ctx.font = fontSizePx + 'px ' + fontFamily;
+    ctx.font = fontWeight + ' ' + fontSizePx + 'px ' + fontFamily;
     return ctx.measureText(text).width;
   }
   function sizeWordmark(el) {
     var container = el.parentElement;
     if (!container) return;
     var baseline = 200;
-    var natural = measureTextWidth(el.textContent, baseline, "Gastroe, 'Instrument Serif', Georgia, serif");
+    // weight is part of the measurement now (unlike Gastroe, which only
+    // ever shipped one weight) since Poppins' bolder cuts run measurably
+    // wider — leaving it out would size against the wrong natural width
+    var natural = measureTextWidth(el.textContent, baseline, 'Poppins, Helvetica, sans-serif', '600');
     if (!natural) return;
     var target = container.getBoundingClientRect().width * 0.8;
     el.style.fontSize = (baseline * (target / natural)) + 'px';
@@ -76,7 +78,7 @@
               '</div>' +
             '</div>' +
           '</div>' +
-          '<p data-wordmark style="margin:56px 0 0;text-align:center;opacity:0;white-space:nowrap;font-family:\'Gastroe\',\'Instrument Serif\',Georgia,serif;font-weight:400;line-height:1;color:#f4eeeb;">ayubleon</p>' +
+          '<p data-wordmark style="margin:56px 0 0;text-align:center;opacity:0;white-space:nowrap;font-family:Poppins,Helvetica,sans-serif;font-weight:600;line-height:1;color:#f4eeeb;">ayubleon</p>' +
           '<p style="margin:16px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size:12px;color:var(--al-text-muted,rgba(239,232,229,0.45));">©2026 Ayub Leon</p>' +
         '</div>' +
       '</footer>'
