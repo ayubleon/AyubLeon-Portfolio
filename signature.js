@@ -43,7 +43,7 @@
     heading.style.fontFamily = 'Poppins, Helvetica, sans-serif';
     heading.style.fontSize = '11px';
     heading.style.letterSpacing = '0.18em';
-    heading.style.color = 'rgba(239,232,229,0.45)';
+    heading.style.color = 'var(--al-text-muted,rgba(239,232,229,0.45))';
     heading.style.textTransform = 'uppercase';
   }
 
@@ -52,12 +52,5 @@
     fixFriendsHeading();
   }
 
-  patch();
-
-  var observer = new MutationObserver(patch);
-  observer.observe(document.body, { childList: true, subtree: true });
-  window.addEventListener('load', function () {
-    patch();
-    setTimeout(function () { observer.disconnect(); }, 5000);
-  });
+  AL.selfHeal(patch, 5000);
 })();

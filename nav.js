@@ -1,7 +1,7 @@
 (function () {
   var CSS = [
     "@keyframes siteNavRise{from{opacity:0;transform:translateX(-50%) translateY(16px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}",
-    ".site-nav-dock{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:4px;padding:8px;border-radius:999px;border:1px solid rgba(255,255,255,0.13);background:#1C1C1E;box-shadow:inset 0 1px 0 rgba(255,255,255,0.16),inset 0 -1px 0 rgba(0,0,0,0.35),0 22px 50px -28px rgba(0,0,0,0.9);animation:siteNavRise .8s cubic-bezier(.22,1,.36,1) .1s both;}",
+    ".site-nav-dock{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:4px;padding:8px;border-radius:999px;border:1px solid var(--al-border,rgba(255,255,255,0.13));background:var(--al-card,#1C1C1E);box-shadow:inset 0 1px 0 var(--al-border-light,rgba(255,255,255,0.16)),inset 0 -1px 0 rgba(0,0,0,0.35),0 22px 50px -28px rgba(0,0,0,0.9);animation:siteNavRise .8s cubic-bezier(.22,1,.36,1) .1s both;}",
     // same border-only cursor-tracked glow as the case-study "More work"
     // cards: a real sibling span (not ::before — see case-labels.js for
     // why), masked to just the border ring, lit by a radial-gradient
@@ -11,18 +11,18 @@
     ".site-nav-glow{position:absolute;inset:0;border-radius:inherit;padding:1px;background:radial-gradient(70px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,0.95) 0%,transparent 65%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:0;transition:opacity .3s ease;}",
     "@media (prefers-reduced-motion: reduce){.site-nav-glow{display:none;}}",
     ".site-nav-link{padding:12px 22px;border-radius:999px;font-size:14.5px;font-weight:500;color:rgba(246,239,236,0.7);transition:background .25s ease,color .25s ease;}",
-    ".site-nav-link:hover{color:#fff;background:#2A2A2C;}",
-    ".site-nav-link.is-active{color:#fff;background:#2A2A2C;font-weight:600;}",
+    ".site-nav-link:hover{color:#fff;background:var(--al-card-hover,#2A2A2C);}",
+    ".site-nav-link.is-active{color:#fff;background:var(--al-card-hover,#2A2A2C);font-weight:600;}",
     ".site-nav-divider{width:1px;align-self:stretch;margin:8px 6px;background:rgba(255,255,255,0.14);}",
     ".site-nav-avatar-btn{position:relative;border:0;padding:0;margin:0;background:none;cursor:pointer;border-radius:50%;flex:0 0 auto;display:flex;-webkit-tap-highlight-color:transparent;}",
     ".site-nav-avatar{width:42px;height:42px;border-radius:50%;background:#fff;display:block;flex:0 0 auto;padding:3px;pointer-events:none;}",
-    ".site-nav-tooltip{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,4px);background:#1C1C1E;color:#f4eeeb;font-family:Poppins,Helvetica,sans-serif;font-size:12.5px;font-weight:500;letter-spacing:-0.005em;padding:6px 11px;border-radius:14px;white-space:nowrap;border:1px solid rgba(255,255,255,0.12);box-shadow:0 10px 24px -10px rgba(0,0,0,0.7);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;}",
-    ".site-nav-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1C1C1E;}",
+    ".site-nav-tooltip{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,4px);background:var(--al-card,#1C1C1E);color:#f4eeeb;font-family:Poppins,Helvetica,sans-serif;font-size:12.5px;font-weight:500;letter-spacing:-0.005em;padding:6px 11px;border-radius:14px;white-space:nowrap;border:1px solid rgba(255,255,255,0.12);box-shadow:0 10px 24px -10px rgba(0,0,0,0.7);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;}",
+    ".site-nav-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--al-card,#1C1C1E);}",
     ".site-nav-avatar-btn:hover .site-nav-tooltip,.site-nav-avatar-btn:focus-visible .site-nav-tooltip{opacity:1;transform:translate(-50%,0);}",
     "@media (max-width:700px){.site-nav-dock{bottom:16px;gap:4px;}.site-nav-link{padding:11px 16px;font-size:13px;}}",
     ".site-contact-backdrop{position:fixed;inset:0;z-index:39;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .35s ease;}",
     ".site-contact-backdrop.is-open{opacity:1;pointer-events:auto;}",
-    ".site-contact-card{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) rotate(2deg) scale(0.4);width:min(300px,calc(100vw - 32px));background:#1C1C1E;border:1px solid rgba(255,255,255,0.13);border-radius:18px;padding:68px 24px 24px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.16),inset 0 -1px 0 rgba(0,0,0,0.35),0 30px 70px -26px rgba(0,0,0,0.9);z-index:41;opacity:0;pointer-events:none;transition:opacity .35s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.16,1,.3,1);" +
+    ".site-contact-card{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) rotate(2deg) scale(0.4);width:min(300px,calc(100vw - 32px));background:var(--al-card,#1C1C1E);border:1px solid var(--al-border,rgba(255,255,255,0.13));border-radius:18px;padding:68px 24px 24px;box-shadow:inset 0 1px 0 var(--al-border-light,rgba(255,255,255,0.16)),inset 0 -1px 0 rgba(0,0,0,0.35),0 30px 70px -26px rgba(0,0,0,0.9);z-index:41;opacity:0;pointer-events:none;transition:opacity .35s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.16,1,.3,1);" +
     // nametag lanyard-hole: punch a fixed-size pill out of the card so
     // whatever sits behind it (the blurred page backdrop) shows through,
     // via the same dual-layer mask-composite:exclude technique used for
@@ -34,7 +34,6 @@
     "-webkit-mask-composite:xor;mask-composite:exclude;}",
     ".site-contact-card.is-open{opacity:1;pointer-events:auto;}",
     "@media (max-width:700px){.site-contact-card{width:min(300px,calc(100vw - 64px));}}",
-    "@keyframes siteContactToastSpin{from{transform:translate(-50%,-50%) rotate(0deg);}to{transform:translate(-50%,-50%) rotate(360deg);}}",
     ".site-contact-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border:0;background:none;color:#8E8D8E;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:color .25s ease;}",
     ".site-contact-close:hover{color:#fff;}",
     ".site-contact-header{display:flex;align-items:center;gap:16px;}",
@@ -45,12 +44,12 @@
     ".site-contact-avatar-flip.is-flipped .site-contact-avatar-face-back{transform:rotateY(0deg);}",
     ".site-contact-avatar{width:76px;height:76px;border-radius:50%;background:#fff;display:block;object-fit:cover;}",
     ".site-contact-name{margin:0;font-family:'Gastroe','Instrument Serif',Georgia,serif;font-weight:400;font-size:20px;color:#fff;}",
-    ".site-contact-role{margin:2px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size:13px;font-weight:500;color:#73C41E;}",
+    ".site-contact-role{margin:2px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size:13px;font-weight:500;color:var(--al-green,#73C41E);}",
     ".site-contact-blurb{margin:18px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size:13.5px;line-height:1.55;color:rgba(244,238,235,0.82);}",
-    ".site-contact-link{display:block;color:#73C41E;text-decoration:none;}",
-    ".site-contact-link:hover{color:#8fe030;}",
+    ".site-contact-link{display:block;color:var(--al-green,#73C41E);text-decoration:none;}",
+    ".site-contact-link:hover{color:var(--al-green-hover,#8fe030);}",
     ".site-contact-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px;}",
-    ".site-contact-action{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px;border-radius:16px;background:#2A2A2C;text-decoration:none;color:#8E8D8E;transition:background .25s ease,color .25s ease;}",
+    ".site-contact-action{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px;border-radius:16px;background:var(--al-card-hover,#2A2A2C);text-decoration:none;color:#8E8D8E;transition:background .25s ease,color .25s ease;}",
     ".site-contact-action:hover{background:#343438;color:#fff;}",
     ".site-contact-action span{font-family:Poppins,Helvetica,sans-serif;font-size:12px;color:rgba(244,238,235,0.75);transition:color .25s ease;}",
     ".site-contact-action:hover span{color:#fff;}",
@@ -68,105 +67,13 @@
     '<path d="M1 1L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
   '</svg>';
 
-  function fallbackCopy(text, done) {
-    var ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    try { document.execCommand('copy'); done(); } catch (err) {}
-    document.body.removeChild(ta);
-  }
-
-  // built once per page, independent of how many times the nav markup
-  // itself gets (re)injected — mirrors the same toast used by footer.js
-  var showToast = (function () {
-    var wrap = document.createElement('div');
-    wrap.setAttribute('role', 'status');
-    wrap.setAttribute('aria-live', 'polite');
-    wrap.style.cssText = 'position:fixed;left:50%;bottom:92px;z-index:60;padding:1.6px;border-radius:999px;overflow:hidden;isolation:isolate;box-shadow:0 30px 70px -26px rgba(0,0,0,0.98);opacity:0;transform:translate(-50%,18px);pointer-events:none;transition:opacity .45s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1);';
-    wrap.innerHTML =
-      '<div aria-hidden="true" style="position:absolute;left:50%;top:50%;width:260%;aspect-ratio:1;background:conic-gradient(from 0deg, rgba(255,255,255,0) 0deg, rgba(255,255,255,0) 200deg, rgba(255,255,255,0.55) 292deg, rgba(255,255,255,0.92) 330deg, #ffffff 348deg, rgba(255,255,255,0) 360deg);animation:siteContactToastSpin 2.6s linear infinite;"></div>' +
-      '<div style="position:relative;display:flex;align-items:center;padding:14px 24px;border-radius:999px;background:#1C1C1E;font-family:\'Schibsted Grotesk\',Helvetica,sans-serif;font-size:14px;letter-spacing:-0.005em;color:#fdf9f7;">' +
-        '<span data-toast-text style="font-family:Poppins">Copied to Clipboard</span>' +
-      '</div>';
-    document.body.appendChild(wrap);
-    var timer;
-    return function showToast(msg) {
-      var textEl = wrap.querySelector('[data-toast-text]');
-      if (textEl) textEl.textContent = msg;
-      wrap.style.opacity = '1';
-      wrap.style.transform = 'translate(-50%, 0)';
-      clearTimeout(timer);
-      timer = setTimeout(function () {
-        wrap.style.opacity = '0';
-        wrap.style.transform = 'translate(-50%, 18px)';
-      }, 2000);
-    };
-  })();
-
-  // plain `new Audio().play()` re-fetches/decodes the file on every call,
-  // which on mobile is slow enough to land audibly behind the animation —
-  // decode once into an AudioBuffer up front so playback is just scheduling
-  // a buffer source, which starts with near-zero latency
-  var AudioCtx = window.AudioContext || window.webkitAudioContext;
-  var audioCtx = AudioCtx ? new AudioCtx() : null;
-  function makeSoundPlayer(url, volume) {
-    var buffer = null;
-    var ready = null;
-    if (audioCtx) {
-      ready = fetch(url)
-        .then(function (r) { return r.arrayBuffer(); })
-        .then(function (data) { return audioCtx.decodeAudioData(data); })
-        .then(function (buf) { buffer = buf; })
-        .catch(function () {});
-    }
-    function start() {
-      if (!buffer) return;
-      var src = audioCtx.createBufferSource();
-      src.buffer = buffer;
-      var gain = audioCtx.createGain();
-      gain.gain.value = volume;
-      src.connect(gain).connect(audioCtx.destination);
-      src.start(0);
-    }
-    // on a freshly loaded page the fetch+decode may still be in flight —
-    // resume the (possibly still-locked) context on this gesture regardless,
-    // and queue the actual start for the moment decoding finishes instead of
-    // silently dropping the very first click/tap of each page
-    return function play() {
-      if (!audioCtx) return;
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      if (buffer) start();
-      else if (ready) ready.then(start);
-    };
-  }
-  var playWhoosh = makeSoundPlayer('sounds/whoosh.wav', 0.20);
-  var playClick = makeSoundPlayer('sounds/click.mp3', 0.6);
-  var playIconTap = makeSoundPlayer('sounds/icon-tap.mp3', 0.6);
+  var playWhoosh = AL.makeSoundPlayer('sounds/whoosh.wav', 0.20);
+  var playClick = AL.makeSoundPlayer('sounds/click.mp3', 0.6);
+  var playIconTap = AL.makeSoundPlayer('sounds/icon-tap.mp3', 0.6);
 
   function copyEmail(e) {
     e.preventDefault();
-    var email = 'ayubleon9@gmail.com';
-    var done = function () { showToast('Copied to Clipboard'); };
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(email).then(done).catch(function () { fallbackCopy(email, done); });
-    } else {
-      fallbackCopy(email, done);
-    }
-  }
-
-  function pageLinks() {
-    var root = document.querySelector('[data-screen-label]');
-    var label = root ? root.getAttribute('data-screen-label') : '';
-    if (label === 'Hero') {
-      return { home: '#top', work: '#work', about: 'Ayub Leon - About.dc.html', active: 'home' };
-    }
-    if (label === 'About') {
-      return { home: 'Ayub%20Leon%20-%20Landing%20Page.dc.html', work: 'Ayub%20Leon%20-%20Landing%20Page.dc.html#work', about: '#top', active: 'about' };
-    }
-    return { home: 'Ayub%20Leon%20-%20Landing%20Page.dc.html', work: 'Ayub%20Leon%20-%20Landing%20Page.dc.html#work', about: 'Ayub Leon - About.dc.html', active: 'work' };
+    AL.copyText('ayubleon9@gmail.com', function () { AL.showToast('Copied to Clipboard'); });
   }
 
   function navHTML(links) {
@@ -316,7 +223,7 @@
 
   function fill(el) {
     if (el.childElementCount > 0) return;
-    el.innerHTML = navHTML(pageLinks());
+    el.innerHTML = navHTML(AL.pageLinks());
     initContactCard(el);
     initNavGlow(el);
   }
@@ -325,14 +232,5 @@
     document.querySelectorAll('[data-nav-mount]').forEach(fill);
   }
 
-  fillAll();
-
-  // the host framework can re-render and clear this mount point shortly
-  // after first paint; keep it self-healing rather than racing its timing
-  var observer = new MutationObserver(fillAll);
-  observer.observe(document.body, { childList: true, subtree: true });
-  window.addEventListener('load', function () {
-    fillAll();
-    setTimeout(function () { observer.disconnect(); }, 3000);
-  });
+  AL.selfHeal(fillAll, 3000);
 })();

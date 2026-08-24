@@ -8,6 +8,9 @@
   // re-patching through the settle window since support.js can rebuild in
   // more than one wave.
 
+  // kept as a literal rather than var(--al-text-muted,...): this string is
+  // also used below to detect labels the browser already serialized with
+  // this exact color, and a css var() reference wouldn't read back that way
   var MUTED = 'rgba(239, 232, 229, 0.45)';
 
   // border-only glow that tracks the cursor: a real span (not a ::before —
@@ -36,7 +39,7 @@
   shimmerStyle.textContent = [
     ".al-glass-card{position:relative;}",
     ".al-glass-glow{position:absolute;inset:0;border-radius:inherit;padding:1px;background:radial-gradient(farthest-corner circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,0.95) 0%,transparent 65%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:0;transition:opacity .3s ease;}",
-    ".al-glass-card.al-glass-card, .al-glass-card.al-glass-card:hover{background:#1C1C1E !important;border:1px solid rgba(255,255,255,0.16) !important;}",
+    ".al-glass-card.al-glass-card, .al-glass-card.al-glass-card:hover{background:var(--al-card,#1C1C1E) !important;border:1px solid var(--al-border-light,rgba(255,255,255,0.16)) !important;}",
     "@media (prefers-reduced-motion: reduce){.al-glass-glow{display:none;}}"
   ].join('');
   document.head.appendChild(shimmerStyle);
@@ -102,12 +105,5 @@
     glassifyMoreWorkCards();
   }
 
-  patchAll();
-
-  var observer = new MutationObserver(patchAll);
-  observer.observe(document.body, { childList: true, subtree: true });
-  window.addEventListener('load', function () {
-    patchAll();
-    setTimeout(function () { observer.disconnect(); }, 5000);
-  });
+  AL.selfHeal(patchAll, 5000);
 })();

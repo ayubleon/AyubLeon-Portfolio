@@ -60,45 +60,7 @@
     });
   }
 
-  // decode once into an AudioBuffer up front (mirrors nav.js's whoosh/click
-  // sounds) so playback on hover starts with near-zero latency instead of
-  // fetching/decoding fresh on every mouseenter
-  var AudioCtx = window.AudioContext || window.webkitAudioContext;
-  var audioCtx = AudioCtx ? new AudioCtx() : null;
-  var tapBuffer = null;
-  if (audioCtx) {
-    fetch('sounds/icon-tap.mp3')
-      .then(function (r) { return r.arrayBuffer(); })
-      .then(function (data) { return audioCtx.decodeAudioData(data); })
-      .then(function (buf) { tapBuffer = buf; })
-      .catch(function () {});
-  }
-  function playIconTap() {
-    if (!audioCtx || !tapBuffer) return;
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    var src = audioCtx.createBufferSource();
-    src.buffer = tapBuffer;
-    var gain = audioCtx.createGain();
-    gain.gain.value = 0.6;
-    src.connect(gain).connect(audioCtx.destination);
-    src.start(0);
-  }
-  // browsers only unlock a suspended AudioContext on a real user gesture
-  // (click/tap/keypress) — hovering the badge doesn't count as one, so
-  // resuming only inside playIconTap() can leave it permanently silent if
-  // a hover happens to be the very first interaction on the page. Grab the
-  // first genuine gesture anywhere on the page to unlock it early instead.
-  if (audioCtx) {
-    var unlockAudio = function () {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      document.removeEventListener('pointerdown', unlockAudio);
-      document.removeEventListener('keydown', unlockAudio);
-      document.removeEventListener('touchstart', unlockAudio);
-    };
-    document.addEventListener('pointerdown', unlockAudio);
-    document.addEventListener('keydown', unlockAudio);
-    document.addEventListener('touchstart', unlockAudio);
-  }
+  var playIconTap = AL.makeSoundPlayer('sounds/icon-tap.mp3', 0.6);
 
   // the first wheel/touch scroll attempt is held (preventDefault) and
   // dragged 1:1 with the scroll motion instead of snapping instantly —
@@ -112,6 +74,13 @@
   var DRAG_THRESHOLD = 200;   // px of cumulative scroll effort for a full turn
   var COMMIT_RATIO = 0.5;     // past this fraction, letting go completes the turn
   var DRAG_IDLE_MS = 220;     // gap since the last scroll tick that counts as "letting go"
+  var MAX_DRAG_MS = 700;      // hard cap on how long one drag can hold the page —
+                               // trackpad inertial scrolling keeps emitting decaying
+                               // wheel ticks for a second or more after the finger
+                               // lifts, each one resetting the idle timer above, so
+                               // without this cap a single real scroll gesture could
+                               // block the page from scrolling for its entire momentum
+                               // tail instead of just the deliberate part of it
   var SETTLE_MS = 320;        // full-arc duration for the commit/revert snap
   var SCROLL_KEYS = { ' ': 1, 'Spacebar': 1, 'PageDown': 1, 'PageUp': 1, 'ArrowDown': 1, 'ArrowUp': 1, 'Home': 1, 'End': 1 };
 
@@ -120,7 +89,20 @@
     return window.innerHeight + window.scrollY >= doc.scrollHeight - 2;
   }
 
+  // if support.js clears and re-renders the badge mount after a first
+  // successful fill (it can rebuild in more than one wave), fill() creates
+  // a brand new badge element and initSpin() used to just attach a second,
+  // fully independent set of window-level wheel/touch/key listeners on top
+  // of the first — two state machines, each with their own idea of
+  // "dragging" and "already scrolled", both calling preventDefault() on
+  // the same events. That's what a stuck/double-triggering scroll looks
+  // like. Tearing down the previous instance's listeners before attaching
+  // a new one guarantees at most one is ever live.
+  var teardownSpin = null;
+
   function initSpin(badgeEl, inner) {
+    if (teardownSpin) teardownSpin();
+
     var angle = 0;
     var spinning = false;
     var scrollTriggered = false;
@@ -128,10 +110,12 @@
     var dragging = false;
     var dragDelta = 0;
     var idleTimer = null;
+    var maxTimer = null;
     var lastTouchY = null;
+    var settling = false;
 
     function spinOnce() {
-      if (spinning || dragging) return;
+      if (spinning || dragging || settling) return;
       spinning = true;
       angle += 90;
       inner.style.transform = 'rotateY(' + angle + 'deg)';
@@ -145,6 +129,8 @@
       dragDelta = 0;
       scrollTriggered = true;
       inner.style.transition = 'none';
+      clearTimeout(maxTimer);
+      maxTimer = setTimeout(endDrag, MAX_DRAG_MS);
     }
 
     function updateDrag(delta) {
@@ -157,12 +143,15 @@
       idleTimer = setTimeout(endDrag, DRAG_IDLE_MS);
     }
 
-    // resolves the held gesture once scroll ticks stop arriving: past the
+    // resolves the held gesture once scroll ticks stop arriving (or once
+    // MAX_DRAG_MS forces it regardless — see the constant above): past the
     // commit ratio it finishes the turn, short of it it springs back —
     // either way the snap duration scales with the remaining arc so a
     // near-complete drag settles fast and a barely-started one does too
     function endDrag() {
       if (!dragging) return;
+      clearTimeout(idleTimer);
+      clearTimeout(maxTimer);
       var progress = dragDelta / DRAG_THRESHOLD;
       var commit = progress >= COMMIT_RATIO;
       var remaining = commit ? 1 - progress : progress;
@@ -172,8 +161,17 @@
       if (commit) angle += 90;
       inner.style.transition = 'transform ' + duration + 'ms cubic-bezier(.22,1,.36,1)';
       inner.style.transform = 'rotateY(' + angle + 'deg)';
+      // block new drags for the (brief, <=320ms) rest of this settle —
+      // starting a fresh drag while this transition is still animating
+      // would cancel it mid-flight, freezing it at whatever fractional
+      // angle it happened to be interpolating through, and the new drag's
+      // math would then jump from that arbitrary value instead of a clean
+      // one. Continuous scrolling at the bottom is what surfaces this,
+      // since each turn's settle otherwise races the very next drag.
+      settling = true;
       setTimeout(function () {
         inner.style.transition = '';
+        settling = false;
       }, duration);
     }
 
@@ -195,7 +193,7 @@
         updateDrag(delta);
         return;
       }
-      if (spinning) {
+      if (spinning || settling) {
         e.preventDefault();
         return;
       }
@@ -242,6 +240,16 @@
     window.addEventListener('keydown', guardKey, { passive: false });
     badgeEl.addEventListener('mouseenter', spinOnce);
     badgeEl.addEventListener('mouseenter', playIconTap);
+
+    teardownSpin = function () {
+      window.removeEventListener('wheel', guardWheel);
+      window.removeEventListener('touchstart', guardTouchStart);
+      window.removeEventListener('touchmove', guardTouch);
+      window.removeEventListener('touchend', guardTouchEnd);
+      window.removeEventListener('keydown', guardKey);
+      badgeEl.removeEventListener('mouseenter', spinOnce);
+      badgeEl.removeEventListener('mouseenter', playIconTap);
+    };
   }
 
   function fill(el) {
@@ -255,14 +263,5 @@
     document.querySelectorAll('[data-badge-mount]').forEach(fill);
   }
 
-  fillAll();
-
-  // the host framework can re-render and clear this mount point shortly
-  // after first paint; keep it self-healing rather than racing its timing
-  var observer = new MutationObserver(fillAll);
-  observer.observe(document.body, { childList: true, subtree: true });
-  window.addEventListener('load', function () {
-    fillAll();
-    setTimeout(function () { observer.disconnect(); }, 3000);
-  });
+  AL.selfHeal(fillAll, 3000);
 })();
