@@ -10,7 +10,7 @@
     // edge-to-edge like the farthest-corner sizing used on the cards
     ".site-nav-glow{position:absolute;inset:0;border-radius:inherit;padding:1px;background:radial-gradient(70px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,0.95) 0%,transparent 65%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:0;transition:opacity .3s ease;}",
     "@media (prefers-reduced-motion: reduce){.site-nav-glow{display:none;}}",
-    ".site-nav-link{padding:12px 22px;border-radius:999px;font-size:14.5px;font-weight:500;color:rgba(246,239,236,0.7);transition:background .25s ease,color .25s ease;}",
+    ".site-nav-link{padding:12px 22px;border-radius:999px;font-size:14.5px;font-weight:500;color:rgba(244,238,235,0.7);transition:background .25s ease,color .25s ease;}",
     ".site-nav-link:hover{color:#fff;background:var(--al-card-hover,#2A2A2C);}",
     ".site-nav-link.is-active{color:#fff;background:var(--al-card-hover,#2A2A2C);font-weight:600;}",
     ".site-nav-divider{width:1px;align-self:stretch;margin:8px 6px;background:rgba(255,255,255,0.14);}",
@@ -49,7 +49,7 @@
     ".site-contact-link{display:block;color:var(--al-green,#73C41E);text-decoration:none;}",
     ".site-contact-link:hover{color:var(--al-green-hover,#8fe030);}",
     ".site-contact-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px;}",
-    ".site-contact-action{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px;border-radius:16px;background:var(--al-card-hover,#2A2A2C);text-decoration:none;color:#8E8D8E;transition:background .25s ease,color .25s ease;}",
+    ".site-contact-action{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px;border-radius:16px;background:var(--al-card-hover,#2A2A2C);text-decoration:none;color:var(--al-section-title,rgba(239,232,229,0.66));transition:background .25s ease,color .25s ease;}",
     ".site-contact-action:hover{background:#343438;color:#fff;}",
     ".site-contact-action span{font-family:Poppins,Helvetica,sans-serif;font-size:12px;color:rgba(244,238,235,0.75);transition:color .25s ease;}",
     ".site-contact-action:hover span{color:#fff;}",
