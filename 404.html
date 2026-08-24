@@ -5,21 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Page not found — Ayub Leon</title>
 <meta name="robots" content="noindex">
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&amp;display=swap" rel="stylesheet">
 <style>
-  html, body { margin: 0; padding: 0; height: 100%; background: #000000; }
+  html, body { margin: 0; padding: 0; height: 100%; background: #000000; overflow: hidden; }
   body {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    min-height: 100dvh; padding: 24px; text-align: center; box-sizing: border-box;
     font-family: Poppins, Helvetica, Arial, sans-serif; color: #eee6e3;
     -webkit-font-smoothing: antialiased;
   }
-  p.eyebrow { margin: 0 0 14px; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(238,230,227,0.5); }
-  h1 { margin: 0 0 16px; font-size: clamp(2.2rem, 7vw, 4rem); font-weight: 600; letter-spacing: -0.03em; color: #f4eeeb; }
-  p.desc { margin: 0 0 32px; max-width: 46ch; font-size: 15.5px; line-height: 1.6; color: rgba(239,232,229,0.78); }
+  #grid { position: fixed; inset: 0; z-index: 0; }
+  .content {
+    position: fixed; inset: 0; z-index: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 24px; text-align: center; box-sizing: border-box;
+    pointer-events: none;
+  }
+  /* shrink-wrapped to the actual text/button cluster (not the full-screen
+     .content wrapper) — this is the box the grid-fade distance is measured
+     against, so it has to match what's visually on screen, not the viewport */
+  .content-inner { display: inline-flex; flex-direction: column; align-items: center; pointer-events: auto; }
+  h1 { margin: 0 0 6px; font-size: 24px; font-weight: 600; letter-spacing: -0.03em; color: #f4eeeb; }
+  p.desc { margin: 0 0 32px; max-width: 46ch; font-size: 16px; line-height: 1.6; color: rgba(239,232,229,0.78); }
   a.home {
     display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 999px;
     background: rgba(255,255,255,0.95); color: #120a08; font-size: 15px; font-weight: 500;
@@ -32,9 +40,144 @@
 </style>
 </head>
 <body>
-  <p class="eyebrow">404</p>
-  <h1>This page took a wrong turn.</h1>
-  <p class="desc">The page you're looking for doesn't exist, or the link may be out of date.</p>
-  <a class="home" href="/">Back to home</a>
+  <canvas id="grid" aria-hidden="true"></canvas>
+  <div class="content">
+    <div class="content-inner">
+      <h1>Page not found.</h1>
+      <p class="desc">This page was deleted in a git commit that nobody wants to talk about.</p>
+      <a class="home" href="/">Back to home</a>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var canvas = document.getElementById('grid');
+      var ctx = canvas.getContext('2d');
+      var contentEl = document.querySelector('.content-inner');
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      var SPACING = 34;       // px between dots
+      var DOT_RADIUS = 1.3;   // resting dot size
+      var BASE_OPACITY = 0.16; // resting grid faintness
+      var GLOW_CAP = 0.15;    // max opacity a ripple can add — kept under the
+                               // subtext's own 0.78 so the hover glow never
+                               // outshines it
+      var FADE_PAD = 40;      // gap around the text before the grid starts fading back in
+      var FADE_SPAN = 1;      // extra normalized distance (past the content
+                               // ellipse) over which the grid fades in
+
+      // ripple physics: each ripple is a single expanding ring (a Gaussian
+      // pulse riding outward at WAVE_SPEED) that nudges nearby dots larger
+      // and brighter as it passes through them, same shape as a real water
+      // ring — not a literal fluid sim, just enough of one to read as water
+      var WAVE_SPEED = 260;   // px/s the ring expands
+      var BAND = 46;          // px width of the ring
+      var DECAY = 1.1;        // per-second amplitude falloff
+      var MAX_AGE = 2.2;      // s before a ripple is discarded
+      var ripples = [];
+      var lastSpawn = { x: null, y: null, t: 0 };
+
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var width = 0, height = 0, contentRect = null;
+
+      function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        contentRect = contentEl.getBoundingClientRect();
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      // how much of the grid's normal opacity survives this close to the
+      // text block — an ellipse sized to the text, not a bounding-box
+      // rectangle, so the fade reads as a soft vignette rather than a
+      // visible geometric shape. 0 inside the ellipse, ramping back up to
+      // full strength over FADE_SPAN more (normalized) past its edge.
+      function contentFade(x, y) {
+        var rx = contentRect.width / 2 + FADE_PAD;
+        var ry = contentRect.height / 2 + FADE_PAD;
+        var cx = contentRect.left + contentRect.width / 2;
+        var cy = contentRect.top + contentRect.height / 2;
+        var normDist = Math.sqrt(Math.pow((x - cx) / rx, 2) + Math.pow((y - cy) / ry, 2));
+        return Math.min(1, Math.max(0, normDist - 1) / FADE_SPAN);
+      }
+
+      function spawnRipple(x, y) {
+        var now = performance.now() / 1000;
+        var dx = lastSpawn.x == null ? Infinity : x - lastSpawn.x;
+        var dy = lastSpawn.y == null ? Infinity : y - lastSpawn.y;
+        if (Math.hypot(dx, dy) < 26 && now - lastSpawn.t < 0.18) return;
+        ripples.push({ x: x, y: y, t0: now });
+        if (ripples.length > 18) ripples.shift();
+        lastSpawn = { x: x, y: y, t: now };
+      }
+      // demonstrate the effect on its own before the visitor's first
+      // cursor move — a slow pulse from the screen's center, handing off
+      // to real cursor-driven ripples the moment they actually move it
+      var AUTO_RIPPLE_INTERVAL = 2500;
+      var autoRippleTimer = null;
+      function startAutoRipple() {
+        spawnRipple(window.innerWidth / 2, window.innerHeight / 2);
+        autoRippleTimer = setInterval(function () {
+          spawnRipple(window.innerWidth / 2, window.innerHeight / 2);
+        }, AUTO_RIPPLE_INTERVAL);
+      }
+      function stopAutoRipple() {
+        clearInterval(autoRippleTimer);
+      }
+
+      if (!reduceMotion) {
+        startAutoRipple();
+        window.addEventListener('pointermove', function (e) {
+          stopAutoRipple();
+          spawnRipple(e.clientX, e.clientY);
+        });
+      }
+
+      function drawFrame(now) {
+        ripples = ripples.filter(function (r) { return now - r.t0 < MAX_AGE; });
+        ctx.clearRect(0, 0, width, height);
+        var cols = Math.ceil(width / SPACING) + 1;
+        var rows = Math.ceil(height / SPACING) + 1;
+        for (var i = 0; i < cols; i++) {
+          for (var j = 0; j < rows; j++) {
+            var x = i * SPACING;
+            var y = j * SPACING;
+            var amp = 0;
+            for (var k = 0; k < ripples.length; k++) {
+              var r = ripples[k];
+              var age = now - r.t0;
+              var dist = Math.hypot(x - r.x, y - r.y);
+              var front = age * WAVE_SPEED;
+              var ring = Math.exp(-Math.pow((dist - front) / BAND, 2));
+              amp += ring * Math.exp(-age * DECAY);
+            }
+            var fade = contentFade(x, y);
+            var glow = Math.min(GLOW_CAP, amp * 0.4);
+            var opacity = (BASE_OPACITY + glow) * fade;
+            if (opacity <= 0.004) continue;
+            var radius = Math.max(0.4, DOT_RADIUS + amp * 0.7);
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(238,230,227,' + opacity.toFixed(3) + ')';
+            ctx.fill();
+          }
+        }
+      }
+
+      if (reduceMotion) {
+        drawFrame(0);
+      } else {
+        requestAnimationFrame(function loop(t) {
+          drawFrame(t / 1000);
+          requestAnimationFrame(loop);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
