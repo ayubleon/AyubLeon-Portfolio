@@ -19,14 +19,26 @@
   document.head.appendChild(tokenStyle);
 
   // reveals the page (see the body{opacity:0} + .al-ready rule each page's
-  // own inline <style> ships with) once fonts have swapped in and the
-  // initial load has settled, instead of the page flashing through an
+  // own inline <style> ships with) instead of letting it flash through an
   // unstyled/incomplete state first — that gap is invisible on a fast
-  // local server but real on a cold, real-network first visit. A hard
-  // fallback still reveals the page after 2.5s regardless, so a hung font
-  // load (or anything else that never resolves) can't leave it invisible.
-  var REVEAL_DELAY_MS = 120;
-  var REVEAL_FALLBACK_MS = 2500;
+  // local server but real on a cold, real-network first visit.
+  //
+  // waiting on window.load + fonts.ready alone isn't enough: support.js
+  // can rebuild the page's <main> from its own template in more than one
+  // wave, and the self-mounting components (nav/footer/badge) keep
+  // watching for it for 3-5s after load specifically to react when that
+  // happens. Revealing on load alone risks showing the page just before
+  // one of those rebuilds hits, moving the flash to after reveal instead
+  // of removing it. So this waits for the DOM to actually stop changing
+  // structurally (no elements added/removed for QUIET_MS) before
+  // revealing, capped at MAX_WAIT_MS so a page that never fully quiets
+  // down doesn't stay hidden forever. Attribute mutations (badge drag,
+  // hover glows, etc.) are deliberately not watched, so an interaction
+  // in progress can't be mistaken for the page still settling.
+  var QUIET_MS = 220;
+  var MAX_WAIT_MS = 1800;
+  var REVEAL_DELAY_MS = 100;
+  var REVEAL_FALLBACK_MS = 3200;
   function reveal() {
     document.body.classList.add('al-ready');
   }
@@ -35,7 +47,26 @@
     if (document.readyState === 'complete') resolve();
     else window.addEventListener('load', resolve);
   });
-  Promise.all([fontsReady, pageLoaded]).then(function () {
+  var domQuiet = new Promise(function (resolve) {
+    var quietTimer = null;
+    var settled = false;
+    var maxTimer = setTimeout(function () { finish(); }, MAX_WAIT_MS);
+    var observer = new MutationObserver(function () {
+      clearTimeout(quietTimer);
+      quietTimer = setTimeout(finish, QUIET_MS);
+    });
+    function finish() {
+      if (settled) return;
+      settled = true;
+      clearTimeout(quietTimer);
+      clearTimeout(maxTimer);
+      observer.disconnect();
+      resolve();
+    }
+    observer.observe(document.body, { childList: true, subtree: true });
+    quietTimer = setTimeout(finish, QUIET_MS);
+  });
+  Promise.all([fontsReady, pageLoaded, domQuiet]).then(function () {
     setTimeout(reveal, REVEAL_DELAY_MS);
   });
   setTimeout(reveal, REVEAL_FALLBACK_MS);
