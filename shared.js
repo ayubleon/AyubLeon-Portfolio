@@ -1,65 +1,15 @@
 (function () {
   window.AL = window.AL || {};
 
-  // full-screen loading intro — a real component, not markup duplicated
-  // per page: this file is the only place its styles, copy, and timing
-  // live. Only shown on the three destinations the nav bar actually
-  // lists (Home, Work, About — both the first two live on the same
-  // Landing Page, screen-label "Hero"), not on individual case-study
-  // pages. Sits above everything else on the page (toast is the
-  // next-highest at z-index:60), holds for exactly HOLD_MS, then slides
-  // away into whatever the page looks like by then — it doesn't gate on
-  // the page being "ready" the way an earlier version of this idea did,
-  // just a fixed, predictable duration.
-  (function initLoadingScreen() {
-    var root = document.querySelector('[data-screen-label]');
-    var label = root ? root.getAttribute('data-screen-label') : '';
-    if (label !== 'Hero' && label !== 'About') return;
-
-    var LINES = [
-      "Lining up the pixels...",
-      "Getting the details in order...",
-      "One second, making sure it's right..."
-    ];
-    var HOLD_MS = 2000;
-    var EXIT_MS = 600;
-    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    var style = document.createElement('style');
-    style.textContent = [
-      ".al-loading{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:#000;transition:opacity " + EXIT_MS + "ms ease;}",
-      ".al-loading-text{margin:0;padding:0 24px;text-align:center;font-family:Poppins,Helvetica,Arial,sans-serif;font-weight:500;font-size:clamp(1rem,2vw,1.35rem);color:#f6f0ed;opacity:0;transition:opacity .5s ease;}",
-      ".al-loading-text.al-loading-in{opacity:1;}",
-      ".al-loading.al-loading-out{opacity:0;pointer-events:none;}",
-      "@media (prefers-reduced-motion: reduce){.al-loading,.al-loading-text{transition:none;}}"
-    ].join('');
-    document.head.appendChild(style);
-
-    var overlay = document.createElement('div');
-    overlay.className = 'al-loading';
-    overlay.setAttribute('aria-hidden', 'true');
-    var text = document.createElement('p');
-    text.className = 'al-loading-text';
-    text.textContent = LINES[Math.floor(Math.random() * LINES.length)];
-    overlay.appendChild(text);
-    document.body.appendChild(overlay);
-
-    // one rAF to let the initial opacity:0 actually paint, a second to
-    // guarantee it's committed before the class swap — a single rAF is
-    // sometimes not enough for a transition to reliably kick in
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () {
-        text.classList.add('al-loading-in');
-      });
-    });
-
-    setTimeout(function () {
-      overlay.classList.add('al-loading-out');
-      setTimeout(function () {
-        overlay.remove();
-      }, reduceMotion ? 0 : EXIT_MS);
-    }, HOLD_MS);
-  })();
+  // The loading-screen intro used to live here, built by this deferred
+  // script. That's structurally too late: a deferred script only runs
+  // after the browser has already parsed (and painted) the page's raw
+  // HTML, and after support.js — deferred too, but ordered before this
+  // file — has done its own initial rebuild of <main>. Both of those paint
+  // before this script gets a turn, so the real page flashed through
+  // (twice) before the overlay could ever appear. It's now an inline,
+  // non-deferred snippet at the very top of <body> on the two pages that
+  // use it (Landing Page, About) instead — see the top of those files.
 
   // design tokens used across nav.js/footer.js/badge.js/signature.js/
   // case-labels.js — one definition instead of the same literals
