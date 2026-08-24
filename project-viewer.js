@@ -55,6 +55,32 @@
     return html.replace(/font-size:\s*11px;\s*letter-spacing:\s*0\.18em;/gi, 'font-size: 11px; letter-spacing: normal;');
   }
 
+  // the section headings (h2, e.g. "The advantage that made it work"),
+  // the bold intro statement under "Overview", and the in-body
+  // subheadings (e.g. "Protecting system integrity") all run oversized
+  // for this card — sized (with the h2/statement pair fluid up to
+  // 1.55rem/1.62rem via vw) for the source pages' own wide desktop
+  // columns, not this narrower card. Fixed, smaller sizes here instead
+  // of just capping the clamp(), consistent with how the rest of this
+  // card's typography (body copy, meta-grid values) is already fixed
+  // rather than fluid
+  function shrinkCardHeadings(html) {
+    return html
+      .replace(/font-size:\s*clamp\(1\.2rem,\s*1\.9vw,\s*1\.55rem\)/gi, 'font-size: 1.25rem')
+      .replace(/font-size:\s*clamp\(1\.2rem,\s*1\.9vw,\s*1\.62rem\)/gi, 'font-size: 1.25rem')
+      .replace(/font-size:\s*1\.08rem(;\s*font-weight:\s*500;\s*letter-spacing:\s*-0\.015em;)/gi, 'font-size: 0.95rem$1');
+  }
+
+  // the source's 1px, 55%-opacity green left-border (the callout list in
+  // BuzzIQ/Danadana's "My role" section) reads as a soft accent against
+  // the dark page it was tuned for, but is nearly invisible at that
+  // width/opacity against this card's light background. Thickened and
+  // brought to full opacity so it still reads as an accent, just a
+  // visible one here
+  function thickenGreenAccentBorders(html) {
+    return html.replace(/border-left:\s*1px solid rgba\(115,\s*196,\s*30,\s*0\.55\)/gi, 'border-left: 3px solid #73C41E');
+  }
+
   // each project's own page is the single source of truth for its title,
   // description, and full case-study body — fetched and cached here
   // instead of duplicating any of that copy into a second, driftable copy
@@ -117,7 +143,7 @@
         // the center card is white, so its embedded content needs its
         // text recolored dark — see darkenTextColors above — and its
         // label tracking normalized — see normalizeLabelSpacing above
-        bodyHTML: main ? normalizeLabelSpacing(darkenTextColors(main.innerHTML)) : ''
+        bodyHTML: main ? thickenGreenAccentBorders(shrinkCardHeadings(normalizeLabelSpacing(darkenTextColors(main.innerHTML)))) : ''
       };
     }).catch(function () { return { title: '', descHTML: '', bodyHTML: '' }; });
     return cache[href];
