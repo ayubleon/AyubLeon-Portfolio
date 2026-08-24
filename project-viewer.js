@@ -232,7 +232,20 @@
       ".al-pv-card[data-role=center] .case-label-grid{grid-template-columns:1fr !important;gap:14px 0 !important;}" +
       ".al-pv-card[data-role=center] .case-split-grid{grid-template-columns:1fr !important;gap:56px 0 !important;}" +
       ".al-pv-card[data-role=center] .case-figure-grid{grid-template-columns:1fr !important;}" +
-      ".al-pv-card[data-role=center] .mobile-gutter{padding-left:16px !important;padding-right:16px !important;}}",
+      ".al-pv-card[data-role=center] .mobile-gutter{padding-left:16px !important;padding-right:16px !important;}" +
+      // the case-study pages' body copy runs a size or two larger than
+      // the About page's own — 17.5px/15.5px/15px against About's
+      // consistent 14.5px body-paragraph size — which barely reads as a
+      // difference on these pages' own wide desktop columns but stands
+      // out once both are seen at the same phone width. Matched here by
+      // targeting the exact inline font-size values the source markup
+      // uses (attribute substring selectors on raw, unnormalized inline
+      // styles — reliable here since these pages don't vary that value)
+      // rather than by role/selector, since the same size shows up
+      // across differently-purposed elements (hero subhead, body
+      // paragraphs, meta-grid values) that don't share a class
+      ".al-pv-card[data-role=center] [data-pv-inner] [style*=\"font-size: 17.5px\"],.al-pv-card[data-role=center] [data-pv-inner] [style*=\"font-size: 15px\"]{font-size:14.5px !important;}" +
+      ".al-pv-card[data-role=center] [data-pv-inner] [style*=\"font-size: 15.5px\"]{font-size:14.5px !important;line-height:1.72 !important;}}",
     "@media (prefers-reduced-motion: reduce){.al-pv-overlay,.al-pv-card{transition:none !important;}}"
   ].join('');
   document.head.appendChild(style);
