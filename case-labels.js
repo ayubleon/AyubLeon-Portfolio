@@ -2,22 +2,25 @@
   // case study pages are rebuilt by support.js from its own internal
   // template on load (same as the About page), discarding raw style edits
   // — so patch the section-title labels (Overview, My role, Challenges,
-  // More work, etc.) via live DOM manipulation instead, matching them to
-  // the shared section-title color also used by the footer's PAGES/
+  // More work, etc.) and the sentence-case meta-labels (Role, Client,
+  // Timeline, etc.) via live DOM manipulation instead, matching them all
+  // to the shared section-title color also used by the footer's PAGES/
   // CONTACTS/RESOURCES and the About page's "PEOPLE I'VE BUILT WITH"
-  // treatment (a different, dimmer shade covers the Role/Client/Timeline
-  // meta-labels — see ALREADY_MUTED below). Keep re-patching through the
-  // settle window since support.js can rebuild in more than one wave.
+  // treatment. Only the case/tracking treatment differs between the two
+  // groups now, not the color — see ALREADY_MUTED below. Keep
+  // re-patching through the settle window since support.js can rebuild
+  // in more than one wave.
 
   // kept as a literal rather than var(...): this string is also used below
   // to detect labels the browser already serialized with this exact color,
-  // and a css var() reference wouldn't read back that way. Matches the
-  // Role/Client/Timeline-style meta-labels' unchanged source color — not
-  // the section-title color below, so it must stay 0.45 regardless of that
+  // and a css var() reference wouldn't read back that way. Only used to
+  // tell the two label groups apart by their unchanged source color — both
+  // groups now end up on SECTION_TITLE regardless of which branch matches
   var ALREADY_MUTED = 'rgba(239, 232, 229, 0.45)';
-  // applied to the actual all-caps section titles (Overview, Challenges,
-  // etc.) — matches shared.js's --al-section-title, kept as a literal here
-  // for the same reason as ALREADY_MUTED above
+  // applied to every 0.18em-tracked label — section titles (Overview,
+  // Challenges, etc.) and meta-labels (Role, Client, Timeline, etc.) alike
+  // — matches shared.js's --al-section-title, kept as a literal here for
+  // the same reason as ALREADY_MUTED above
   var SECTION_TITLE = 'rgba(239, 232, 229, 0.66)';
 
   // border-only glow that tracks the cursor: a real span (not a ::before —
@@ -60,16 +63,17 @@
       if (p.dataset.alLabelPatched) return;
       p.dataset.alLabelPatched = '1';
       var style = p.getAttribute('style') || '';
-      // already-correct sentence-case labels (Role, Client/Type, Timeline,
-      // Platforms, Project contributors, Previous/Next) read back with
-      // this exact browser-normalized rgba string — they keep Poppins and
-      // the muted color, just lose the wide tracking back to the font's
-      // own default spacing
+      p.style.color = SECTION_TITLE;
+      // sentence-case labels (Role, Client/Type, Timeline, Platforms,
+      // Project contributors, Previous/Next) read back with this exact
+      // browser-normalized rgba string — they keep Poppins and their
+      // sentence case, just lose the wide tracking back to the font's own
+      // default spacing. Everything else gets the full section-title
+      // treatment: uppercase, wide tracking kept as shipped
       if (style.indexOf(ALREADY_MUTED) !== -1) {
         p.style.letterSpacing = 'normal';
         return;
       }
-      p.style.color = SECTION_TITLE;
       p.style.textTransform = 'uppercase';
     });
   }
