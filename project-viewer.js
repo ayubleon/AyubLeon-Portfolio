@@ -255,6 +255,11 @@
     // close button follows to the bottom corner, out of the way of a
     // thumb reaching for it one-handed at the top of a tall screen
     "@media (max-width: 700px){.al-pv-card[data-role=center]{width:calc(100% - 24px);}.al-pv-close{top:auto;bottom:20px;}" +
+      // the close button relocates to the bottom corner on mobile (see
+      // above), so unlike desktop there's nothing at the top-right this
+      // padding needs to clear — free to sit much tighter than the 64px
+      // set on this section inline (loadProject, above)
+      ".al-pv-card[data-role=center] [data-pv-inner]>section:first-child{padding-top:24px !important;}" +
       // each case-study page's own mobile stacking rules (.case-label-grid
       // etc. dropping from a two-column layout to one) live in that page's
       // <style> block, in <head> — outside <main>, so they never come
