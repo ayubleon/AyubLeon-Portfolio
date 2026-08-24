@@ -12,6 +12,7 @@
     "--al-green:#73C41E;",
     "--al-green-hover:#8fe030;",
     "--al-text-muted:rgba(239,232,229,0.45);",
+    "--al-section-title:rgba(239,232,229,0.66);",
     "--al-border:rgba(255,255,255,0.13);",
     "--al-border-strong:rgba(255,255,255,0.16);",
     "}"
@@ -81,7 +82,7 @@
     wrap.style.cssText = 'position:fixed;left:50%;bottom:92px;z-index:60;padding:1.6px;border-radius:999px;overflow:hidden;isolation:isolate;box-shadow:0 30px 70px -26px rgba(0,0,0,0.98);opacity:0;transform:translate(-50%,18px);pointer-events:none;transition:opacity .45s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1);';
     wrap.innerHTML =
       '<div data-toast-glow aria-hidden="true" style="position:absolute;left:50%;top:50%;width:260%;aspect-ratio:1;background:conic-gradient(from 0deg, rgba(255,255,255,0) 0deg, rgba(255,255,255,0) 200deg, rgba(255,255,255,0.55) 292deg, rgba(255,255,255,0.92) 330deg, #ffffff 348deg, rgba(255,255,255,0) 360deg);animation:alToastSpin 2.6s linear infinite;"></div>' +
-      '<div style="position:relative;display:flex;align-items:center;padding:14px 24px;border-radius:999px;background:var(--al-card,#1C1C1E);font-family:\'Schibsted Grotesk\',Helvetica,sans-serif;font-size:14px;letter-spacing:-0.005em;color:#fdf9f7;">' +
+      '<div style="position:relative;display:flex;align-items:center;padding:14px 24px;border-radius:999px;background:var(--al-card,#1C1C1E);font-family:\'Schibsted Grotesk\',Helvetica,sans-serif;font-size:14px;letter-spacing:-0.005em;color:#f4eeeb;">' +
         '<span data-toast-text style="font-family:Poppins">Copied to Clipboard</span>' +
       '</div>';
     document.body.appendChild(wrap);

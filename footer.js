@@ -54,29 +54,29 @@
             '<div style="display:flex;align-items:center;gap:16px;">' +
               '<img src="images/ayub-avatar.svg" alt="Ayub Leon" style="width:64px;height:64px;border-radius:50%;background:#fff;display:block;flex:0 0 auto;">' +
               '<div style="display:flex;flex-direction:column;gap:3px;">' +
-                '<p style="margin:0;font-family:Poppins,Helvetica,sans-serif;font-size:16px;font-weight:600;color:#f6f0ed;">Ayub Leon</p>' +
+                '<p style="margin:0;font-family:Poppins,Helvetica,sans-serif;font-size:16px;font-weight:600;color:#f4eeeb;">Ayub Leon</p>' +
                 '<p style="margin:0;font-family:Poppins,Helvetica,sans-serif;font-size:15px;font-weight:400;color:#73C41E;">Product Designer</p>' +
               '</div>' +
             '</div>' +
             '<div class="footer-nav-cols" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:48px;flex:0 1 380px;min-width:0;">' +
               '<div style="display:flex;flex-direction:column;gap:14px;">' +
-                '<p style="margin:0;font-family:Poppins;font-size:11px;letter-spacing:0.18em;color:var(--al-text-muted,rgba(239,232,229,0.45))">PAGES</p>' +
+                '<p style="margin:0;font-family:Poppins;font-size:11px;letter-spacing:0.18em;color:var(--al-section-title,rgba(239,232,229,0.66))">PAGES</p>' +
                 '<a class="site-footer-link" href="' + links.home + '">Home</a>' +
                 '<a class="site-footer-link" href="' + links.work + '">Work</a>' +
                 '<a class="site-footer-link" href="' + links.about + '">About</a>' +
               '</div>' +
               '<div style="display:flex;flex-direction:column;gap:14px;">' +
-                '<p style="margin:0;font-family:Poppins;font-size:11px;letter-spacing:0.18em;color:var(--al-text-muted,rgba(239,232,229,0.45))">CONTACTS</p>' +
+                '<p style="margin:0;font-family:Poppins;font-size:11px;letter-spacing:0.18em;color:var(--al-section-title,rgba(239,232,229,0.66))">CONTACTS</p>' +
                 '<a class="site-footer-link" href="mailto:ayubleon9@gmail.com" data-copy-email>Copy Email</a>' +
                 '<a class="site-footer-link" href="https://www.linkedin.com/in/ayubleon" target="_blank" rel="noopener noreferrer">Linked In</a>' +
               '</div>' +
               '<div style="display:flex;flex-direction:column;gap:14px;">' +
-                '<p style="margin:0;font-family:Poppins;font-size:11px;letter-spacing:0.18em;color:var(--al-text-muted,rgba(239,232,229,0.45))">RESOURCES</p>' +
+                '<p style="margin:0;font-family:Poppins;font-size:11px;letter-spacing:0.18em;color:var(--al-section-title,rgba(239,232,229,0.66))">RESOURCES</p>' +
                 '<a class="site-footer-link" href="Ayub%20Leon%20-%20Resume.pdf" target="_blank" rel="noopener noreferrer">Download Resume</a>' +
               '</div>' +
             '</div>' +
           '</div>' +
-          '<p data-wordmark style="margin:56px 0 0;text-align:center;opacity:0;white-space:nowrap;font-family:\'Gastroe\',\'Instrument Serif\',Georgia,serif;font-weight:400;line-height:1;color:#f6f0ed;">ayubleon</p>' +
+          '<p data-wordmark style="margin:56px 0 0;text-align:center;opacity:0;white-space:nowrap;font-family:\'Gastroe\',\'Instrument Serif\',Georgia,serif;font-weight:400;line-height:1;color:#f4eeeb;">ayubleon</p>' +
           '<p style="margin:16px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size:12px;color:var(--al-text-muted,rgba(239,232,229,0.45));">©2026 Ayub Leon</p>' +
         '</div>' +
       '</footer>'

@@ -43,7 +43,7 @@
     heading.style.fontFamily = 'Poppins, Helvetica, sans-serif';
     heading.style.fontSize = '11px';
     heading.style.letterSpacing = '0.18em';
-    heading.style.color = 'var(--al-text-muted,rgba(239,232,229,0.45))';
+    heading.style.color = 'var(--al-section-title,rgba(239,232,229,0.66))';
     heading.style.textTransform = 'uppercase';
   }
 
