@@ -1,6 +1,66 @@
 (function () {
   window.AL = window.AL || {};
 
+  // full-screen loading intro — a real component, not markup duplicated
+  // per page: this file is the only place its styles, copy, and timing
+  // live. Only shown on the three destinations the nav bar actually
+  // lists (Home, Work, About — both the first two live on the same
+  // Landing Page, screen-label "Hero"), not on individual case-study
+  // pages. Sits above everything else on the page (toast is the
+  // next-highest at z-index:60), holds for exactly HOLD_MS, then slides
+  // away into whatever the page looks like by then — it doesn't gate on
+  // the page being "ready" the way an earlier version of this idea did,
+  // just a fixed, predictable duration.
+  (function initLoadingScreen() {
+    var root = document.querySelector('[data-screen-label]');
+    var label = root ? root.getAttribute('data-screen-label') : '';
+    if (label !== 'Hero' && label !== 'About') return;
+
+    var LINES = [
+      "Lining up the pixels...",
+      "Getting the details in order...",
+      "One second, making sure it's right..."
+    ];
+    var HOLD_MS = 2000;
+    var EXIT_MS = 600;
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    var style = document.createElement('style');
+    style.textContent = [
+      ".al-loading{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:#000;transition:opacity " + EXIT_MS + "ms ease;}",
+      ".al-loading-text{margin:0;padding:0 24px;text-align:center;font-family:Poppins,Helvetica,Arial,sans-serif;font-weight:500;font-size:clamp(1rem,2vw,1.35rem);color:#f6f0ed;opacity:0;transition:opacity .5s ease;}",
+      ".al-loading-text.al-loading-in{opacity:1;}",
+      ".al-loading.al-loading-out{opacity:0;pointer-events:none;}",
+      "@media (prefers-reduced-motion: reduce){.al-loading,.al-loading-text{transition:none;}}"
+    ].join('');
+    document.head.appendChild(style);
+
+    var overlay = document.createElement('div');
+    overlay.className = 'al-loading';
+    overlay.setAttribute('aria-hidden', 'true');
+    var text = document.createElement('p');
+    text.className = 'al-loading-text';
+    text.textContent = LINES[Math.floor(Math.random() * LINES.length)];
+    overlay.appendChild(text);
+    document.body.appendChild(overlay);
+
+    // one rAF to let the initial opacity:0 actually paint, a second to
+    // guarantee it's committed before the class swap — a single rAF is
+    // sometimes not enough for a transition to reliably kick in
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        text.classList.add('al-loading-in');
+      });
+    });
+
+    setTimeout(function () {
+      overlay.classList.add('al-loading-out');
+      setTimeout(function () {
+        overlay.remove();
+      }, reduceMotion ? 0 : EXIT_MS);
+    }, HOLD_MS);
+  })();
+
   // design tokens used across nav.js/footer.js/badge.js/signature.js/
   // case-labels.js — one definition instead of the same literals
   // hand-repeated in every file's own CSS string
@@ -17,59 +77,6 @@
     "}"
   ].join('');
   document.head.appendChild(tokenStyle);
-
-  // reveals the page (see the body{opacity:0} + .al-ready rule each page's
-  // own inline <style> ships with) instead of letting it flash through an
-  // unstyled/incomplete state first — that gap is invisible on a fast
-  // local server but real on a cold, real-network first visit.
-  //
-  // waiting on window.load + fonts.ready alone isn't enough: support.js
-  // can rebuild the page's <main> from its own template in more than one
-  // wave, and the self-mounting components (nav/footer/badge) keep
-  // watching for it for 3-5s after load specifically to react when that
-  // happens. Revealing on load alone risks showing the page just before
-  // one of those rebuilds hits, moving the flash to after reveal instead
-  // of removing it. So this waits for the DOM to actually stop changing
-  // structurally (no elements added/removed for QUIET_MS) before
-  // revealing, capped at MAX_WAIT_MS so a page that never fully quiets
-  // down doesn't stay hidden forever. Attribute mutations (badge drag,
-  // hover glows, etc.) are deliberately not watched, so an interaction
-  // in progress can't be mistaken for the page still settling.
-  var QUIET_MS = 220;
-  var MAX_WAIT_MS = 1800;
-  var REVEAL_DELAY_MS = 100;
-  var REVEAL_FALLBACK_MS = 3200;
-  function reveal() {
-    document.body.classList.add('al-ready');
-  }
-  var fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
-  var pageLoaded = new Promise(function (resolve) {
-    if (document.readyState === 'complete') resolve();
-    else window.addEventListener('load', resolve);
-  });
-  var domQuiet = new Promise(function (resolve) {
-    var quietTimer = null;
-    var settled = false;
-    var maxTimer = setTimeout(function () { finish(); }, MAX_WAIT_MS);
-    var observer = new MutationObserver(function () {
-      clearTimeout(quietTimer);
-      quietTimer = setTimeout(finish, QUIET_MS);
-    });
-    function finish() {
-      if (settled) return;
-      settled = true;
-      clearTimeout(quietTimer);
-      clearTimeout(maxTimer);
-      observer.disconnect();
-      resolve();
-    }
-    observer.observe(document.body, { childList: true, subtree: true });
-    quietTimer = setTimeout(finish, QUIET_MS);
-  });
-  Promise.all([fontsReady, pageLoaded, domQuiet]).then(function () {
-    setTimeout(reveal, REVEAL_DELAY_MS);
-  });
-  setTimeout(reveal, REVEAL_FALLBACK_MS);
 
   // self-healing mount/patch runner: support.js can rebuild the page's
   // <main> content from its own internal template after first paint, in
