@@ -22,9 +22,8 @@
     'Kenyan Banking Redesign.dc.html'
   ];
 
-  var PEEK_PCT = 20; // side cards show at most this much of their own width
   var SWIPE_MIN_PX = 60; // shorter horizontal drags read as scroll wobble, not an intentional swipe
-  var FADE_MS = 380; // per phase — a fade-out then fade-in, not one round trip
+  var MOVE_MS = 480; // duration of the slot-shift scroll on a project change
 
   // the case-study pages' text colors are all tuned for light-on-black;
   // the center card is now white, so every one of those needs to flip
@@ -156,75 +155,115 @@
   style.textContent = [
     // solid instead of a black tint over the real page — the cards behind
     // it are now fully opaque in their own right, so there's nothing left
-    // to tint through
-    ".al-pv-overlay{position:fixed;inset:0;z-index:200;overflow:hidden;background:#000;opacity:0;pointer-events:none;transition:opacity .35s ease;}",
+    // to tint through. --al-cw/--al-peek-scale/--al-gap are the shared
+    // geometry every card and slot position below is derived from, so
+    // resizing the viewport or retuning either constant automatically
+    // keeps everything (card size, peek position, close button) in sync
+    // --al-cw is defined in vw, not %: a custom property's internal %
+    // resolves against whatever property ends up consuming it — the
+    // containing block's width when it lands in `width`, but the
+    // element's OWN width when the same variable lands inside a
+    // translateX() calc() on that same element — so the exact same
+    // --al-cw value would silently mean two different pixel numbers
+    // depending on which rule below reads it. vw is always relative to
+    // the viewport regardless of which property consumes it, so every
+    // rule agrees on the same card width
+    ".al-pv-overlay{position:fixed;inset:0;z-index:200;overflow:hidden;background:#000;opacity:0;pointer-events:none;transition:opacity .35s ease;--al-cw:min(1480px, calc(100vw - 80px));--al-peek-scale:0.8;--al-gap:16px;}",
     ".al-pv-overlay.al-pv-open{opacity:1;pointer-events:auto;}",
-    // wider than the embedded content's own 1400px column on purpose —
+    // every card is the exact same shape at all times — a peeking card
+    // isn't a differently-sized box, it's this same card scaled down (see
+    // the data-slot rules below), the way pressing K and dragging in
+    // Figma scales a whole layer uniformly rather than resizing it.
+    // Wider than the embedded content's own 1400px column on purpose —
     // that gap is exactly where the close button lives, so it sits beside
     // the title/text instead of over it. Height is a definite 90vh (not a
     // max-height): a percentage height on the scrolling inner wrapper
     // below only resolves against a definite parent height, not a capped
-    // auto one. Navigating between projects fades opacity only — the
-    // positions below are static, nothing here ever animates a transform
-    ".al-pv-card{position:absolute;top:50%;left:50%;width:min(1480px,calc(100% - 80px));height:90vh;margin:0;padding:0;border-radius:24px;background:var(--al-card,#1C1C1E);border:1px solid var(--al-border-strong,rgba(255,255,255,0.16));box-shadow:0 50px 110px -40px rgba(0,0,0,0.9);overflow:hidden;font:inherit;text-align:left;cursor:default;transition:opacity " + FADE_MS + "ms ease;}",
-    // percentages here resolve against each card's own width, not the
-    // viewport, so offsetting prev/next by (50 + PEEK_PCT)% / (50 -
-    // PEEK_PCT)% always leaves exactly PEEK_PCT% of that card's own width
-    // showing beyond the center card's edge, regardless of how wide the
-    // card itself ends up being. Center is white — the focused project
-    // reads as a bright surface lifted above the black page — while
-    // prev/next keep the dark card grey, receding behind it
-    ".al-pv-card[data-role=center]{transform:translate(-50%,-50%);opacity:1;z-index:3;background:var(--al-card-light,#FDFBF8);}",
-    // shorter than center — top:50% + translateY(-50%) still centers each
-    // card on its own (smaller) box, so this alone is enough to inset it
-    // evenly top and bottom, matching a stacked-behind card rather than
-    // just a same-height card peeking out sideways
-    ".al-pv-card[data-role=prev]{height:calc(90vh - 80px);transform:translate(-" + (50 + PEEK_PCT) + "%,-50%);opacity:1;z-index:1;cursor:pointer;}",
-    ".al-pv-card[data-role=next]{height:calc(90vh - 80px);transform:translate(-" + (50 - PEEK_PCT) + "%,-50%);opacity:1;z-index:1;cursor:pointer;}",
+    // auto one. transform is the only thing that ever differs per slot,
+    // so it's the only property transitioned — a single native CSS
+    // transition drives the whole move, no per-frame JS needed. Every
+    // slot below keeps the exact same transform-origin (the box's own
+    // center, the default) and the exact same three-function transform
+    // shape (translateX, then the standard center-the-box translate,
+    // then scale) — only the numbers differ. Matching shape matters: two
+    // states with a different *number* of transform functions (or a
+    // transform-origin that itself moves) can't be interpolated function-
+    // by-function, so the browser falls back to decomposing both into
+    // matrices and interpolating those instead — which briefly bulges the
+    // box larger than either end state along the way, flashing white
+    // (this card's own color) outside where either card should be
+    ".al-pv-card{position:absolute;top:50%;left:50%;width:var(--al-cw);height:90vh;margin:0;padding:0;border-radius:24px;background:var(--al-card-light,#FDFBF8);border:1px solid var(--al-border-strong,rgba(255,255,255,0.16));box-shadow:0 50px 110px -40px rgba(0,0,0,0.9);overflow:hidden;font:inherit;text-align:left;cursor:default;transition:transform " + MOVE_MS + "ms cubic-bezier(.65,0,.35,1);}",
+    // the close button's own containing block — sized like the card, but
+    // as a fixed fifth element rather than a child of whichever card
+    // currently holds the center slot, since that rotates between the
+    // four real cards on every navigation
+    ".al-pv-close-anchor{position:absolute;top:50%;left:50%;width:var(--al-cw);height:90vh;transform:translate(-50%,-50%);pointer-events:none;z-index:7;}",
+    // center: the resting point every transform below is built from — a
+    // no-op translateX(0), then translate(-50%,-50%) to center the full-
+    // size box on the screen, then scale(1) — full opacity, full scale.
+    // The leading translateX(0) and trailing scale(1) don't do anything
+    // here, but keep this rule's transform the same three-function shape
+    // every other slot below uses, which is what keeps a transition
+    // between any two of them a plain per-function interpolation
+    ".al-pv-card[data-slot=center]{transform:translateX(0) translate(-50%,-50%) scale(1);opacity:1;z-index:3;}",
+    // left/right sit fully beside center, never behind it. Both scale
+    // around the box's own center (the shared default above, never
+    // overridden), so translateX has to place the box's *center* far
+    // enough out that its near edge — half its own scaled width closer
+    // in — lands exactly --al-gap past center's own edge: half of
+    // center's own width (to clear center's box) + the gap + half of
+    // this card's own scaled width (half of it extends back inward from
+    // its own center). The far edge is then free to extend past the
+    // screen's own boundary and get clipped by the overlay, rather than
+    // by the center card sitting on top of it. Dimmed to read as a
+    // receded, same object rather than a differently-colored one;
+    // brightens to full strength on hover as a click affordance, since
+    // these carry no visible content of their own to hint they're
+    // interactive
+    ".al-pv-card[data-slot=left]{transform:translateX(calc(-1 * (var(--al-cw) / 2 + var(--al-gap) + var(--al-cw) * var(--al-peek-scale) / 2))) translate(-50%,-50%) scale(var(--al-peek-scale));opacity:0.35;z-index:1;cursor:pointer;}",
+    ".al-pv-card[data-slot=right]{transform:translateX(calc(var(--al-cw) / 2 + var(--al-gap) + var(--al-cw) * var(--al-peek-scale) / 2)) translate(-50%,-50%) scale(var(--al-peek-scale));opacity:0.35;z-index:1;cursor:pointer;}",
+    ".al-pv-card[data-slot=left]:hover,.al-pv-card[data-slot=right]:hover{opacity:1;}",
+    // offLeft/offRight: the fourth card waiting just past each edge,
+    // clipped by the overlay's own overflow:hidden — but "past the edge"
+    // has to mean past where left/right's own far edge already sits, not
+    // just past the viewport boundary. left's own far (outer) edge is
+    // already most of the way off-screen (at --al-peek-scale 0.8 it's a
+    // 960px-wide card showing a sliver at most 24px onto the screen), so
+    // a fixed viewport-relative buffer that was comfortable at a smaller
+    // --al-peek-scale stops being enough once the card is this big:
+    // offLeft would land well short of left's own far edge, and the two
+    // visibly overlap while both are still on screen mid-transition. This
+    // instead places offLeft's *near* edge --al-gap past left's own *far*
+    // edge — one full center-card-width, one full peek-card-width, and
+    // the gap between them, all beyond center's own left edge — so the
+    // two can never overlap while on screen, regardless of scale
+    ".al-pv-card[data-slot=offLeft]{transform:translateX(calc(-1 * (var(--al-cw) / 2 + var(--al-gap) * 2 + var(--al-cw) * var(--al-peek-scale) * 1.5))) translate(-50%,-50%) scale(var(--al-peek-scale));opacity:0.35;z-index:0;}",
+    ".al-pv-card[data-slot=offRight]{transform:translateX(calc(var(--al-cw) / 2 + var(--al-gap) * 2 + var(--al-cw) * var(--al-peek-scale) * 1.5)) translate(-50%,-50%) scale(var(--al-peek-scale));opacity:0.35;z-index:0;}",
     // the scroll container is this inner wrapper, not the card itself —
-    // .al-pv-close is a sibling of it, not a descendant, so it never
-    // scrolls along: an absolutely positioned element scrolls with
-    // whichever ancestor is its containing block, and keeping the close
-    // button's containing block (.al-pv-card) separate from the element
-    // that actually scrolls is what keeps it in place
-    ".al-pv-card-inner{height:100%;box-sizing:border-box;pointer-events:none;}",
-    // most paragraphs in the source don't set their own font-family — on
-    // the real page they inherit Schibsted Grotesk from a wrapper div
-    // outside <main>, which isn't part of what gets extracted and injected
-    // here, so without this they'd fall back to the browser default
-    // instead. Headings that DO set Poppins inline are unaffected either way
-    // touch-action:pan-y reserves the horizontal axis for the swipe
-    // handlers below instead of leaving it to the browser's own gesture
-    // recognizer, which can otherwise claim a horizontal drag started
-    // over this scrollable content as an ambiguous scroll gesture and
-    // swallow it before touchmove ever reports it as a deliberate swipe
-    // matches the About page's own site-wide default: on the real
-    // case-study page this same body copy inherits Schibsted Grotesk
-    // from a wrapper that lives outside <main>, so outside what gets
-    // extracted into this card — Poppins was standing in as a fallback
-    // for that lost inheritance, which left every paragraph, meta-grid
-    // value, and inline link in the wrong typeface here specifically
-    ".al-pv-card[data-role=center] .al-pv-card-inner{overflow-y:auto;overflow-x:hidden;color:#000;font-family:'Schibsted Grotesk',Helvetica,Arial,sans-serif;touch-action:pan-y;}",
-    // pointer-events:auto only while open — this scrollable inner needs
-    // it re-enabled since the closed overlay's pointer-events:none
-    // wouldn't otherwise reach through a nested pointer-events override.
-    // Without the .al-pv-open condition, this rule alone re-enables
-    // clicks on the card's whole content area even after closing, which
-    // sits centered over most of the viewport and silently swallows
-    // every click landing within it instead of letting it reach the
-    // real page underneath
-    ".al-pv-overlay.al-pv-open .al-pv-card[data-role=center] .al-pv-card-inner{pointer-events:auto;}",
-    // side cards are plain surfaces now — no title/description peek, just
-    // the card grey itself (the same --al-card the About page's friend
-    // cards use), same as a stack of cards showing only their backs
-    // scoped reproductions of the case-study pages' own document-level
-    // defaults, so links/selection inside the embedded body look the same
-    // as they do on the real page instead of falling back to browser
-    // defaults — kept scoped to .al-pv-card so nothing leaks site-wide
-    ".al-pv-card[data-role=center] a{color:#636262;text-decoration:none;transition:color .35s cubic-bezier(.22,1,.36,1);}",
-    ".al-pv-card[data-role=center] a:hover{color:#000;}",
-    ".al-pv-card[data-role=center] a:focus-visible,.al-pv-card[data-role=center] button:focus-visible{outline:2px solid var(--al-green,#73C41E);outline-offset:3px;border-radius:4px;}",
-    ".al-pv-card[data-role=center] ::selection{background:#ff3b12;color:#fff;}",
+    // .al-pv-close lives in its own anchor entirely outside the card tree
+    // (see .al-pv-close-anchor above), so it never scrolls along
+    // regardless of which card the scrolling content happens to be in.
+    // Unconditional rather than scoped to the center slot: only the
+    // center card is ever actually carrying content, so styling that
+    // would-be-center-only content has nothing to affect on the other
+    // three, which stay empty regardless of which slot they're in
+    ".al-pv-card-inner{height:100%;box-sizing:border-box;pointer-events:none;overflow-y:auto;overflow-x:hidden;color:#000;font-family:'Schibsted Grotesk',Helvetica,Arial,sans-serif;touch-action:pan-y;opacity:0;transition:opacity .4s ease;}",
+    ".al-pv-card-inner.al-pv-inner-visible{opacity:1;}",
+    // pointer-events:auto only while open AND only for the card actually
+    // holding the center slot — this scrollable inner needs it re-enabled
+    // since the closed overlay's pointer-events:none wouldn't otherwise
+    // reach through a nested pointer-events override, and only the
+    // center card should ever be a click target for its own embedded
+    // links rather than whichever card happens to be mid-transition
+    // through that slot
+    ".al-pv-overlay.al-pv-open .al-pv-card[data-slot=center] .al-pv-card-inner{pointer-events:auto;}",
+    // reproductions of the case-study pages' own document-level defaults,
+    // so links/selection inside the embedded body look the same as they
+    // do on the real page instead of falling back to browser defaults
+    ".al-pv-card a{color:#636262;text-decoration:none;transition:color .35s cubic-bezier(.22,1,.36,1);}",
+    ".al-pv-card a:hover{color:#000;}",
+    ".al-pv-card a:focus-visible,.al-pv-card button:focus-visible{outline:2px solid var(--al-green,#73C41E);outline-offset:3px;border-radius:4px;}",
+    ".al-pv-card ::selection{background:#ff3b12;color:#fff;}",
     // the case-study pages' body copy runs a size or two larger than the
     // About page's own — 17.5px/15.5px/15px against About's consistent
     // 14.5px body-paragraph size. Matched here at every width, not just
@@ -234,8 +273,8 @@
     // value) rather than by role/selector, since the same size shows up
     // across differently-purposed elements (hero subhead, body
     // paragraphs, meta-grid values) that don't share a class
-    ".al-pv-card[data-role=center] [data-pv-inner] [style*=\"font-size: 17.5px\"],.al-pv-card[data-role=center] [data-pv-inner] [style*=\"font-size: 15px\"]{font-size:14.5px !important;}",
-    ".al-pv-card[data-role=center] [data-pv-inner] [style*=\"font-size: 15.5px\"]{font-size:14.5px !important;line-height:1.72 !important;}",
+    ".al-pv-card [data-pv-inner] [style*=\"font-size: 17.5px\"],.al-pv-card [data-pv-inner] [style*=\"font-size: 15px\"]{font-size:14.5px !important;}",
+    ".al-pv-card [data-pv-inner] [style*=\"font-size: 15.5px\"]{font-size:14.5px !important;line-height:1.72 !important;}",
     // the "More work" section is rebuilt into a plain list of all four
     // projects (see rebuildMoreWork below) rather than the source's own
     // prev/next card pair, so it needs its own row styling instead of the
@@ -251,9 +290,30 @@
     ".al-pv-more-row-current{cursor:default;}",
     ".al-pv-more-row-current:hover{opacity:1;}",
     // black-on-white, the reverse of the dark-card close button elsewhere
-    // on the site — this one only ever sits on the white center card
-    ".al-pv-close{position:absolute;top:20px;right:20px;z-index:4;width:36px;height:36px;border-radius:50%;border:0;padding:0;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .2s ease;}",
-    ".al-pv-close:hover{transform:scale(1.08);}",
+    // on the site — this one only ever sits on the white center card.
+    // pointer-events:auto only while open, same reasoning as the card-
+    // inner rule above: its anchor is pointer-events:none so it doesn't
+    // block clicks through to whatever card is underneath it, but without
+    // the .al-pv-open gate this alone would re-enable the button even
+    // while the overlay is closed and invisible
+    ".al-pv-close{position:absolute;top:20px;right:20px;z-index:4;width:36px;height:36px;border-radius:50%;border:0;padding:0;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .3s cubic-bezier(.22,1,.36,1);}",
+    ".al-pv-overlay.al-pv-open .al-pv-close{pointer-events:auto;}",
+    // the circle itself just scales and rotates — stays solid black, no
+    // color shift — while the X inside does its own crossing animation
+    // (below)
+    ".al-pv-close:hover{transform:scale(1.1) rotate(90deg);}",
+    // the two strokes swap places on hover rather than the whole glyph
+    // just spinning along with the button above — transform-origin at
+    // (7,7), the icon's own center in its 14x14 viewBox, so each stroke
+    // pivots in place. Rotating one +90deg and the other -90deg lands
+    // each exactly on the other's original line (a diagonal rotated 90
+    // degrees maps onto the other diagonal), so the end state looks like
+    // a plain X again — the animation is in the two strokes visibly
+    // sweeping through and crossing each other on the way there, not in
+    // the resting shape, which is unchanged
+    ".al-pv-close-stroke{transform-origin:7px 7px;transition:transform .3s cubic-bezier(.22,1,.36,1);}",
+    ".al-pv-close:hover .al-pv-close-stroke:first-child{transform:rotate(90deg);}",
+    ".al-pv-close:hover .al-pv-close-stroke:last-child{transform:rotate(-90deg);}",
     // very subtle elevation on the case-study's own photography/screenshots
     // — box-shadow on the same element as its own overflow:hidden still
     // renders outside the clip, so this is safe to add directly to the
@@ -264,22 +324,20 @@
     // it shows through as a visible dark edge wherever the cover-fit image
     // doesn't fully hide it, and as an outright letterboxed bar around the
     // prototype video, which uses object-fit:contain instead of cover
-    ".al-pv-card[data-role=center] [data-pv-inner] div:has(> img),.al-pv-card[data-role=center] [data-pv-inner] div:has(> video){box-shadow:0 6px 24px -6px rgba(0,0,0,0.14);background:var(--al-card-light,#FDFBF8) !important;border:none !important;}",
-    // the center card takes almost the full screen, only trimmed enough
-    // to leave a slim margin on each side — the same existing PEEK_PCT
-    // math naturally clips prev/next down to a thin grey sliver in just
-    // that margin (the overlay's own overflow:hidden takes care of it,
-    // no separate mobile-specific peek size needed), rather than hiding
-    // them outright. Swipe is still the primary way to move between
-    // projects here; see the touchstart/touchend handlers below. The
-    // close button follows to the bottom corner, out of the way of a
-    // thumb reaching for it one-handed at the top of a tall screen
-    "@media (max-width: 700px){.al-pv-card[data-role=center]{width:calc(100% - 24px);}.al-pv-close{top:auto;bottom:20px;}" +
+    ".al-pv-card [data-pv-inner] div:has(> img),.al-pv-card [data-pv-inner] div:has(> video){box-shadow:0 6px 24px -6px rgba(0,0,0,0.14);background:var(--al-card-light,#FDFBF8) !important;border:none !important;}",
+    // phones get the opposite treatment from desktop: screen space is
+    // scarce, so the center card claims as much of it as possible (a
+    // slim 12px margin per side instead of desktop's 40px) and the gap
+    // to each peeking card shrinks to match, rather than eating further
+    // into that reclaimed width. The close button follows to the bottom
+    // corner, out of the way of a thumb reaching for it one-handed at
+    // the top of a tall screen
+    "@media (max-width: 700px){.al-pv-overlay{--al-cw:calc(100vw - 24px);--al-gap:8px;}.al-pv-close{top:auto;bottom:20px;}" +
       // the close button relocates to the bottom corner on mobile (see
       // above), so unlike desktop there's nothing at the top-right this
       // padding needs to clear — free to sit much tighter than the 64px
       // set on this section inline (loadProject, above)
-      ".al-pv-card[data-role=center] [data-pv-inner]>section:first-child{padding-top:24px !important;}" +
+      ".al-pv-card [data-pv-inner]>section:first-child{padding-top:24px !important;}" +
       // each case-study page's own mobile stacking rules (.case-label-grid
       // etc. dropping from a two-column layout to one) live in that page's
       // <style> block, in <head> — outside <main>, so they never come
@@ -287,10 +345,10 @@
       // Reproduced here rather than lost, so text stacks the same way it
       // always did on a narrow screen instead of staying jammed into the
       // desktop column layout
-      ".al-pv-card[data-role=center] .case-label-grid{grid-template-columns:1fr !important;gap:14px 0 !important;}" +
-      ".al-pv-card[data-role=center] .case-split-grid{grid-template-columns:1fr !important;gap:56px 0 !important;}" +
-      ".al-pv-card[data-role=center] .case-figure-grid{grid-template-columns:1fr !important;}" +
-      ".al-pv-card[data-role=center] .mobile-gutter{padding-left:16px !important;padding-right:16px !important;}" +
+      ".al-pv-card .case-label-grid{grid-template-columns:1fr !important;gap:14px 0 !important;}" +
+      ".al-pv-card .case-split-grid{grid-template-columns:1fr !important;gap:56px 0 !important;}" +
+      ".al-pv-card .case-figure-grid{grid-template-columns:1fr !important;}" +
+      ".al-pv-card .mobile-gutter{padding-left:16px !important;padding-right:16px !important;}" +
       // the Role/Client/Timeline/Platforms/Project contributors grid has
       // no class of its own — it already auto-fits into however many
       // 190px-minimum columns fit, no override needed for that part on
@@ -298,14 +356,14 @@
       // narrow phone, so it's lowered here — same auto-fit behavior,
       // just with room to place a pair side by side when the screen
       // allows it, matching the source pages' own equivalent rule
-      ".al-pv-card[data-role=center] [data-pv-inner] div[style*=\"grid-template-columns: repeat(auto-fit, minmax(190px, 1fr))\"]{grid-template-columns:repeat(auto-fit,minmax(130px,1fr)) !important;}}",
-    "@media (prefers-reduced-motion: reduce){.al-pv-overlay,.al-pv-card{transition:none !important;}}"
+      ".al-pv-card [data-pv-inner] div[style*=\"grid-template-columns: repeat(auto-fit, minmax(190px, 1fr))\"]{grid-template-columns:repeat(auto-fit,minmax(130px,1fr)) !important;}}",
+    "@media (prefers-reduced-motion: reduce){.al-pv-overlay,.al-pv-card,.al-pv-card-inner{transition:none !important;}}"
   ].join('');
   document.head.appendChild(style);
 
   var CLOSE_SVG = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-    '<path d="M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
-    '<path d="M1 1L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
+    '<path class="al-pv-close-stroke" d="M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
+    '<path class="al-pv-close-stroke" d="M1 1L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
   '</svg>';
 
   var overlay = null;
@@ -313,32 +371,59 @@
   var animating = false;
   var lastFocused = null;
 
-  function cardHTML(role) {
-    var closeBtn = role === 'center' ? '<button type="button" class="al-pv-close" data-pv-close aria-label="Close">' + CLOSE_SVG + '</button>' : '';
-    var tag = role === 'center' ? 'div' : 'button';
-    var typeAttr = role === 'center' ? '' : ' type="button"';
-    var label = role === 'prev' ? ' aria-label="Previous project"' : role === 'next' ? ' aria-label="Next project"' : '';
-    return (
-      '<' + tag + ' class="al-pv-card" data-role="' + role + '"' + typeAttr + label + '>' +
-        closeBtn +
-        '<div class="al-pv-card-inner" data-pv-inner></div>' +
-      '</' + tag + '>'
-    );
+  // four identical plain divs — none of them can be a <button>, since
+  // whichever one is currently 'center' needs to host real nested
+  // interactive content (links, the "More work" list, videos), and
+  // nesting interactive elements inside a <button> is invalid HTML.
+  // Which slot is clickable-to-navigate vs. not is expressed instead
+  // through role/tabindex/aria-label, kept in sync with each card's
+  // current data-slot by setSlotA11y — see go(), where that slot rotates
+  // between the four physical cards on every navigation
+  function cardHTML() {
+    return '<div class="al-pv-card"><div class="al-pv-card-inner" data-pv-inner></div></div>';
+  }
+  function setSlotA11y(card, slot) {
+    if (slot === 'left' || slot === 'right') {
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', slot === 'left' ? 'Previous project' : 'Next project');
+    } else {
+      card.removeAttribute('role');
+      card.removeAttribute('tabindex');
+      card.removeAttribute('aria-label');
+    }
+  }
+  function mod(i) {
+    return (i + ORDER.length) % ORDER.length;
   }
 
   function build() {
     overlay = document.createElement('div');
     overlay.className = 'al-pv-overlay';
     overlay.setAttribute('aria-hidden', 'true');
-    overlay.innerHTML = cardHTML('prev') + cardHTML('center') + cardHTML('next');
+    overlay.innerHTML = cardHTML() + cardHTML() + cardHTML() + cardHTML() +
+      '<div class="al-pv-close-anchor"><button type="button" class="al-pv-close" data-pv-close aria-label="Close">' + CLOSE_SVG + '</button></div>';
     document.body.appendChild(overlay);
 
     overlay.querySelector('[data-pv-close]').addEventListener('click', close);
+    // delegated rather than bound per-card at build time — which physical
+    // card is clickable-to-navigate changes as slots rotate, so the
+    // handler has to read each card's CURRENT slot at click time rather
+    // than assume whichever slot it was wired to when the cards were built
     overlay.addEventListener('click', function (e) {
-      if (e.target === overlay) close();
+      if (e.target === overlay) { close(); return; }
+      var card = e.target.closest('.al-pv-card');
+      if (!card) return;
+      if (card.dataset.slot === 'left') go(-1);
+      else if (card.dataset.slot === 'right') go(1);
     });
-    overlay.querySelector('[data-role="prev"]').addEventListener('click', function () { go(-1); });
-    overlay.querySelector('[data-role="next"]').addEventListener('click', function () { go(1); });
+    overlay.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      var card = e.target.closest('.al-pv-card');
+      if (!card) return;
+      if (card.dataset.slot === 'left') { e.preventDefault(); go(-1); }
+      else if (card.dataset.slot === 'right') { e.preventDefault(); go(1); }
+    });
 
     // swipe stands in for the peeking side cards on mobile, where they're
     // hidden entirely — a left swipe advances the same way tapping the
@@ -383,15 +468,18 @@
     overlay.addEventListener('touchcancel', resetTouch, { passive: true });
   }
 
-  function fillSide(role, href) {
-    var card = overlay.querySelector('[data-role="' + role + '"]');
-    card.dataset.href = href;
+  // no card other than 'center' ever shows visible content — just its
+  // own white surface, scaled and positioned per its slot — so this is
+  // all any of the other three slots ever need: the right position/size
+  // (driven entirely by the data-slot attribute change itself) and no
+  // leftover content from whatever it was showing before
+  function assignSlot(card, slot) {
+    card.dataset.slot = slot;
+    setSlotA11y(card, slot);
+    if (slot === 'center') return;
     var inner = card.querySelector('[data-pv-inner]');
+    inner.classList.remove('al-pv-inner-visible');
     inner.innerHTML = '';
-    // no visible content on a side card — just its own card-grey surface
-    // — but still worth fetching now: by the time this becomes the
-    // center card the request has likely already resolved
-    loadProject(href);
   }
 
   // replaces the source's own "More work" prev/next card pair with a
@@ -455,9 +543,10 @@
   }
 
   function fillCenter(href) {
-    var card = overlay.querySelector('[data-role="center"]');
+    var card = overlay.querySelector('[data-slot="center"]');
     card.dataset.href = href;
     var inner = card.querySelector('[data-pv-inner]');
+    inner.classList.remove('al-pv-inner-visible');
     inner.innerHTML = '';
     inner.scrollTop = 0;
     loadProject(href).then(function (data) {
@@ -476,35 +565,100 @@
       rebuildMoreWork(inner, href);
       fixMediaCrops(inner);
       fixCaseStudyLinkLayout(inner);
+      // the reveal: content starts at opacity 0 (see .al-pv-card-inner)
+      // and fades in once it's actually ready, rather than popping in the
+      // instant the fetch resolves — a rAF tick so the class addition
+      // lands on its own frame and actually transitions instead of
+      // applying before the browser's first paint of the new content
+      requestAnimationFrame(function () {
+        inner.classList.add('al-pv-inner-visible');
+      });
     });
   }
 
   function render() {
-    var prevIdx = (currentIndex - 1 + ORDER.length) % ORDER.length;
-    var nextIdx = (currentIndex + 1) % ORDER.length;
-    fillSide('prev', ORDER[prevIdx]);
+    var cards = Array.from(overlay.querySelectorAll('.al-pv-card'));
+    assignSlot(cards[0], 'left');
+    assignSlot(cards[1], 'center');
+    assignSlot(cards[2], 'right');
+    assignSlot(cards[3], 'offRight');
+    // prev/next/the-one-after-next carry no visible content, but fetching
+    // them now means the request has likely already resolved by the time
+    // any of them becomes the center card
+    loadProject(ORDER[mod(currentIndex - 1)]);
+    loadProject(ORDER[mod(currentIndex + 1)]);
+    loadProject(ORDER[mod(currentIndex + 2)]);
     fillCenter(ORDER[currentIndex]);
-    fillSide('next', ORDER[nextIdx]);
   }
 
-  // a plain crossfade: fade the trio out, swap in the new center/prev/next
-  // content while invisible, fade back in at the same (static) positions.
-  // A shifting-transform version of this read as jittery — likely the cost
-  // of animating three large, scroll-bearing boxes' position at once —
-  // where opacity alone is cheap to animate regardless of what's under it
+  // a single continuous scroll of the whole strip by one slot, in the
+  // direction clicked — not two separately-choreographed shrink/grow
+  // animations. Every card's transform is driven entirely by its
+  // data-slot attribute (see the stylesheet above), so moving four cards
+  // at once is just reassigning four attributes; the browser's own CSS
+  // transition handles the actual interpolation on the compositor thread,
+  // which is both simpler and smoother than animating width/height/top/
+  // left by hand ever was. The fourth card — always waiting just past one
+  // edge, clipped and invisible — slides into the vacated peek slot at
+  // the same time the clicked card grows into center and the old center
+  // shrinks into the opposite peek slot; the card that peek slot just
+  // displaced becomes the new waiting one on the far side
   function go(delta) {
     if (animating) return;
+    var cards = Array.from(overlay.querySelectorAll('.al-pv-card'));
+    var leftCard = cards.find(function (c) { return c.dataset.slot === 'left'; });
+    var centerCard = cards.find(function (c) { return c.dataset.slot === 'center'; });
+    var rightCard = cards.find(function (c) { return c.dataset.slot === 'right'; });
+    var offCard = cards.find(function (c) { return c.dataset.slot === 'offLeft' || c.dataset.slot === 'offRight'; });
+
+    currentIndex = mod(currentIndex + delta);
+    loadProject(ORDER[mod(currentIndex - 1)]);
+    loadProject(ORDER[mod(currentIndex + 1)]);
+
+    // the waiting card sits wherever it last exited to — the correct side
+    // if the last navigation went the same direction, the wrong one if it
+    // just reversed. Since it's clipped and invisible either way, snapping
+    // it across with no transition before this scroll starts is imperceptible
+    var neededOffSlot = delta > 0 ? 'offRight' : 'offLeft';
+    if (offCard.dataset.slot !== neededOffSlot) {
+      offCard.style.transition = 'none';
+      offCard.dataset.slot = neededOffSlot;
+      offCard.offsetWidth; // flush the snap before re-enabling the transition
+      offCard.style.transition = '';
+    }
+
+    // the outgoing center card keeps its real content through the move —
+    // assignSlot below would otherwise blank it out instantly, before the
+    // fade-out (just started above) or the shrink itself ever plays — so
+    // its own slot/a11y are set directly here instead, and its content is
+    // only actually cleared once the move finishes, in the timeout below
+    var outgoingInner = centerCard.querySelector('[data-pv-inner]');
+    outgoingInner.classList.remove('al-pv-inner-visible');
+
+    if (delta > 0) {
+      centerCard.dataset.slot = 'left';
+      setSlotA11y(centerCard, 'left');
+      assignSlot(leftCard, 'offLeft');
+      assignSlot(rightCard, 'center');
+      assignSlot(offCard, 'right');
+    } else {
+      centerCard.dataset.slot = 'right';
+      setSlotA11y(centerCard, 'right');
+      assignSlot(rightCard, 'offRight');
+      assignSlot(leftCard, 'center');
+      assignSlot(offCard, 'left');
+    }
+    fillCenter(ORDER[currentIndex]);
+
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      outgoingInner.innerHTML = '';
+      return;
+    }
     animating = true;
-    var cards = overlay.querySelectorAll('.al-pv-card');
-    cards.forEach(function (c) { c.style.opacity = '0'; });
     setTimeout(function () {
-      currentIndex = (currentIndex + delta + ORDER.length) % ORDER.length;
-      render();
-      // clears the inline override so each card fades back in to its own
-      // resting opacity, not a forced value
-      cards.forEach(function (c) { c.style.opacity = ''; });
+      outgoingInner.innerHTML = '';
       animating = false;
-    }, FADE_MS);
+    }, MOVE_MS);
   }
 
   function onKeydown(e) {

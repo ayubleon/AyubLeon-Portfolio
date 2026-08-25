@@ -42,6 +42,16 @@
     "@media (max-width:700px){.site-contact-card{width:min(300px,calc(100vw - 64px));}}",
     ".site-contact-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border:0;background:none;color:#8E8D8E;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:color .25s ease;}",
     ".site-contact-close:hover{color:#fff;}",
+    // same crossing-strokes animation as the case-study popup's close
+    // button: transform-origin at (7,7), the icon's own center in its
+    // 14x14 viewBox, and the two strokes rotate +90/-90deg on hover.
+    // Since a diagonal rotated 90 degrees lands exactly on the other
+    // diagonal's line, the resting and fully-hovered states both still
+    // read as a plain X — the animation is the two strokes visibly
+    // sweeping through and crossing each other on the way there
+    ".site-contact-close-stroke{transform-origin:7px 7px;transition:transform .3s cubic-bezier(.22,1,.36,1);}",
+    ".site-contact-close:hover .site-contact-close-stroke:first-child{transform:rotate(90deg);}",
+    ".site-contact-close:hover .site-contact-close-stroke:last-child{transform:rotate(-90deg);}",
     ".site-contact-header{display:flex;align-items:center;gap:16px;}",
     ".site-contact-avatar-flip{position:relative;width:76px;height:76px;flex:0 0 auto;border:0;padding:0;margin:0;background:none;cursor:pointer;perspective:400px;-webkit-tap-highlight-color:transparent;}",
     ".site-contact-avatar-face{position:absolute;inset:0;border-radius:50%;backface-visibility:hidden;-webkit-backface-visibility:hidden;transition:transform .6s cubic-bezier(.22,1,.36,1);transform:rotateY(0deg);}",
@@ -49,7 +59,7 @@
     ".site-contact-avatar-flip.is-flipped .site-contact-avatar-face-front{transform:rotateY(-180deg);}",
     ".site-contact-avatar-flip.is-flipped .site-contact-avatar-face-back{transform:rotateY(0deg);}",
     ".site-contact-avatar{width:76px;height:76px;border-radius:50%;background:#fff;display:block;object-fit:cover;}",
-    ".site-contact-name{margin:0;font-family:'Gastroe','Instrument Serif',Georgia,serif;font-weight:400;font-size:20px;color:#fff;}",
+    ".site-contact-name{margin:0;font-family:Poppins,Helvetica,sans-serif;font-weight:600;font-size:20px;color:#fff;}",
     ".site-contact-role{margin:2px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size:13px;font-weight:500;color:var(--al-green,#73C41E);}",
     ".site-contact-blurb{margin:18px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size:13.5px;line-height:1.55;color:rgba(244,238,235,0.82);}",
     ".site-contact-link{display:block;color:var(--al-green,#73C41E);text-decoration:none;}",
@@ -69,8 +79,8 @@
   var RESUME_SVG = '<svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.00004 29.3334C7.2928 29.3334 6.61452 29.0525 6.11442 28.5524C5.61433 28.0523 5.33337 27.374 5.33337 26.6668V5.33342C5.33337 4.62617 5.61433 3.9479 6.11442 3.4478C6.61452 2.9477 7.2928 2.66675 8.00004 2.66675H18.6667C19.0888 2.66607 19.5068 2.74889 19.8967 2.91044C20.2867 3.072 20.6408 3.3091 20.9387 3.60809L25.7227 8.39209C26.0225 8.69009 26.2603 9.04455 26.4223 9.43497C26.5843 9.82539 26.6674 10.244 26.6667 10.6668V26.6668C26.6667 27.374 26.3858 28.0523 25.8857 28.5524C25.3856 29.0525 24.7073 29.3334 24 29.3334H8.00004Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.6666 2.66675V9.33342C18.6666 9.68704 18.8071 10.0262 19.0572 10.2762C19.3072 10.5263 19.6463 10.6667 20 10.6667H26.6666" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 24V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 20L16 24L20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var LINKEDIN_SVG = '<svg width="21" height="21" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.909239 26.7887H4.54928C5.05147 26.7887 5.45852 26.3816 5.45852 25.8794V9.96881C5.45852 9.46657 5.05147 9.05957 4.54928 9.05957H0.909239C0.407005 9.05957 0 9.46657 0 9.96881V25.8794C0 26.3815 0.407005 26.7887 0.909239 26.7887Z" fill="currentColor"/><path d="M0.909239 6.26229H4.54928C5.05147 6.26229 5.45852 5.85523 5.45852 5.35305V2.12066C5.45852 1.61848 5.05147 1.21143 4.54928 1.21143H0.909239C0.407005 1.21143 0 1.61848 0 2.12066V5.35305C0 5.85523 0.407005 6.26229 0.909239 6.26229Z" fill="currentColor"/><path d="M26.6304 10.905C26.1189 10.2317 25.3647 9.67797 24.3674 9.24396C23.3701 8.81026 22.2693 8.59326 21.0649 8.59326C18.6199 8.59326 16.5482 9.52636 14.8497 11.3929C14.5118 11.7643 14.266 11.6831 14.266 11.1809V9.96877C14.266 9.46654 13.8589 9.05953 13.3567 9.05953H10.1052C9.60293 9.05953 9.19592 9.46654 9.19592 9.96877V25.8793C9.19592 26.3815 9.60298 26.7886 10.1052 26.7886H13.7452C14.2474 26.7886 14.6544 26.3815 14.6544 25.8793V20.346C14.6544 18.0409 14.7936 16.4608 15.072 15.6062C15.3503 14.7515 15.8653 14.0652 16.6164 13.5471C17.3676 13.0291 18.2157 12.7699 19.1612 12.7699C19.8994 12.7699 20.5308 12.9513 21.0553 13.314C21.5799 13.6767 21.9587 14.1848 22.1918 14.8389C22.425 15.4929 22.5415 16.9336 22.5415 19.1612V25.8793C22.5415 26.3815 22.9485 26.7886 23.4507 26.7886H27.0908C27.5929 26.7886 27.9999 26.3815 27.9999 25.8793V16.8689C27.9999 15.276 27.8995 14.0521 27.699 13.1975C27.4985 12.3428 27.1422 11.5786 26.6304 10.905Z" fill="currentColor"/></svg>';
   var CLOSE_SVG = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-    '<path d="M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
-    '<path d="M1 1L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
+    '<path class="site-contact-close-stroke" d="M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
+    '<path class="site-contact-close-stroke" d="M1 1L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
   '</svg>';
 
   var playWhoosh = AL.makeSoundPlayer('sounds/whoosh.wav', 0.20);
