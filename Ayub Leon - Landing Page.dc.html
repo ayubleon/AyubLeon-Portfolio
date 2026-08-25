@@ -104,7 +104,7 @@
       </div>
 
       <div class="work-grid" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.02fr); gap: 60px; align-items: center;">
-        <div data-work-viewport="1" style="position: relative; height: 56svh; overflow: hidden; -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0) 0%, #000 20%, #000 80%, rgba(0,0,0,0) 100%); mask-image: linear-gradient(180deg, rgba(0,0,0,0) 0%, #000 20%, #000 80%, rgba(0,0,0,0) 100%);">
+        <div data-work-viewport="1" style="position: relative; height: 56svh; overflow: hidden;">
           <div data-work-list="1" style="position: absolute; top: 50%; left: 0; right: 0; display: flex; flex-direction: column; will-change: transform;">
           <a data-work-row="0" href="BuzzIQ.dc.html" style="display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 7px; align-items: center; padding: 30px 0; color: inherit; text-decoration: none;">
             <span data-row-num="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: rgba(255,255,255,0.22); transition: color .55s cubic-bezier(.22,1,.36,1);">01</span>
@@ -151,6 +151,8 @@
             </div>
           </a>
           </div>
+          <div aria-hidden="true" style="position: absolute; top: 0; left: 0; right: 0; height: 20%; z-index: 2; pointer-events: none; background: linear-gradient(180deg, #000 0%, rgba(0,0,0,0) 100%);"></div>
+          <div aria-hidden="true" style="position: absolute; bottom: 0; left: 0; right: 0; height: 20%; z-index: 2; pointer-events: none; background: linear-gradient(0deg, #000 0%, rgba(0,0,0,0) 100%);"></div>
         </div>
 
         <div class="work-media" style="display: flex; flex-direction: column; gap: 26px;">
@@ -428,8 +430,7 @@ class Component extends DCLogic {
     const dots = Array.from(section.querySelectorAll('[data-work-dot]'));
     const counter = section.querySelector('[data-work-counter]');
     const n = rows.length;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let current = -1, queued = false, settling = false, settleTimer = null, settleClearTimer = null;
+    let current = -1, queued = false;
 
     const paint = () => {
       queued = false;
@@ -478,56 +479,8 @@ class Component extends DCLogic {
       }
     };
 
-    // native scrollTo({behavior:'smooth'}) has a fixed, non-tunable easing curve that
-    // visibly clashes with touch momentum on mobile; a hand-rolled tween stays smooth
-    // regardless of distance and can be interrupted cleanly if the user grabs the page again
-    let settleRaf = null;
-    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
-    const animateScrollTo = (targetY) => {
-      if (settleRaf) cancelAnimationFrame(settleRaf);
-      const startY = window.scrollY;
-      const delta = targetY - startY;
-      const duration = 420;
-      const startTime = performance.now();
-      settling = true;
-      const step = (now) => {
-        const t = Math.min((now - startTime) / duration, 1);
-        window.scrollTo(0, startY + delta * easeOutCubic(t));
-        if (t < 1) {
-          settleRaf = requestAnimationFrame(step);
-        } else {
-          settleRaf = null;
-          clearTimeout(settleClearTimer);
-          settleClearTimer = setTimeout(() => { settling = false; }, 60);
-        }
-      };
-      settleRaf = requestAnimationFrame(step);
-    };
-
-    // mobile: once the user pauses mid-scroll, settle the whole page onto the
-    // nearest project — driven by window scroll (not a nested container), so it
-    // works no matter where on the screen the gesture started, and scrolling past
-    // the first/last project continues into the neighboring section naturally
-    const settleNow = () => {
-      settleTimer = null;
-      const rect = section.getBoundingClientRect();
-      const span = section.offsetHeight - window.innerHeight;
-      if (span <= 0) return;
-      const p = Math.min(Math.max(-rect.top / span, 0), 1);
-      if (p <= 0 || p >= 1) return; // already resting before/after the section, nothing to settle
-      const nearest = Math.round(p * (n - 1));
-      const targetY = section.offsetTop + (nearest / (n - 1)) * span;
-      if (Math.abs(targetY - window.scrollY) < 1) return;
-      if (reduce) { window.scrollTo(0, targetY); return; }
-      animateScrollTo(targetY);
-    };
-
     this.onWorkScroll = () => {
       if (!queued) { queued = true; requestAnimationFrame(paint); }
-      if (window.innerWidth <= 700 && !settling) {
-        clearTimeout(settleTimer);
-        settleTimer = setTimeout(settleNow, 140);
-      }
     };
     window.addEventListener('scroll', this.onWorkScroll, { passive: true });
     window.addEventListener('resize', this.onWorkScroll);
