@@ -58,6 +58,14 @@
     ".site-contact-avatar-face-back{transform:rotateY(180deg);}",
     ".site-contact-avatar-flip.is-flipped .site-contact-avatar-face-front{transform:rotateY(-180deg);}",
     ".site-contact-avatar-flip.is-flipped .site-contact-avatar-face-back{transform:rotateY(0deg);}",
+    // a brief partial flip played once right after the card opens — the
+    // same rotateY motion as the real hover/click flip, just a peek of it
+    // (front/back stay a rigid 180deg apart throughout) and self-reverting,
+    // to hint the photo is flippable without any text explaining it
+    "@keyframes siteContactFrontHint{0%,100%{transform:rotateY(0deg);}50%{transform:rotateY(-35deg);}}",
+    "@keyframes siteContactBackHint{0%,100%{transform:rotateY(180deg);}50%{transform:rotateY(145deg);}}",
+    ".site-contact-avatar-flip.is-hint .site-contact-avatar-face-front{animation:siteContactFrontHint .6s cubic-bezier(.22,1,.36,1);}",
+    ".site-contact-avatar-flip.is-hint .site-contact-avatar-face-back{animation:siteContactBackHint .6s cubic-bezier(.22,1,.36,1);}",
     ".site-contact-avatar{width:76px;height:76px;border-radius:50%;background:#fff;display:block;object-fit:cover;}",
     ".site-contact-name{margin:0;font-family:Poppins,Helvetica,sans-serif;font-weight:600;font-size:20px;color:#fff;}",
     ".site-contact-role{margin:2px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size:13px;font-weight:500;color:var(--al-green,#73C41E);}",
@@ -138,7 +146,9 @@
     var card = el.querySelector('[data-contact-card]');
     var backdrop = el.querySelector('[data-contact-backdrop]');
     var closeBtn = el.querySelector('[data-contact-close]');
+    var avatarFlip = el.querySelector('[data-avatar-flip]');
     if (!toggleBtn || !card) return;
+    var hintTimer = null;
 
     // the transform transition is always active on this element, so simply
     // writing the avatar-position "closed" transform would itself animate
@@ -166,7 +176,21 @@
           card.classList.add('is-open');
         });
         if (backdrop) backdrop.classList.add('is-open');
+        // wait for the card's own open transition to settle before
+        // wiggling the photo — hinting at it while the card is still
+        // flying into place would get lost in the bigger motion
+        if (avatarFlip) {
+          clearTimeout(hintTimer);
+          avatarFlip.classList.remove('is-hint');
+          hintTimer = setTimeout(function () {
+            avatarFlip.classList.add('is-hint');
+          }, 550);
+        }
       } else {
+        if (avatarFlip) {
+          clearTimeout(hintTimer);
+          avatarFlip.classList.remove('is-hint');
+        }
         // reverse the entrance: travel back toward the avatar's current
         // position (recomputed fresh in case the page scrolled/resized)
         // instead of just fading out in place
