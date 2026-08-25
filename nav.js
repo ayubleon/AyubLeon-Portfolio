@@ -68,7 +68,7 @@
     ".site-contact-avatar-flip.is-hint .site-contact-avatar-face-back{animation:siteContactBackHint .6s cubic-bezier(.22,1,.36,1);}",
     ".site-contact-avatar{width:76px;height:76px;border-radius:50%;background:#fff;display:block;object-fit:cover;}",
     ".site-contact-name{margin:0;font-family:Poppins,Helvetica,sans-serif;font-weight:600;font-size:20px;color:#fff;}",
-    ".site-contact-role{margin:2px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size:13px;font-weight:500;color:var(--al-green,#73C41E);}",
+    ".site-contact-role{margin:2px 0 0;font-family:'Schibsted Grotesk',Helvetica,Arial,sans-serif;font-size:13px;font-weight:500;color:var(--al-green,#73C41E);}",
     ".site-contact-blurb{margin:18px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size:13.5px;line-height:1.55;color:rgba(244,238,235,0.82);}",
     ".site-contact-link{display:block;color:var(--al-green,#73C41E);text-decoration:none;}",
     ".site-contact-link:hover{color:var(--al-green-hover,#8fe030);}",

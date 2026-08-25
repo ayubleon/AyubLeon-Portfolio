@@ -57,7 +57,7 @@
               '<img src="images/badge-name.svg" alt="Ayub Leon" style="width:16px;height:48px;display:block;flex:0 0 auto;">' +
               '<div style="display:flex;flex-direction:column;gap:3px;">' +
                 '<p style="margin:0;font-family:Poppins,Helvetica,sans-serif;font-size:14px;font-weight:600;color:#f4eeeb;">Ayub Leon</p>' +
-                '<p style="margin:0;font-family:Poppins,Helvetica,sans-serif;font-size:14px;font-weight:400;color:#73C41E;">Product Designer</p>' +
+                '<p style="margin:0;font-family:\'Schibsted Grotesk\',Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;color:#73C41E;">Product Designer</p>' +
               '</div>' +
             '</div>' +
             '<div class="footer-nav-cols" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:48px;flex:0 1 380px;min-width:0;">' +
