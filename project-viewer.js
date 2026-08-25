@@ -168,8 +168,14 @@
     // depending on which rule below reads it. vw is always relative to
     // the viewport regardless of which property consumes it, so every
     // rule agrees on the same card width
-    ".al-pv-overlay{position:fixed;inset:0;z-index:200;overflow:hidden;background:#000;opacity:0;pointer-events:none;transition:opacity .35s ease;--al-cw:min(1480px, calc(100vw - 80px));--al-peek-scale:0.8;--al-gap:16px;}",
+    ".al-pv-overlay{position:fixed;inset:0;z-index:200;overflow:hidden;background:#000;opacity:0;pointer-events:none;transition:opacity .35s ease;--al-cw:min(1440px, calc(100vw - 80px));--al-peek-scale:0.8;--al-gap:16px;}",
     ".al-pv-overlay.al-pv-open{opacity:1;pointer-events:auto;}",
+    // caps how far apart the two peek cards' clip edges can drift on very
+    // wide screens — without this, the peek cards' offsets stop growing
+    // once --al-cw hits its own max, but the viewport (and its clipping
+    // edge) keeps growing, so past ~3800px wide a peek card clears the
+    // screen edge entirely and stops looking clipped/off-screen at all
+    ".al-pv-stage{position:relative;width:100%;height:100%;max-width:1920px;margin:0 auto;overflow:hidden;}",
     // every card is the exact same shape at all times — a peeking card
     // isn't a differently-sized box, it's this same card scaled down (see
     // the data-slot rules below), the way pressing K and dragging in
@@ -401,9 +407,10 @@
     overlay = document.createElement('div');
     overlay.className = 'al-pv-overlay';
     overlay.setAttribute('aria-hidden', 'true');
-    overlay.innerHTML = cardHTML() + cardHTML() + cardHTML() + cardHTML() +
-      '<div class="al-pv-close-anchor"><button type="button" class="al-pv-close" data-pv-close aria-label="Close">' + CLOSE_SVG + '</button></div>';
+    overlay.innerHTML = '<div class="al-pv-stage">' + cardHTML() + cardHTML() + cardHTML() + cardHTML() +
+      '<div class="al-pv-close-anchor"><button type="button" class="al-pv-close" data-pv-close aria-label="Close">' + CLOSE_SVG + '</button></div></div>';
     document.body.appendChild(overlay);
+    var stage = overlay.querySelector('.al-pv-stage');
 
     overlay.querySelector('[data-pv-close]').addEventListener('click', close);
     // delegated rather than bound per-card at build time — which physical
@@ -411,7 +418,7 @@
     // handler has to read each card's CURRENT slot at click time rather
     // than assume whichever slot it was wired to when the cards were built
     overlay.addEventListener('click', function (e) {
-      if (e.target === overlay) { close(); return; }
+      if (e.target === overlay || e.target === stage) { close(); return; }
       var card = e.target.closest('.al-pv-card');
       if (!card) return;
       if (card.dataset.slot === 'left') go(-1);
