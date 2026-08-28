@@ -13,8 +13,8 @@
     // page's hero card and the project-viewer white card, an off-white
     // rather than pure #fff
     "--al-card-light:#FDFBF8;",
-    "--al-green:#73C41E;",
-    "--al-green-hover:#8fe030;",
+    "--al-green:#EF4418;",
+    "--al-green-hover:#F37352;",
     "--al-text-muted:rgba(239,232,229,0.45);",
     "--al-section-title:rgba(239,232,229,0.66);",
     "--al-border:rgba(255,255,255,0.13);",

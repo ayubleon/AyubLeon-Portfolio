@@ -57,7 +57,7 @@
               '<img src="images/badge-name.svg" alt="Ayub Leon" style="width:16px;height:48px;display:block;flex:0 0 auto;">' +
               '<div style="display:flex;flex-direction:column;gap:3px;">' +
                 '<p style="margin:0;font-family:Poppins,Helvetica,sans-serif;font-size:14px;font-weight:600;color:#f4eeeb;">Ayub Leon</p>' +
-                '<p style="margin:0;font-family:\'Schibsted Grotesk\',Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;color:#73C41E;">Product Designer</p>' +
+                '<p style="margin:0;font-family:\'Schibsted Grotesk\',Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;color:#EF4418;">Product Designer</p>' +
               '</div>' +
             '</div>' +
             '<div class="footer-nav-cols" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:48px;flex:0 1 380px;min-width:0;">' +
@@ -79,10 +79,7 @@
             '</div>' +
           '</div>' +
           '<p data-wordmark style="margin:56px 0 0;text-align:center;opacity:0;white-space:nowrap;font-family:Poppins,Helvetica,sans-serif;font-weight:600;line-height:1;color:#f4eeeb;">ayubleon</p>' +
-          '<div style="margin:16px 0 0;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">' +
-            '<p style="margin:0;font-family:Poppins,Helvetica,sans-serif;font-size:12px;color:rgba(239,232,229,0.28);">©2026 Ayub Leon</p>' +
-            '<p style="margin:0;font-family:Poppins,Helvetica,sans-serif;font-size:12px;color:rgba(239,232,229,0.28);">Made by Ayub Leon</p>' +
-          '</div>' +
+          '<p style="margin:16px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size:12px;color:rgba(239,232,229,0.28);">©2026 Made by Leon</p>' +
         '</div>' +
       '</footer>'
     );
