@@ -25,6 +25,22 @@
   var SWIPE_MIN_PX = 60; // shorter horizontal drags read as scroll wobble, not an intentional swipe
   var MOVE_MS = 480; // duration of the slot-shift scroll on a project change
 
+  var playSwitch = AL.makeSoundPlayer('sounds/switch.mp3', 0.35);
+  // touch devices fire a synthetic mouseenter right before click on first
+  // tap, so a hover-triggered sound would double up with a click sound on
+  // a real tap — gating behind real hover support keeps touch to one sound
+  var supportsHover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  // the "More work" rows are torn down and rebuilt on every project
+  // change (see rebuildMoreWork), so a click that leaves the cursor
+  // resting over the freshly-created row at the same screen position can
+  // get a genuine but phantom mouseenter for it with no actual mouse
+  // movement — which played the hover sound a second time right after
+  // the click. Ignoring hover sound until a real mousemove has happened
+  // since load filters that out
+  var mouseHasMoved = false;
+  window.addEventListener('mousemove', function () { mouseHasMoved = true; }, { once: true, passive: true });
+  function playSwitchOnRealHover() { if (mouseHasMoved) playSwitch(); }
+
   // the case-study pages' text colors are all tuned for light-on-black;
   // the center card is now white, so every one of those needs to flip
   // dark. The source uses two base colors, not one, and they carry
@@ -285,16 +301,15 @@
     // projects (see rebuildMoreWork below) rather than the source's own
     // prev/next card pair, so it needs its own row styling instead of the
     // glow-card treatment those used to get
-    ".al-pv-more-row{display:flex;align-items:center;gap:20px;padding:22px 4px;border-bottom:1px solid rgba(0,0,0,0.1);color:inherit;text-decoration:none;transition:opacity .2s ease;}",
+    ".al-pv-more-row{display:flex;align-items:center;gap:20px;padding:22px 4px;border-bottom:1px solid rgba(0,0,0,0.1);color:inherit;text-decoration:none;}",
     ".al-pv-more-row:first-child{border-top:1px solid rgba(0,0,0,0.1);}",
-    ".al-pv-more-row:hover{opacity:0.6;}",
+    "[data-pv-more-title]{display:inline-block;transition:transform .25s cubic-bezier(.22,1,.36,1);}",
+    ".al-pv-more-row:hover [data-pv-more-title]{transform:translateX(6px);}",
     // the row for whatever project is already open — clicking it is a
     // no-op (the document click handler below returns early when the
-    // clicked href matches currentIndex), so it's marked inert (default
-    // cursor, no hover-dim) rather than left looking like every other
-    // navigable row
+    // clicked href matches currentIndex), so it's marked inert rather
+    // than left looking like every other navigable row
     ".al-pv-more-row-current{cursor:default;}",
-    ".al-pv-more-row-current:hover{opacity:1;}",
     // black-on-white, the reverse of the dark-card close button elsewhere
     // on the site — this one only ever sits on the white center card.
     // pointer-events:auto only while open, same reasoning as the card-
@@ -412,7 +427,9 @@
     document.body.appendChild(overlay);
     var stage = overlay.querySelector('.al-pv-stage');
 
-    overlay.querySelector('[data-pv-close]').addEventListener('click', close);
+    var closeBtn = overlay.querySelector('[data-pv-close]');
+    closeBtn.addEventListener('click', close);
+    if (supportsHover) closeBtn.addEventListener('mouseenter', playSwitchOnRealHover);
     // delegated rather than bound per-card at build time — which physical
     // card is clickable-to-navigate changes as slots rotate, so the
     // handler has to read each card's CURRENT slot at click time rather
@@ -513,6 +530,7 @@
         (isCurrent ?
           '<span aria-hidden="true" style="flex:0 0 auto;font-family:Poppins,Helvetica,sans-serif;font-size:12px;color:var(--al-green,#EF4418);">Currently viewing</span>' :
           '<span aria-hidden="true" style="flex:0 0 auto;color:#636262;">&rarr;</span>');
+      if (supportsHover) row.addEventListener('mouseenter', playSwitchOnRealHover);
       grid.appendChild(row);
       loadProject(projectHref).then(function (data) {
         row.querySelector('[data-pv-more-title]').textContent = data.title;

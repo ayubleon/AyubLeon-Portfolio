@@ -94,6 +94,18 @@
   var playWhoosh = AL.makeSoundPlayer('sounds/whoosh.wav', 0.20);
   var playClick = AL.makeSoundPlayer('sounds/click.mp3', 0.6);
   var playIconTap = AL.makeSoundPlayer('sounds/icon-tap.mp3', 0.6);
+  var playSwitch = AL.makeSoundPlayer('sounds/switch.mp3', 0.35);
+
+  // the nav dock sits at the same fixed screen position on every page, so
+  // clicking a link that navigates away can land the cursor exactly over
+  // that same link again the instant the next page's dock renders —
+  // WebKit fires a real mouseenter for that with no actual mouse movement,
+  // which played the hover sound a second time right after the click's
+  // own sound. Ignoring hover sound until a genuine mousemove has been
+  // seen on this page load filters that phantom hover out
+  var mouseHasMoved = false;
+  window.addEventListener('mousemove', function () { mouseHasMoved = true; }, { once: true, passive: true });
+  function playSwitchOnRealHover() { if (mouseHasMoved) playSwitch(); }
 
   function copyEmail(e) {
     e.preventDefault();
@@ -149,6 +161,11 @@
     var avatarFlip = el.querySelector('[data-avatar-flip]');
     if (!toggleBtn || !card) return;
     var hintTimer = null;
+    // touch devices fire a synthetic mouseenter right before click on first
+    // tap, so a hover-triggered sound would double up with the click sound
+    // on a real tap — gating hover sound/effects behind real hover support
+    // keeps touch to just the one, deliberate sound
+    var supportsHover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
     // the transform transition is always active on this element, so simply
     // writing the avatar-position "closed" transform would itself animate
@@ -220,7 +237,10 @@
       playClick();
       setOpen(!card.classList.contains('is-open'));
     });
-    if (closeBtn) closeBtn.addEventListener('click', function () { setOpen(false); });
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function () { setOpen(false); });
+      if (supportsHover) closeBtn.addEventListener('mouseenter', playSwitchOnRealHover);
+    }
     if (backdrop) backdrop.addEventListener('click', function () { setOpen(false); });
 
     var avatarFlip = el.querySelector('[data-avatar-flip]');
@@ -233,7 +253,6 @@
       // handlers fighting over the same tap: hover-capable pointers get
       // the mouseenter/mouseleave behavior, everything else (touch) gets
       // a plain click toggle
-      var supportsHover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
       avatarFlip.addEventListener('click', function (e) {
         e.stopPropagation();
         if (!supportsHover) avatarFlip.classList.toggle('is-flipped');
