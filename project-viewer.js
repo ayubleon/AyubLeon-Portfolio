@@ -335,6 +335,33 @@
     ".al-pv-close-stroke{transform-origin:7px 7px;transition:transform .3s cubic-bezier(.22,1,.36,1);}",
     ".al-pv-close:hover .al-pv-close-stroke:first-child{transform:rotate(90deg);}",
     ".al-pv-close:hover .al-pv-close-stroke:last-child{transform:rotate(-90deg);}",
+    // frosted glass: a translucent tint + backdrop-filter blur, masked so
+    // the blur itself fades out toward the bottom edge instead of cutting
+    // off in a hard line. backdrop-filter behind a transformed ancestor
+    // (this overlay's whole slot-shift carousel is built on transformed
+    // cards) is a known cross-browser trouble spot, Safari especially —
+    // untested there, so if it renders wrong or stays frozen on an actual
+    // iOS/macOS Safari, that's the first thing to suspect and the plain
+    // gradient-fade version (solid-to-transparent, no blur) is the fallback.
+    // The header lives in the close-anchor, fixed at the center slot's
+    // final position/size — during the slide it just sits there statically
+    // while the actual cards scale/translate underneath it, so it visibly
+    // detaches from whatever's animating in. Faded out for the move and
+    // back in once the new card has settled (see go()) rather than left
+    // on-screen the whole time
+    ".al-pv-header{position:absolute;top:0;left:0;right:0;height:96px;z-index:3;pointer-events:none;background:rgba(253,251,248,0.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 45%,rgba(0,0,0,0) 100%);mask-image:linear-gradient(180deg,#000 0%,#000 45%,rgba(0,0,0,0) 100%);border-radius:24px 24px 0 0;opacity:1;transition:opacity .18s ease;}",
+    // backdrop-filter behind a transformed ancestor (this whole carousel)
+    // can leave a stale, frozen blur rendered through an opacity fade
+    // instead of cleanly disappearing with it — turning the filter off
+    // outright while hidden, not just fading it, avoids that lingering trace
+    ".al-pv-header.al-pv-header-hidden{opacity:0;backdrop-filter:none;-webkit-backdrop-filter:none;}",
+    ".al-pv-counter{position:absolute;top:20px;left:0;right:0;margin:0;text-align:center;font-family:Poppins,Helvetica,sans-serif;font-size:11px;letter-spacing:0.06em;color:#636262;}",
+    // hidden until scrolling actually starts (see the scroll handler in
+    // build()) — a bar reading 0% at rest just looks like an unexplained
+    // decoration; it only earns its place once there's real progress on it
+    ".al-pv-progress-track{position:absolute;top:26px;left:20px;width:90px;height:3px;border-radius:999px;background:rgba(0,0,0,0.1);overflow:hidden;opacity:0;transition:opacity .25s ease;}",
+    ".al-pv-progress-track.al-pv-progress-active{opacity:1;}",
+    ".al-pv-progress-fill{width:0%;height:100%;background:#000;}",
     // very subtle elevation on the case-study's own photography/screenshots
     // — box-shadow on the same element as its own overflow:hidden still
     // renders outside the clip, so this is safe to add directly to the
@@ -354,11 +381,15 @@
     // corner, out of the way of a thumb reaching for it one-handed at
     // the top of a tall screen
     "@media (max-width: 700px){.al-pv-overlay{--al-cw:calc(100vw - 24px);--al-gap:8px;}.al-pv-close{top:auto;bottom:20px;}" +
-      // the close button relocates to the bottom corner on mobile (see
-      // above), so unlike desktop there's nothing at the top-right this
-      // padding needs to clear — free to sit much tighter than the 64px
-      // set on this section inline (loadProject, above)
-      ".al-pv-card [data-pv-inner]>section:first-child{padding-top:24px !important;}" +
+      // the sticky header (counter + progress bar) still sits at the top
+      // on mobile even though the close button moves to the bottom — it
+      // just shrinks, since the 96px desktop height was sized to give the
+      // decorative fade room to run, which scarce phone screen space can't
+      // spare. Content's own top padding is matched to this shorter height
+      // so the title clears it, rather than the leftover 24px from when
+      // this override only had to clear the (now relocated) close button
+      ".al-pv-header{height:64px !important;}" +
+      ".al-pv-card [data-pv-inner]>section:first-child{padding-top:64px !important;}" +
       // each case-study page's own mobile stacking rules (.case-label-grid
       // etc. dropping from a two-column layout to one) live in that page's
       // <style> block, in <head> — outside <main>, so they never come
@@ -423,7 +454,13 @@
     overlay.className = 'al-pv-overlay';
     overlay.setAttribute('aria-hidden', 'true');
     overlay.innerHTML = '<div class="al-pv-stage">' + cardHTML() + cardHTML() + cardHTML() + cardHTML() +
-      '<div class="al-pv-close-anchor"><button type="button" class="al-pv-close" data-pv-close aria-label="Close">' + CLOSE_SVG + '</button></div></div>';
+      '<div class="al-pv-close-anchor">' +
+        '<div class="al-pv-header" aria-hidden="true">' +
+          '<div class="al-pv-progress-track"><div class="al-pv-progress-fill" data-pv-progress></div></div>' +
+          '<p class="al-pv-counter" data-pv-counter></p>' +
+        '</div>' +
+        '<button type="button" class="al-pv-close" data-pv-close aria-label="Close">' + CLOSE_SVG + '</button>' +
+      '</div></div>';
     document.body.appendChild(overlay);
     var stage = overlay.querySelector('.al-pv-stage');
 
@@ -448,6 +485,25 @@
       if (card.dataset.slot === 'left') { e.preventDefault(); go(-1); }
       else if (card.dataset.slot === 'right') { e.preventDefault(); go(1); }
     });
+
+    // fills the header's progress bar as the center card's own content
+    // scrolls. Delegated on the overlay in capture phase — scroll doesn't
+    // bubble, so this is the only way to catch it from the [data-pv-inner]
+    // descendant without binding a listener per physical card — and
+    // gated to whichever card currently holds the center slot, since
+    // that's the only one a user can actually scroll (peek cards' content
+    // is emptied by assignSlot)
+    var progressFill = overlay.querySelector('[data-pv-progress]');
+    var progressTrack = progressFill.parentElement;
+    overlay.addEventListener('scroll', function (e) {
+      var card = e.target.closest && e.target.closest('.al-pv-card');
+      if (!card || card.dataset.slot !== 'center') return;
+      var inner = e.target;
+      var span = inner.scrollHeight - inner.clientHeight;
+      var pct = span > 0 ? Math.min(Math.max(inner.scrollTop / span, 0), 1) * 100 : 0;
+      progressFill.style.width = pct + '%';
+      progressTrack.classList.toggle('al-pv-progress-active', inner.scrollTop > 0);
+    }, true);
 
     // swipe stands in for the peeking side cards on mobile, where they're
     // hidden entirely — a left swipe advances the same way tapping the
@@ -570,6 +626,17 @@
   function fillCenter(href) {
     var card = overlay.querySelector('[data-slot="center"]');
     card.dataset.href = href;
+    // both only depend on href's own fixed spot in ORDER, never on the
+    // fetch below, so they update immediately on every slide instead of
+    // waiting on (and briefly showing stale state until) that resolves
+    var counter = overlay.querySelector('[data-pv-counter]');
+    var progress = overlay.querySelector('[data-pv-progress]');
+    var pos = ORDER.indexOf(href);
+    if (counter) counter.textContent = pos === -1 ? '' : 'Project ' + (pos + 1) + ' / ' + ORDER.length;
+    if (progress) {
+      progress.style.width = '0%';
+      progress.parentElement.classList.remove('al-pv-progress-active');
+    }
     var inner = card.querySelector('[data-pv-inner]');
     inner.classList.remove('al-pv-inner-visible');
     inner.innerHTML = '';
@@ -679,10 +746,13 @@
       outgoingInner.innerHTML = '';
       return;
     }
+    var header = overlay.querySelector('.al-pv-header');
+    if (header) header.classList.add('al-pv-header-hidden');
     animating = true;
     setTimeout(function () {
       outgoingInner.innerHTML = '';
       animating = false;
+      if (header) header.classList.remove('al-pv-header-hidden');
     }, MOVE_MS);
   }
 
