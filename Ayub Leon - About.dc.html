@@ -377,12 +377,24 @@ class Component extends DCLogic {
   componentDidMount() {
     AL.selfHeal(() => this.initPhotoStack(), 5000);
     AL.selfHeal(() => this.initBehanceTooltip(), 5000);
-    this.initReveals();
-    this.initParallax();
+    // wrapped like initPhotoStack above (not called once): these two also
+    // touch nodes inside the same rebuildable <main>, and calling them
+    // once left the hero/story/photo-trio images with no scroll-reveal or
+    // parallax at all whenever support.js's rebuild wave replaced them
+    // after this first mount
+    AL.selfHeal(() => this.initReveals(), 5000);
+    AL.selfHeal(() => this.initParallax(), 5000);
   }
 
+  // guarded per-node (data-reveal-bound) rather than on a single container,
+  // since [data-reveal] marks many independent elements scattered through
+  // the page rather than one wrapper — a rebuild only ever introduces fresh,
+  // unbound nodes, so already-bound ones are always skipped for free and
+  // the one IntersectionObserver instance is reused rather than recreated
   initReveals() {
-    const nodes = Array.from(document.querySelectorAll('[data-reveal]'));
+    const nodes = Array.from(document.querySelectorAll('[data-reveal]')).filter((n) => !n.dataset.revealBound);
+    if (!nodes.length) return;
+    nodes.forEach((n) => { n.dataset.revealBound = '1'; });
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     nodes.forEach((n) => {
       if (reduce) return;
@@ -391,20 +403,32 @@ class Component extends DCLogic {
       n.style.transitionDelay = (parseInt(n.dataset.reveal, 10) - 1) * 0.09 + 's';
     });
     if (reduce) return;
-    this.io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting) {
-          e.target.style.transform = 'none';
-          this.io.unobserve(e.target);
-        }
-      });
-    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
+    if (!this.io) {
+      this.io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.style.transform = 'none';
+            this.io.unobserve(e.target);
+          }
+        });
+      }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
+    }
     nodes.forEach((n) => this.io.observe(n));
   }
 
+  // guarded the same way, but on the whole [data-parallax] set rather than
+  // per-node: a single window scroll listener drives all of them from one
+  // closure, so a genuine rebuild needs that closure rebuilt over the
+  // current live nodes and the previous listener torn down first — same
+  // teardown-before-rebind shape as footer.js's wordmark resize wiring
   initParallax() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const items = Array.from(document.querySelectorAll('[data-parallax]')).map((el) => ({ el, k: parseFloat(el.dataset.parallax) }));
+    const nodes = Array.from(document.querySelectorAll('[data-parallax]'));
+    const unbound = nodes.filter((el) => !el.dataset.parallaxBound);
+    if (!unbound.length) return;
+    unbound.forEach((el) => { el.dataset.parallaxBound = '1'; });
+    if (this.onScroll) window.removeEventListener('scroll', this.onScroll);
+    const items = nodes.map((el) => ({ el, k: parseFloat(el.dataset.parallax) }));
     let queued = false;
     this.onScroll = () => {
       if (queued) return;
@@ -427,7 +451,6 @@ class Component extends DCLogic {
   componentWillUnmount() {
     if (this.io) this.io.disconnect();
     window.removeEventListener('scroll', this.onScroll);
-    window.removeEventListener('resize', this.onNavResize);
     if (this.behanceTrigger) {
       this.behanceTrigger.removeEventListener('mouseenter', this.onBehanceEnter);
       this.behanceTrigger.removeEventListener('mousemove', this.onBehanceMove);

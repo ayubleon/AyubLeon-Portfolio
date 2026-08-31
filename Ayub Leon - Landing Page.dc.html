@@ -374,7 +374,15 @@ class Component extends DCLogic {
     // stuck on the outer wrapper's inherited Schibsted Grotesk instead of
     // this page's chosen body font
     AL.selfHeal(() => this.applyFonts(), 5000);
-    this.initWork();
+    this.initHashJump();
+    // wrapped like initSignatureClearance/initBurnText below (not called
+    // once): support.js's rebuild wave can replace the Featured Work
+    // section's DOM after this first mount, and this method used to cache
+    // its rows/panels/list against whatever existed at that single call —
+    // a later rebuild silently orphaned the scroll-scrub entirely, since
+    // the listener kept running against detached nodes the page could
+    // never see again
+    AL.selfHeal(() => this.initWork(), 5000);
     AL.selfHeal(() => this.initSignatureClearance(), 5000);
     AL.selfHeal(() => this.initBurnText(), 5000);
     AL.selfHeal(() => this.initHeadingFit(), 5000);
@@ -1266,11 +1274,19 @@ class Component extends DCLogic {
   }
 
   initWork() {
-    this.initHashJump();
     const section = document.querySelector('[data-work-section]');
     const list = document.querySelector('[data-work-list]');
     const viewport = document.querySelector('[data-work-viewport]');
-    if (!section || !list) return;
+    if (!section || !list || list.dataset.workBound) return;
+    list.dataset.workBound = '1';
+    // tear down the previous rebuild's window listener before replacing it
+    // with a fresh closure over the current live rows/panels — same
+    // teardown-before-rebind shape as footer.js's wordmark resize wiring,
+    // needed because window (unlike this list node) outlives the rebuild
+    if (this.onWorkScroll) {
+      window.removeEventListener('scroll', this.onWorkScroll);
+      window.removeEventListener('resize', this.onWorkScroll);
+    }
     const rows = Array.from(section.querySelectorAll('[data-work-row]'));
     const panels = Array.from(section.querySelectorAll('[data-work-panel]'));
     const dots = Array.from(section.querySelectorAll('[data-work-dot]'));
@@ -1331,67 +1347,19 @@ class Component extends DCLogic {
     window.addEventListener('resize', this.onWorkScroll);
     paint();
 
-    return;
-  }
-
-  initWorkCards() {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    document.querySelectorAll('[data-work]').forEach((card) => {
-      const media = card.querySelector('[data-work-media]');
-      const img = card.querySelector('[data-work-img]');
-      const glow = card.querySelector('[data-work-glow]');
-      const scan = card.querySelector('[data-work-scan]');
-      const cue = card.querySelector('[data-work-cue]');
-      const title = card.querySelector('[data-work-title]');
-      const s = { cx: 0, cy: 0, tcx: 0, tcy: 0, rx: 0, ry: 0, trx: 0, try_: 0 };
-      let raf = null, on = false;
-
-      const tick = () => {
-        s.cx += (s.tcx - s.cx) * 0.16;
-        s.cy += (s.tcy - s.cy) * 0.16;
-        s.rx += (s.trx - s.rx) * 0.09;
-        s.ry += (s.try_ - s.ry) * 0.09;
-        if (cue) { cue.style.left = s.cx + 'px'; cue.style.top = s.cy + 'px'; }
-        card.style.transform = 'perspective(1100px) rotateY(' + s.rx.toFixed(3) + 'deg) rotateX(' + s.ry.toFixed(3) + 'deg)';
-        if (img) img.style.transform = 'scale(' + (on ? 1.07 : 1) + ') translate3d(' + (s.rx * -1.4).toFixed(2) + 'px,' + (s.ry * 1.4).toFixed(2) + 'px,0)';
-        const moving = Math.abs(s.tcx - s.cx) > 0.3 || Math.abs(s.trx - s.rx) > 0.02 || Math.abs(s.try_ - s.ry) > 0.02;
-        if (on || moving) { raf = requestAnimationFrame(tick); } else { raf = null; }
-      };
-
-      const enter = (e) => {
-        on = true;
-        if (glow) glow.style.opacity = '1';
-        if (scan) scan.style.opacity = '1';
-        if (cue) { cue.style.opacity = '1'; cue.style.transform = 'scale(1)'; }
-        if (title) { title.style.transform = 'translate3d(6px, 0, 0)'; title.style.color = '#ffffff'; }
-        move(e, true);
-      };
-      const move = (e, snap) => {
-        if (media) {
-          const mr = media.getBoundingClientRect();
-          s.tcx = e.clientX - mr.left;
-          s.tcy = e.clientY - mr.top;
-          if (snap) { s.cx = s.tcx; s.cy = s.tcy; }
-        }
-        const r = card.getBoundingClientRect();
-        s.trx = ((e.clientX - r.left) / r.width - 0.5) * 6;
-        s.try_ = -((e.clientY - r.top) / r.height - 0.5) * 5;
-        if (!raf) raf = requestAnimationFrame(tick);
-      };
-      const leave = () => {
-        on = false;
-        s.trx = 0; s.try_ = 0;
-        if (glow) glow.style.opacity = '0';
-        if (scan) scan.style.opacity = '0';
-        if (cue) { cue.style.opacity = '0'; cue.style.transform = 'scale(0.5)'; }
-        if (title) { title.style.transform = 'none'; title.style.color = '#f4eeeb'; }
-        if (!raf) raf = requestAnimationFrame(tick);
-      };
-
-      if (reduce) return;
-      card.addEventListener('pointerenter', enter);
-      card.addEventListener('pointermove', move);
-      card.addEventListener('pointerleave', leave);
+    // keyboard focus on a row: the viewport hides off-screen rows via
+    // `list`'s transform, not real page scroll, so the browser's native
+    // scroll-into-view-on-focus never fires here — jump the real page
+    // scroll to the position that paints this row active, keeping focus
+    // and the visible state in sync
+    list.addEventListener('focusin', (e) => {
+      const row = e.target.closest('[data-work-row]');
+      const ri = row ? rows.indexOf(row) : -1;
+      if (ri < 0 || ri === current) return;
+      const targetSpan = section.offsetHeight - window.innerHeight;
+      const p = n > 1 ? ri / (n - 1) : 0;
+      const rect = section.getBoundingClientRect();
+      window.scrollTo({ top: rect.top + window.scrollY + p * (targetSpan || 1), behavior: 'instant' });
     });
   }
 
@@ -1401,7 +1369,6 @@ class Component extends DCLogic {
     document.removeEventListener('click', this.onDocClick);
     window.removeEventListener('scroll', this.onWorkScroll);
     window.removeEventListener('resize', this.onWorkScroll);
-    window.removeEventListener('resize', this.onNavResize);
     window.removeEventListener('resize', this.onSignatureResize);
     if (this.signatureResizeObserver) this.signatureResizeObserver.disconnect();
     window.removeEventListener('resize', this.onCycleResize);
