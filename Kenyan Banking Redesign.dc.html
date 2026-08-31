@@ -66,8 +66,6 @@
 
   <main>
   <section class="mobile-gutter" style="position: relative; max-width: 1400px; margin: 0 auto; padding: 148px 40px 0;">
-    <canvas ref="{{ canvasRef }}" style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100vw; height: 100%; display: block;"></canvas>
-    <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100vw; bottom: 0; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.75) 80%, #000000 93%, #000000 100%);"></div>
 
     <div style="position: relative; display: flex; flex-direction: column; gap: 26px; padding-bottom: 78px;">
 
@@ -85,37 +83,37 @@
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 34px 40px; margin: 62px 0 0; padding: 40px 0; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1);">
       <div style="display: flex; flex-direction: column; gap: 9px;">
-        <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: none; color: rgba(239,232,229,0.45)">Role</p>
+        <p class="case-field-label">Role</p>
         <p style="margin: 0; font-size: 15px; line-height: 1.5; color: rgba(244,238,235,0.94);">UX Designer, UI Designer</p>
       </div>
       <div style="display: flex; flex-direction: column; gap: 9px;">
-        <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: none; color: rgba(239,232,229,0.45)">Type</p>
+        <p class="case-field-label">Type</p>
         <p style="margin: 0; font-size: 15px; line-height: 1.5; color: rgba(244,238,235,0.94);">Self-initiated</p>
       </div>
       <div style="display: flex; flex-direction: column; gap: 9px;">
-        <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: none; color: rgba(239,232,229,0.45)">Timeline</p>
+        <p class="case-field-label">Timeline</p>
         <p style="margin: 0; font-size: 15px; line-height: 1.5; color: rgba(244,238,235,0.94);">2025</p>
       </div>
       <div style="display: flex; flex-direction: column; gap: 9px;">
-        <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: none; color: rgba(239,232,229,0.45)">Platforms</p>
+        <p class="case-field-label">Platforms</p>
         <p style="margin: 0; font-size: 15px; line-height: 1.5; color: rgba(244,238,235,0.94);">Mobile</p>
       </div>
     </div>
 
     <div class="case-label-grid" style="display: grid; grid-template-columns: minmax(0, 0.3fr) minmax(0, 1fr); gap: 40px 72px; margin: 100px 0 0;">
       <div style="align-self: start;">
-        <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(239,232,229,0.66)">Overview</p>
+        <p class="case-section-label">Overview</p>
       </div>
       <div style="display: flex; flex-direction: column; gap: 22px; max-width: 68ch;">
         <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.2rem, 1.9vw, 1.62rem); font-weight: 500; line-height: 1.4; letter-spacing: -0.022em; color: #f4eeeb; text-wrap: pretty;">I'm a frustrated customer of four banking apps in Kenya: DTB, Co-op Bank's Omni, NCBA Loop, and I&amp;M, and this project started from that frustration.</p>
-        <p style="margin: 0; font-size: 15.5px; line-height: 1.78; color: rgba(239,232,229,0.86); text-wrap: pretty;">None of the four felt straightforward. One buried features, the kind that actually drive revenue for the bank, in corners of the app where they were hard to find or easy to miss entirely. Another was missing basic functionality I needed for everyday banking. Across all of them, the interface felt unfinished, and a well-designed interface isn't just cosmetic, it's one of the things that makes people trust an app enough to actually use it for their money.</p>
-        <p style="margin: 0; font-size: 15.5px; line-height: 1.78; color: rgba(239,232,229,0.86); text-wrap: pretty;">A frustrated user doesn't file a complaint, they just use the app less or switch banks.</p>
+        <p class="case-body-text">None of the four felt straightforward. One buried features, the kind that actually drive revenue for the bank, in corners of the app where they were hard to find or easy to miss entirely. Another was missing basic functionality I needed for everyday banking. Across all of them, the interface felt unfinished, and a well-designed interface isn't just cosmetic, it's one of the things that makes people trust an app enough to actually use it for their money.</p>
+        <p class="case-body-text">A frustrated user doesn't file a complaint, they just use the app less or switch banks.</p>
       </div>
     </div>
 
     <div class="case-label-grid" style="display: grid; grid-template-columns: minmax(0, 0.3fr) minmax(0, 1fr); gap: 40px 72px; margin: 96px 0 0;">
       <div style="align-self: start;">
-        <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(239,232,229,0.66)">My role</p>
+        <p class="case-section-label">My role</p>
       </div>
       <div style="display: flex; flex-direction: column; gap: 34px; max-width: 68ch;">
         <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.1rem, 1.6vw, 1.4rem); font-weight: 500; line-height: 1.45; letter-spacing: -0.02em; color: #f4eeeb; text-wrap: pretty;">I owned this project end to end, research, navigation, and interface design, working alone as a self-initiated effort. In response to what I found, I focused on two things: fixing the navigation so features were easy to find and land on, and fixing the interface itself, since a broken-looking app undermines trust before a user even gets to the features. Organization and access were the priority, not just a visual refresh.</p>
@@ -124,28 +122,28 @@
 
     <div class="case-split-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px 72px; margin: 96px 0 0;">
       <div style="display: flex; flex-direction: column; gap: 20px;">
-        <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(239,232,229,0.66)">The advantage</p>
+        <p class="case-section-label">The advantage</p>
         <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.2rem, 1.9vw, 1.55rem); font-weight: 500; line-height: 1.4; letter-spacing: -0.022em; color: #f4eeeb">The advantage that made it work</h2>
-        <p style="margin: 0; font-size: 15.5px; line-height: 1.78; color: rgba(239,232,229,0.86); text-wrap: pretty;">I wasn't designing for a hypothetical user, I was the user. Every pain point in this case study is one I'd actually run into trying to do my own banking, and when I supplemented that with feedback from friends who'd hit the same walls, I wasn't guessing at problems, I already knew where to look.</p>
+        <p class="case-body-text">I wasn't designing for a hypothetical user, I was the user. Every pain point in this case study is one I'd actually run into trying to do my own banking, and when I supplemented that with feedback from friends who'd hit the same walls, I wasn't guessing at problems, I already knew where to look.</p>
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 20px;">
-        <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(239,232,229,0.66)">Challenges</p>
+        <p class="case-section-label">Challenges</p>
         <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.2rem, 1.9vw, 1.55rem); font-weight: 500; line-height: 1.4; letter-spacing: -0.022em; color: #f4eeeb;">Navigating challenges &amp; quality control</h2>
         <div>
           <p style="margin: 0 0 12px; font-family: Poppins, Helvetica, sans-serif; font-size: 1.08rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Validating without a live product</p>
-          <p style="margin: 0; font-size: 15.5px; line-height: 1.78; color: rgba(239,232,229,0.86); text-wrap: pretty;">Since this wasn't a client engagement, I didn't have a real user base to test against. I shared the prototype with friends who work in frontend development and with people who'd specifically complained about their own banking apps, closer to informal peer feedback than a formal usability study, but the response consistently pointed to the same thing: the reorganized navigation and easier-to-find features landed well.</p>
+          <p class="case-body-text">Since this wasn't a client engagement, I didn't have a real user base to test against. I shared the prototype with friends who work in frontend development and with people who'd specifically complained about their own banking apps, closer to informal peer feedback than a formal usability study, but the response consistently pointed to the same thing: the reorganized navigation and easier-to-find features landed well.</p>
         </div>
       </div>
     </div>
 
     <div class="case-label-grid" style="display: grid; grid-template-columns: minmax(0, 0.3fr) minmax(0, 1fr); gap: 40px 72px; margin: 96px 0 0;">
       <div style="align-self: start;">
-        <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(239,232,229,0.66)">Impact</p>
+        <p class="case-section-label">Impact</p>
       </div>
       <div style="display: flex; flex-direction: column; gap: 22px; max-width: 68ch;">
         <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.2rem, 1.9vw, 1.55rem); font-weight: 500; line-height: 1.4; letter-spacing: -0.022em; color: #f4eeeb;">Business &amp; workflow impact</h2>
-        <p style="margin: 0; font-size: 15.5px; line-height: 1.78; color: rgba(239,232,229,0.86); text-wrap: pretty;">This hasn't been picked up by a bank yet, and I haven't formally pitched it to one. But I've started using it directly in outreach to Kenyan banks, as a concrete example of the value I could bring rather than just a portfolio piece. It's a passion project, and I'd like nothing more than to turn it into something real for the millions of people who use these apps every day.</p>
+        <p class="case-body-text">This hasn't been picked up by a bank yet, and I haven't formally pitched it to one. But I've started using it directly in outreach to Kenyan banks, as a concrete example of the value I could bring rather than just a portfolio piece. It's a passion project, and I'd like nothing more than to turn it into something real for the millions of people who use these apps every day.</p>
       </div>
     </div>
 
@@ -154,7 +152,7 @@
         <div style="position: relative; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden; background: #0e0c0b; border: 1px solid rgba(255,255,255,0.07);">
           <img src="images/banking-first-draft.png" alt="First draft screen inventory of the redesigned banking app" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
         </div>
-        <figcaption style="margin: 0; font-family: Poppins, Helvetica, Arial, sans-serif; font-size: 11px; line-height: 1.6; letter-spacing: 0.02em; color: rgba(239,232,229,0.5);">01 — The very first draft of the redesigned banking app, grouped by flow.</figcaption>
+        <figcaption class="case-figcaption">01 — The very first draft of the redesigned banking app, grouped by flow.</figcaption>
       </figure>
       <figure style="margin: 0; display: flex; flex-direction: column; align-items: center; gap: 12px;">
         <div style="position: relative; width: 100%; max-width: 260px; aspect-ratio: 640 / 1272; overflow: hidden; border-radius: 28px;">
@@ -171,15 +169,15 @@
 
   <section class="mobile-gutter" style="max-width: 1400px; margin: 118px auto 0; padding: 0 40px 120px;">
     <div style="padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1);">
-      <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(239,232,229,0.66)">More work</p>
+      <p class="case-section-label">More work</p>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 30px;">
         <a href="Building a shadcn System from Scratch.dc.html" style="display: flex; flex-direction: column; gap: 12px; padding: 30px 32px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.09); color: inherit;">
-          <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: none; color: rgba(239,232,229,0.45)">← Previous</p>
+          <p class="case-field-label">← Previous</p>
           <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.4rem; font-weight: 600; letter-spacing: -0.025em; color: #f4eeeb;">Building a shadcn System from Scratch</p>
           <p style="margin: 0; font-size: 14px; line-height: 1.55; color: rgba(239,232,229,0.66);">A shadcn component system built from scratch as a personal project, later adapted to power BuzzIQ</p>
         </a>
         <a href="BuzzIQ.dc.html" style="display: flex; flex-direction: column; gap: 12px; padding: 30px 32px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.09); color: inherit; text-align: right;">
-          <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: none; color: rgba(239,232,229,0.45)">Next →</p>
+          <p class="case-field-label">Next →</p>
           <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.4rem; font-weight: 600; letter-spacing: -0.025em; color: #f4eeeb;">BuzzIQ</p>
           <p style="margin: 0; font-size: 14px; line-height: 1.55; color: rgba(239,232,229,0.66);">TikTok Shop intelligence platform built for IGNITEAMZ, a US-based creator commerce company</p>
         </a>
@@ -194,12 +192,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  constructor(props) {
-    super(props);
-    this.canvasRef = React.createRef();
-    this.mouse = { x: 0.6, y: 0.7, tx: 0.6, ty: 0.7 };
-  }
-  renderVals() { return { canvasRef: this.canvasRef }; }
+  renderVals() { return {}; }
   initMockupVideo() {
     const video = document.querySelector('video[src*="kenyan-banking-mockup"]');
     if (!video) return;
@@ -217,103 +210,8 @@ class Component extends DCLogic {
 
   componentDidMount() {
     this.initMockupVideo();
-    const canvas = this.canvasRef.current;
-    if (!canvas) return;
-    const gl = canvas.getContext('webgl', { antialias: false, alpha: true, powerPreference: 'low-power' });
-    if (!gl) { canvas.style.background = 'radial-gradient(70% 90% at 60% 0%, #b81c0c 0%, #4a0b12 42%, rgba(0,0,0,0) 76%)'; return; }
-    const vs = 'attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }';
-    const fs = [
-      'precision highp float;',
-      'uniform vec2 u_res; uniform float u_time; uniform vec2 u_mouse;',
-      'float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }',
-      'float noise(vec2 p){ vec2 i = floor(p); vec2 f = fract(p); vec2 u = f*f*(3.0-2.0*f);',
-      '  return mix(mix(hash(i), hash(i+vec2(1.0,0.0)), u.x), mix(hash(i+vec2(0.0,1.0)), hash(i+vec2(1.0,1.0)), u.x), u.y); }',
-      'float fbm(vec2 p){ float v = 0.0; float a = 0.5; for(int i = 0; i < 4; i++){ v += a * noise(p); p = p * 2.03 + 7.3; a *= 0.5; } return v; }',
-      'void main(){',
-      '  vec2 uv = gl_FragCoord.xy / u_res;',
-      '  float asp = u_res.x / u_res.y;',
-      '  vec2 st = vec2((uv.x - 0.5) * asp, uv.y - 0.5);',
-      '  vec2 mo = vec2((u_mouse.x - 0.5) * asp, u_mouse.y - 0.5);',
-      '  float t = u_time * 0.08;',
-      '  vec2 w = st * 1.05 + vec2(fbm(st * 1.3 + vec2(t, -t)), fbm(st * 1.3 + vec2(3.1 - t, t))) * 0.8;',
-      '  w += (mo - st) * 0.18;',
-      '  float d = fbm(w * 1.2 + vec2(t * 0.5, 0.0));',
-      '  float core = exp(-length(st - mo) * 2.6) * 0.8;',
-      '  float guard = 1.0 - smoothstep(0.30, 0.50, st.y) * 0.55;',
-      '  float e = (d * 1.22 + core * 1.3) * mix(0.95, 1.22, smoothstep(-0.6, 0.42, st.y)) * guard;',
-      '  float m1 = smoothstep(0.38, 1.05, e);',
-      '  float m2 = smoothstep(0.68, 1.32, e);',
-      '  float m3 = smoothstep(1.16, 1.78, e);',
-      '  vec3 col = vec3(0.006, 0.005, 0.005);',
-      '  col = mix(col, vec3(0.28, 0.020, 0.070), m1);',
-      '  col = mix(col, vec3(0.84, 0.11, 0.038), m2 * 0.94);',
-      '  col = mix(col, vec3(1.0, 0.40, 0.19), m3 * 0.85);',
-      '  col *= mix(0.30, 1.0, smoothstep(1.30, 0.26, length(st * vec2(0.9, 1.1))));',
-      '  float g = hash(gl_FragCoord.xy + fract(u_time) * 91.3);',
-      '  col += (g - 0.5) * 0.024;',
-      '  col = col / (col + 1.05) * 1.24;',
-      '  float a = clamp(max(max(col.r, col.g), col.b) * 3.2, 0.0, 1.0);',
-      '  gl_FragColor = vec4(pow(max(col, 0.0), vec3(0.92)), a);',
-      '}'
-    ].join('\n');
-    const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
-    const prog = gl.createProgram();
-    gl.attachShader(prog, sh(gl.VERTEX_SHADER, vs));
-    gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fs));
-    gl.linkProgram(prog);
-    gl.useProgram(prog);
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    const buf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(prog, 'p');
-    gl.enableVertexAttribArray(loc);
-    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    const uRes = gl.getUniformLocation(prog, 'u_res');
-    const uTime = gl.getUniformLocation(prog, 'u_time');
-    const uMouse = gl.getUniformLocation(prog, 'u_mouse');
-    const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      const w = Math.max(1, Math.round(canvas.clientWidth * dpr));
-      const h = Math.max(1, Math.round(canvas.clientHeight * dpr));
-      if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; gl.viewport(0, 0, w, h); }
-    };
-    this.ro = new ResizeObserver(resize);
-    this.ro.observe(canvas);
-    resize();
-    this.onMove = (e) => {
-      this.userMoved = true;
-      const r = canvas.getBoundingClientRect();
-      this.mouse.tx = (e.clientX - r.left) / r.width;
-      this.mouse.ty = 1 - (e.clientY - r.top) / r.height;
-    };
-    window.addEventListener('pointermove', this.onMove, { passive: true });
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const start = performance.now();
-    const draw = (now) => {
-      this.raf = requestAnimationFrame(draw);
-      if (document.hidden) return;
-      const r = canvas.getBoundingClientRect();
-      if (r.bottom < -100) return;
-      if (!this.userMoved && !reduce) {
-        const wt = (now - start) / 1000;
-        this.mouse.tx = 0.6 + Math.sin(wt * 0.45) * 0.14;
-        this.mouse.ty = 0.5 + Math.cos(wt * 0.35) * 0.25;
-      }
-      this.mouse.x += (this.mouse.tx - this.mouse.x) * 0.05;
-      this.mouse.y += (this.mouse.ty - this.mouse.y) * 0.05;
-      gl.uniform2f(uRes, canvas.width, canvas.height);
-      gl.uniform1f(uTime, (now - start) / 1000);
-      gl.uniform2f(uMouse, this.mouse.x, this.mouse.y);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-    };
-    this.raf = requestAnimationFrame(draw);
   }
   componentWillUnmount() {
-    cancelAnimationFrame(this.raf);
-    if (this.ro) this.ro.disconnect();
-    window.removeEventListener('pointermove', this.onMove);
     window.removeEventListener('resize', this.onNavResize);
     if (this.onMockupVideoVisibility) document.removeEventListener('visibilitychange', this.onMockupVideoVisibility);
   }

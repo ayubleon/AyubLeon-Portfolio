@@ -159,6 +159,27 @@
             trailingSpan.style.marginTop = '6px';
           }
         }
+
+        // same reasoning as heroP just above: case-field-label/case-
+        // section-label/case-body-text/case-figcaption (the shared classes
+        // the four case-study pages use for their repeated typography) get
+        // their color from that class, not an inline style, so darkenText
+        // Colors' regex has nothing in the fetched HTML string to match —
+        // set directly here instead, before this element is ever
+        // serialized to a string. Every one of these classes was always
+        // the muted 239,232,229 tier on its source page (never the bright
+        // 244,238,235 one), so they all take the same #636262 darkenText
+        // Colors would have given them anyway. Letter-spacing gets the
+        // same normalize-at-card-scale treatment normalizeLabelSpacing
+        // gives every other 0.18em-tracked label, for the same reason
+        var sharedLabels = main.querySelectorAll('.case-field-label, .case-section-label, .case-body-text, .case-figcaption');
+        for (var i = 0; i < sharedLabels.length; i++) {
+          sharedLabels[i].style.color = '#636262';
+        }
+        var sharedTrackedLabels = main.querySelectorAll('.case-field-label, .case-section-label');
+        for (var j = 0; j < sharedTrackedLabels.length; j++) {
+          sharedTrackedLabels[j].style.letterSpacing = 'normal';
+        }
       }
 
       return {
@@ -169,7 +190,14 @@
         // label tracking normalized — see normalizeLabelSpacing above
         bodyHTML: main ? thickenAccentBorders(shrinkCardHeadings(normalizeLabelSpacing(darkenTextColors(main.innerHTML)))) : ''
       };
-    }).catch(function () { return { title: '', descHTML: '', bodyHTML: '' }; });
+    }).catch(function () {
+      // a failed fetch shouldn't poison this href forever — deleting the
+      // cache entry here means the NEXT call retries fresh, instead of
+      // every future open of this project silently returning the same
+      // permanently-empty result from one transient network hiccup
+      delete cache[href];
+      return { title: '', descHTML: '', bodyHTML: '' };
+    });
     return cache[href];
   }
 
@@ -389,6 +417,17 @@
     // doesn't fully hide it, and as an outright letterboxed bar around the
     // prototype video, which uses object-fit:contain instead of cover
     ".al-pv-card [data-pv-inner] div:has(> img),.al-pv-card [data-pv-inner] div:has(> video){box-shadow:0 6px 24px -6px rgba(0,0,0,0.14);background:var(--al-card-light,#FDFBF8) !important;border:none !important;}",
+    // the four case-study pages' own shared label/body-text classes
+    // (case-field-label/case-section-label/case-body-text/case-figcaption,
+    // defined once here since this file is the one thing every page —
+    // including this popup's own host page — always loads) reproduced at
+    // their SOURCE-page appearance: darkenTextColors() below still does the
+    // actual light-on-dark -> dark-on-white recolor for this card, the same
+    // way it always has for every other muted-tier element on the page
+    ".al-pv-card .case-field-label{margin:0;font-family:Poppins;font-size:11px;letter-spacing:0.18em;text-transform:none;color:rgba(239,232,229,0.45);}",
+    ".al-pv-card .case-section-label{margin:0;font-family:Poppins;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(239,232,229,0.66);}",
+    ".al-pv-card .case-body-text{margin:0;font-size:15.5px;line-height:1.78;color:rgba(239,232,229,0.86);text-wrap:pretty;}",
+    ".al-pv-card .case-figcaption{margin:0;font-family:Poppins,Helvetica,Arial,sans-serif;font-size:11px;line-height:1.6;letter-spacing:0.02em;color:rgba(239,232,229,0.5);}",
     // phones get the opposite treatment from desktop: screen space is
     // scarce, so the center card claims as much of it as possible (a
     // slim 12px margin per side instead of desktop's 40px) and the gap
@@ -472,6 +511,9 @@
     overlay = document.createElement('div');
     overlay.className = 'al-pv-overlay';
     overlay.setAttribute('aria-hidden', 'true');
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', 'Project details');
     overlay.innerHTML = '<div class="al-pv-stage">' + cardHTML() + cardHTML() + cardHTML() + cardHTML() +
       '<div class="al-pv-close-anchor">' +
         '<div class="al-pv-header" aria-hidden="true">' +
@@ -781,10 +823,38 @@
     }, MOVE_MS);
   }
 
+  // every element inside the overlay a keyboard user could legitimately
+  // land on right now — recomputed on each Tab press rather than cached
+  // once, since the center card's real content (links, the "More work"
+  // list) loads in asynchronously after open() and changes on every go().
+  // Non-center cards are excluded implicitly: assignSlot() empties their
+  // [data-pv-inner] and only left/right (never offLeft/offRight) carry
+  // their own role=button/tabindex, so there's nothing stray to filter out
+  function getFocusable() {
+    return Array.from(overlay.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+      .filter(function (el) { return el.offsetParent !== null; });
+  }
+
   function onKeydown(e) {
-    if (e.key === 'Escape') close();
-    else if (e.key === 'ArrowLeft') go(-1);
-    else if (e.key === 'ArrowRight') go(1);
+    if (e.key === 'Escape') { close(); return; }
+    if (e.key === 'ArrowLeft') { go(-1); return; }
+    if (e.key === 'ArrowRight') { go(1); return; }
+    if (e.key !== 'Tab') return;
+    // a focus trap: only intervenes right at the two ends of the tab
+    // order, wrapping back to the other end, rather than fighting the
+    // browser's own tab order in between — without this, tabbing past
+    // either end escapes the modal into the page still sitting behind it
+    var focusable = getFocusable();
+    if (!focusable.length) return;
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
   }
 
   function open(href) {
@@ -798,6 +868,12 @@
     requestAnimationFrame(function () {
       overlay.classList.add('al-pv-open');
       overlay.setAttribute('aria-hidden', 'false');
+      // moves keyboard focus into the dialog itself rather than leaving it
+      // on the trigger link now sitting behind an inert-looking overlay —
+      // the close button rather than the card content, since that content
+      // is still an in-flight fetch at this exact point
+      var closeBtn = overlay.querySelector('[data-pv-close]');
+      if (closeBtn) closeBtn.focus();
     });
   }
 

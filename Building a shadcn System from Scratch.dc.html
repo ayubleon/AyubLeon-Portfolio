@@ -65,8 +65,6 @@
 
   <main>
   <section class="mobile-gutter" style="position: relative; max-width: 1400px; margin: 0 auto; padding: 148px 40px 0;">
-    <canvas ref="{{ canvasRef }}" style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100vw; height: 100%; display: block;"></canvas>
-    <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100vw; bottom: 0; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.75) 80%, #000000 93%, #000000 100%);"></div>
 
     <div style="position: relative; display: flex; flex-direction: column; gap: 26px; padding-bottom: 78px;">
 
@@ -84,31 +82,31 @@
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 34px 40px; margin: 62px 0 0; padding: 40px 0; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1);">
       <div style="display: flex; flex-direction: column; gap: 9px;">
-        <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: none; color: rgba(239,232,229,0.45)">Position</p>
+        <p class="case-field-label">Position</p>
         <p style="margin: 0; font-size: 15px; line-height: 1.5; color: rgba(244,238,235,0.94);">Systems Product Designer</p>
       </div>
       <div style="display: flex; flex-direction: column; gap: 9px;">
-        <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: none; color: rgba(239,232,229,0.45)">Product</p>
+        <p class="case-field-label">Product</p>
         <p style="margin: 0; font-size: 15px; line-height: 1.5; color: rgba(244,238,235,0.94);">BuzzIQ</p>
       </div>
     </div>
 
     <div class="case-label-grid" style="display: grid; grid-template-columns: minmax(0, 0.3fr) minmax(0, 1fr); gap: 40px 72px; margin: 100px 0 0;">
       <div style="align-self: start;">
-        <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(239,232,229,0.66)">Overview</p>
+        <p class="case-section-label">Overview</p>
       </div>
       <div style="display: flex; flex-direction: column; gap: 22px; max-width: 68ch;">
-        <p style="margin: 0; font-size: 15.5px; line-height: 1.78; color: rgba(239,232,229,0.86); text-wrap: pretty;">This started as a personal project, not a client one. The free shadcn resources on Figma Community were thin, promotional demos built to funnel people toward paid kits, and the paid kits were priced per seat in a way that didn't make sense for where I was at. I had the time and the curiosity, so I set out to rebuild the real, open-source shadcn/ui library properly in Figma myself, partly to understand how a design system like that actually works under the hood.</p>
-        <p style="margin: 0; font-size: 15.5px; line-height: 1.78; color: rgba(239,232,229,0.86); text-wrap: pretty;">I landed the BuzzIQ role not long after finishing it, and the system I'd already built turned out to be exactly what that fast-moving project, with no existing design infrastructure of its own, needed.</p>
+        <p class="case-body-text">This started as a personal project, not a client one. The free shadcn resources on Figma Community were thin, promotional demos built to funnel people toward paid kits, and the paid kits were priced per seat in a way that didn't make sense for where I was at. I had the time and the curiosity, so I set out to rebuild the real, open-source shadcn/ui library properly in Figma myself, partly to understand how a design system like that actually works under the hood.</p>
+        <p class="case-body-text">I landed the BuzzIQ role not long after finishing it, and the system I'd already built turned out to be exactly what that fast-moving project, with no existing design infrastructure of its own, needed.</p>
       </div>
     </div>
 
     <div class="case-label-grid" style="display: grid; grid-template-columns: minmax(0, 0.3fr) minmax(0, 1fr); gap: 40px 72px; margin: 96px 0 0;">
       <div style="align-self: start;">
-        <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(239,232,229,0.66)">Documentation Elements</p>
+        <p class="case-section-label">Documentation Elements</p>
       </div>
       <div style="display: flex; flex-direction: column; gap: 22px; max-width: 68ch;">
-        <p style="margin: 0; font-size: 15.5px; line-height: 1.78; color: rgba(239,232,229,0.86); text-wrap: pretty;">30+ reusable components and 400+ variants, documented with spacing and text tokens as named styles. Every component is built and shown across both light and dark mode states, and the system standardizes on Lucide for icons and Sonner for toast notifications, both tools shadcn/ui itself is built around.</p>
+        <p class="case-body-text">30+ reusable components and 400+ variants, documented with spacing and text tokens as named styles. Every component is built and shown across both light and dark mode states, and the system standardizes on Lucide for icons and Sonner for toast notifications, both tools shadcn/ui itself is built around.</p>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 28px; padding: 32px 0; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1);">
           <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -128,61 +126,61 @@
         <div style="position: relative; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden; background: #0e0c0b; border: 1px solid rgba(255,255,255,0.07);">
           <img src="images/ds-tokens.png" alt="Text style and spacing token documentation in Figma" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
         </div>
-        <figcaption style="margin: 0; font-family: Poppins, Helvetica, Arial, sans-serif; font-size: 11px; line-height: 1.6; letter-spacing: 0.02em; color: rgba(239,232,229,0.5);">01 — Spacing and text tokens, documented as named styles.</figcaption>
+        <figcaption class="case-figcaption">01 — Spacing and text tokens, documented as named styles.</figcaption>
       </figure>
       <figure style="margin: 0; display: flex; flex-direction: column; gap: 12px;">
         <div style="position: relative; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden; background: #0e0c0b; border: 1px solid rgba(255,255,255,0.07);">
           <img src="images/ds-components.png" alt="Component states in light and dark mode" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
         </div>
-        <figcaption style="margin: 0; font-family: Poppins, Helvetica, Arial, sans-serif; font-size: 11px; line-height: 1.6; letter-spacing: 0.02em; color: rgba(239,232,229,0.5);">02 — Components across their full state range, with automatic light and dark modes.</figcaption>
+        <figcaption class="case-figcaption">02 — Components across their full state range, with automatic light and dark modes.</figcaption>
       </figure>
     </div>
 
     <div class="case-label-grid" style="display: grid; grid-template-columns: minmax(0, 0.3fr) minmax(0, 1fr); gap: 40px 72px; margin: 96px 0 0;">
       <div style="align-self: start;">
-        <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(239,232,229,0.66)">Design Process</p>
+        <p class="case-section-label">Design Process</p>
       </div>
       <div style="display: flex; flex-direction: column; gap: 22px; max-width: 68ch;">
-        <p style="margin: 0; font-size: 15.5px; line-height: 1.78; color: rgba(239,232,229,0.86); text-wrap: pretty;">I started by auditing shadcn's actual component states, then worked through each component and its variants one at a time, checking that they held up inside full interface layouts rather than just as isolated specs. That meant testing each piece the way it would actually get used, not building a reference sheet that looked clean in isolation but fell apart the moment it met a real screen.</p>
+        <p class="case-body-text">I started by auditing shadcn's actual component states, then worked through each component and its variants one at a time, checking that they held up inside full interface layouts rather than just as isolated specs. That meant testing each piece the way it would actually get used, not building a reference sheet that looked clean in isolation but fell apart the moment it met a real screen.</p>
       </div>
     </div>
 
     <div class="case-label-grid" style="display: grid; grid-template-columns: minmax(0, 0.3fr) minmax(0, 1fr); gap: 40px 72px; margin: 96px 0 0;">
       <div style="align-self: start;">
-        <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(239,232,229,0.66)">Challenges</p>
+        <p class="case-section-label">Challenges</p>
       </div>
       <div style="display: flex; flex-direction: column; gap: 22px; max-width: 68ch;">
         <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.2rem, 1.9vw, 1.55rem); font-weight: 500; line-height: 1.4; letter-spacing: -0.022em; color: #f4eeeb;">Navigating challenges &amp; quality control</h2>
         <div>
           <p style="margin: 0 0 12px; font-family: Poppins, Helvetica, sans-serif; font-size: 1.08rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Adapting a system built for no specific product to a real one</p>
-          <p style="margin: 0; font-size: 15.5px; line-height: 1.78; color: rgba(239,232,229,0.86); text-wrap: pretty;">The system wasn't originally built with BuzzIQ, or any single product, in mind. Once I brought it into a fast-moving project with real requirements, I had to adjust it for BuzzIQ's specific needs and build a handful of custom components and variant states it didn't originally cover. Most of the system held up as-is, but knowing where it needed to flex versus where it could be used directly was its own design decision.</p>
+          <p class="case-body-text">The system wasn't originally built with BuzzIQ, or any single product, in mind. Once I brought it into a fast-moving project with real requirements, I had to adjust it for BuzzIQ's specific needs and build a handful of custom components and variant states it didn't originally cover. Most of the system held up as-is, but knowing where it needed to flex versus where it could be used directly was its own design decision.</p>
         </div>
       </div>
     </div>
 
     <div class="case-label-grid" style="display: grid; grid-template-columns: minmax(0, 0.3fr) minmax(0, 1fr); gap: 40px 72px; margin: 96px 0 0;">
       <div style="align-self: start;">
-        <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(239,232,229,0.66)">Impact</p>
+        <p class="case-section-label">Impact</p>
       </div>
       <div style="display: flex; flex-direction: column; gap: 22px; max-width: 68ch;">
         <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.2rem, 1.9vw, 1.55rem); font-weight: 500; line-height: 1.4; letter-spacing: -0.022em; color: #f4eeeb;">Business &amp; workflow impact</h2>
-        <p style="margin: 0; font-size: 15.5px; line-height: 1.78; color: rgba(239,232,229,0.86); text-wrap: pretty;">Because the foundation already existed, most of BuzzIQ moved faster than it would have starting from zero. The system's light and dark mode support, built in from day one rather than retrofitted, made designing both states across the product straightforward instead of a late addition.</p>
-        <p style="margin: 0; font-size: 15.5px; line-height: 1.78; color: rgba(239,232,229,0.86); text-wrap: pretty;">And because it standardized on one icon set and one toast pattern from the start, developers didn't have to reconcile mismatched libraries the way they might have with an ad hoc component set.</p>
+        <p class="case-body-text">Because the foundation already existed, most of BuzzIQ moved faster than it would have starting from zero. The system's light and dark mode support, built in from day one rather than retrofitted, made designing both states across the product straightforward instead of a late addition.</p>
+        <p class="case-body-text">And because it standardized on one icon set and one toast pattern from the start, developers didn't have to reconcile mismatched libraries the way they might have with an ad hoc component set.</p>
       </div>
     </div>
   </section>
 
   <section class="mobile-gutter" style="max-width: 1400px; margin: 118px auto 0; padding: 0 40px 120px;">
     <div style="padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1);">
-      <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(239,232,229,0.66)">More work</p>
+      <p class="case-section-label">More work</p>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 30px;">
         <a href="Danadana.dc.html" style="display: flex; flex-direction: column; gap: 12px; padding: 30px 32px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.09); color: inherit;">
-          <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: none; color: rgba(239,232,229,0.45)">← Previous</p>
+          <p class="case-field-label">← Previous</p>
           <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.4rem; font-weight: 600; letter-spacing: -0.025em; color: #f4eeeb;">Danadana</p>
           <p style="margin: 0; font-size: 14px; line-height: 1.55; color: rgba(239,232,229,0.66);">A crash betting game licensed to gambling operators, built with player-protection safeguards from the start.</p>
         </a>
         <a href="Kenyan Banking Redesign.dc.html" style="display: flex; flex-direction: column; gap: 12px; padding: 30px 32px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.09); color: inherit; text-align: right;">
-          <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: none; color: rgba(239,232,229,0.45)">Next →</p>
+          <p class="case-field-label">Next →</p>
           <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.4rem; font-weight: 600; letter-spacing: -0.025em; color: #f4eeeb;">Kenyan Banking Redesign</p>
           <p style="margin: 0; font-size: 14px; line-height: 1.55; color: rgba(239,232,229,0.66);">Overhauling digital banking friction across four major regional apps</p>
         </a>
@@ -197,110 +195,8 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  constructor(props) {
-    super(props);
-    this.canvasRef = React.createRef();
-    this.mouse = { x: 0.6, y: 0.7, tx: 0.6, ty: 0.7 };
-  }
-  renderVals() { return { canvasRef: this.canvasRef }; }
-  componentDidMount() {
-    const canvas = this.canvasRef.current;
-    if (!canvas) return;
-    const gl = canvas.getContext('webgl', { antialias: false, alpha: true, powerPreference: 'low-power' });
-    if (!gl) { canvas.style.background = 'radial-gradient(70% 90% at 60% 0%, #b81c0c 0%, #4a0b12 42%, rgba(0,0,0,0) 76%)'; return; }
-    const vs = 'attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }';
-    const fs = [
-      'precision highp float;',
-      'uniform vec2 u_res; uniform float u_time; uniform vec2 u_mouse;',
-      'float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }',
-      'float noise(vec2 p){ vec2 i = floor(p); vec2 f = fract(p); vec2 u = f*f*(3.0-2.0*f);',
-      '  return mix(mix(hash(i), hash(i+vec2(1.0,0.0)), u.x), mix(hash(i+vec2(0.0,1.0)), hash(i+vec2(1.0,1.0)), u.x), u.y); }',
-      'float fbm(vec2 p){ float v = 0.0; float a = 0.5; for(int i = 0; i < 4; i++){ v += a * noise(p); p = p * 2.03 + 7.3; a *= 0.5; } return v; }',
-      'void main(){',
-      '  vec2 uv = gl_FragCoord.xy / u_res;',
-      '  float asp = u_res.x / u_res.y;',
-      '  vec2 st = vec2((uv.x - 0.5) * asp, uv.y - 0.5);',
-      '  vec2 mo = vec2((u_mouse.x - 0.5) * asp, u_mouse.y - 0.5);',
-      '  float t = u_time * 0.08;',
-      '  vec2 w = st * 1.05 + vec2(fbm(st * 1.3 + vec2(t, -t)), fbm(st * 1.3 + vec2(3.1 - t, t))) * 0.8;',
-      '  w += (mo - st) * 0.18;',
-      '  float d = fbm(w * 1.2 + vec2(t * 0.5, 0.0));',
-      '  float core = exp(-length(st - mo) * 2.6) * 0.8;',
-      '  float guard = 1.0 - smoothstep(0.30, 0.50, st.y) * 0.55;',
-      '  float e = (d * 1.22 + core * 1.3) * mix(0.95, 1.22, smoothstep(-0.6, 0.42, st.y)) * guard;',
-      '  float m1 = smoothstep(0.38, 1.05, e);',
-      '  float m2 = smoothstep(0.68, 1.32, e);',
-      '  float m3 = smoothstep(1.16, 1.78, e);',
-      '  vec3 col = vec3(0.006, 0.005, 0.005);',
-      '  col = mix(col, vec3(0.28, 0.020, 0.070), m1);',
-      '  col = mix(col, vec3(0.84, 0.11, 0.038), m2 * 0.94);',
-      '  col = mix(col, vec3(1.0, 0.40, 0.19), m3 * 0.85);',
-      '  col *= mix(0.30, 1.0, smoothstep(1.30, 0.26, length(st * vec2(0.9, 1.1))));',
-      '  float g = hash(gl_FragCoord.xy + fract(u_time) * 91.3);',
-      '  col += (g - 0.5) * 0.024;',
-      '  col = col / (col + 1.05) * 1.24;',
-      '  float a = clamp(max(max(col.r, col.g), col.b) * 3.2, 0.0, 1.0);',
-      '  gl_FragColor = vec4(pow(max(col, 0.0), vec3(0.92)), a);',
-      '}'
-    ].join('\n');
-    const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
-    const prog = gl.createProgram();
-    gl.attachShader(prog, sh(gl.VERTEX_SHADER, vs));
-    gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fs));
-    gl.linkProgram(prog);
-    gl.useProgram(prog);
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    const buf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(prog, 'p');
-    gl.enableVertexAttribArray(loc);
-    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    const uRes = gl.getUniformLocation(prog, 'u_res');
-    const uTime = gl.getUniformLocation(prog, 'u_time');
-    const uMouse = gl.getUniformLocation(prog, 'u_mouse');
-    const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      const w = Math.max(1, Math.round(canvas.clientWidth * dpr));
-      const h = Math.max(1, Math.round(canvas.clientHeight * dpr));
-      if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; gl.viewport(0, 0, w, h); }
-    };
-    this.ro = new ResizeObserver(resize);
-    this.ro.observe(canvas);
-    resize();
-    this.onMove = (e) => {
-      this.userMoved = true;
-      const r = canvas.getBoundingClientRect();
-      this.mouse.tx = (e.clientX - r.left) / r.width;
-      this.mouse.ty = 1 - (e.clientY - r.top) / r.height;
-    };
-    window.addEventListener('pointermove', this.onMove, { passive: true });
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const start = performance.now();
-    const draw = (now) => {
-      this.raf = requestAnimationFrame(draw);
-      if (document.hidden) return;
-      const r = canvas.getBoundingClientRect();
-      if (r.bottom < -100) return;
-      if (!this.userMoved && !reduce) {
-        const wt = (now - start) / 1000;
-        this.mouse.tx = 0.6 + Math.sin(wt * 0.45) * 0.14;
-        this.mouse.ty = 0.5 + Math.cos(wt * 0.35) * 0.25;
-      }
-      this.mouse.x += (this.mouse.tx - this.mouse.x) * 0.05;
-      this.mouse.y += (this.mouse.ty - this.mouse.y) * 0.05;
-      gl.uniform2f(uRes, canvas.width, canvas.height);
-      gl.uniform1f(uTime, (now - start) / 1000);
-      gl.uniform2f(uMouse, this.mouse.x, this.mouse.y);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-    };
-    this.raf = requestAnimationFrame(draw);
-  }
+  renderVals() { return {}; }
   componentWillUnmount() {
-    cancelAnimationFrame(this.raf);
-    if (this.ro) this.ro.disconnect();
-    window.removeEventListener('pointermove', this.onMove);
     window.removeEventListener('resize', this.onNavResize);
   }
 }

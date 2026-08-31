@@ -3,24 +3,22 @@
   // template on load (same as the About page), discarding raw style edits
   // — so patch the section-title labels (Overview, My role, Challenges,
   // More work, etc.) and the sentence-case meta-labels (Role, Client,
-  // Timeline, etc.) via live DOM manipulation instead, matching them all
-  // to the shared section-title color also used by the footer's PAGES/
-  // CONTACTS/RESOURCES and the About page's "PEOPLE I'VE BUILT WITH"
-  // treatment. Both groups also lose the source's wide 0.18em tracking —
-  // only case (uppercase vs sentence-case) still tells them apart, not
-  // color or tracking — see ALREADY_MUTED below. Keep re-patching through
-  // the settle window since support.js can rebuild in more than one wave.
+  // Timeline, etc.) via live DOM manipulation instead, matching them by
+  // the .case-field-label/.case-section-label classes now shared across
+  // all four case-study pages rather than by sniffing their raw inline
+  // styles. Those classes' own CSS is defined in project-viewer.js, not
+  // here — every page that loads this file also loads that one first (see
+  // its own comment on that rule), including the popup card project-
+  // viewer.js renders elsewhere, which needs the exact same base
+  // appearance for content it fetches from these pages' raw HTML. Keep
+  // re-patching through the settle window since support.js can rebuild in
+  // more than one wave.
 
-  // kept as a literal rather than var(...): this string is also used below
-  // to detect labels the browser already serialized with this exact color,
-  // and a css var() reference wouldn't read back that way. Only used to
-  // tell the two label groups apart by their unchanged source color — both
-  // groups now end up on SECTION_TITLE regardless of which branch matches
-  var ALREADY_MUTED = 'rgba(239, 232, 229, 0.45)';
   // applied to every 0.18em-tracked label — section titles (Overview,
   // Challenges, etc.) and meta-labels (Role, Client, Timeline, etc.) alike
-  // — matches shared.js's --al-section-title, kept as a literal here for
-  // the same reason as ALREADY_MUTED above
+  // — matches shared.js's --al-section-title, kept as a literal here since
+  // this file predates that variable and nothing forces the two to move
+  // together
   var SECTION_TITLE = 'rgba(239, 232, 229, 0.66)';
 
   // border-only glow that tracks the cursor: a real span (not a ::before —
@@ -55,23 +53,19 @@
   document.head.appendChild(shimmerStyle);
 
   function patch() {
-    document.querySelectorAll('p[style*="letter-spacing: 0.18em"]').forEach(function (p) {
+    document.querySelectorAll('.case-field-label, .case-section-label').forEach(function (p) {
       // classify each element exactly once — patch() reruns on every
-      // MutationObserver tick through the settle window, and once we've
-      // already muted an uppercase label's color ourselves, a second pass
-      // can't tell it apart from a label that shipped muted in the source
+      // MutationObserver tick through the settle window
       if (p.dataset.alLabelPatched) return;
       p.dataset.alLabelPatched = '1';
-      var style = p.getAttribute('style') || '';
       p.style.color = SECTION_TITLE;
       // sentence-case labels (Role, Client/Type, Timeline, Platforms,
-      // Project contributors, Previous/Next) read back with this exact
-      // browser-normalized rgba string — they keep Poppins and their
+      // Project contributors, Previous/Next) keep Poppins and their
       // sentence case, just lose the wide tracking back to the font's own
       // default spacing. Everything else gets the full section-title
       // treatment: uppercase, wide tracking kept as shipped
       p.style.letterSpacing = 'normal';
-      if (style.indexOf(ALREADY_MUTED) !== -1) return;
+      if (p.classList.contains('case-field-label')) return;
       p.style.textTransform = 'uppercase';
     });
   }
@@ -115,4 +109,24 @@
   }
 
   AL.selfHeal(patchAll, 5000);
+
+  // both patch() and glassifyMoreWorkCards() key off exact framework-
+  // generated inline-style substrings rather than a class, since support.js
+  // gives none of this content its own hook — if it ever changes how it
+  // serializes those styles, or the underlying source values shift, either
+  // selector can stop matching anything with nothing to notice the
+  // regression: the labels/cards just silently keep their unpatched
+  // styling. A one-time check 5s after load (matching AL.selfHeal's own
+  // settle window above) is a cheap tripwire for exactly that — every
+  // case-study page that loads this script has at least one of each, so
+  // finding neither by the time everything should have settled means the
+  // selectors are out of sync with the current markup, not that this page
+  // legitimately has nothing to patch
+  window.addEventListener('load', function () {
+    setTimeout(function () {
+      if (!document.querySelector('[data-al-label-patched]') && !document.querySelector('[data-glass-card]')) {
+        console.warn('case-labels.js: found nothing to patch on this page — its inline-style selectors may be out of sync with the current markup');
+      }
+    }, 5000);
+  });
 })();
