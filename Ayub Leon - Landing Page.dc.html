@@ -1278,6 +1278,13 @@ class Component extends DCLogic {
     const list = document.querySelector('[data-work-list]');
     const viewport = document.querySelector('[data-work-viewport]');
     if (!section || !list || list.dataset.workBound) return;
+    const rows = Array.from(section.querySelectorAll('[data-work-row]'));
+    // the wrapper section/list can exist before support.js has actually
+    // rendered the rows into it — bail without setting the bound flag so
+    // the next AL.selfHeal pass (on the mutation that adds them) tries
+    // again, instead of crashing paint() on an empty rows array and
+    // permanently locking this out via a flag set before that crash
+    if (!rows.length) return;
     list.dataset.workBound = '1';
     // tear down the previous rebuild's window listener before replacing it
     // with a fresh closure over the current live rows/panels — same
@@ -1287,7 +1294,6 @@ class Component extends DCLogic {
       window.removeEventListener('scroll', this.onWorkScroll);
       window.removeEventListener('resize', this.onWorkScroll);
     }
-    const rows = Array.from(section.querySelectorAll('[data-work-row]'));
     const panels = Array.from(section.querySelectorAll('[data-work-panel]'));
     const dots = Array.from(section.querySelectorAll('[data-work-dot]'));
     const counter = section.querySelector('[data-work-counter]');
