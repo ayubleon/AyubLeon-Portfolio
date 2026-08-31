@@ -18,6 +18,19 @@
 <meta name="twitter:description" content="Case study: Danadana, the first Kenyan-made crash betting game, designed with built-in player protection. Product designer, Plexus Core, Aug 2024 – Jun 2025.">
 <meta name="twitter:image" content="https://ayub-leon-portfolio.vercel.app/images/work-danadana-cover.png">
 <style>html, body { background: #000000; margin: 0; }</style><link rel="preload" as="script" href="./support.js">
+<!-- support.js's own boot() re-fetches this exact document a second time
+     right after first paint (unless window.__resources is already set —
+     it's meant for a build mode that bundles resources locally, which
+     this static export doesn't use) and rebuilds part of the page from
+     that second copy, even though the first, synchronous parse of this
+     same already-loaded HTML already rendered everything correctly. Pre-
+     seeding an empty object here — before support.js's own deferred
+     script ever runs — satisfies that check and skips the redundant
+     pass; every other place support.js reads __resources (CDN script
+     URLs, bundled stylesheets, sibling component fetches) already falls
+     back to normal fetching when a key is simply missing, so an empty
+     object changes nothing else -->
+<script>window.__resources = {};</script>
 <script src="./support.js" defer></script>
 <script src="shared.js" defer></script>
 <script src="project-viewer.js" defer></script>

@@ -1,7 +1,13 @@
 (function () {
   var CSS = [
     "@keyframes siteNavRise{from{opacity:0;transform:translateX(-50%) translateY(16px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}",
-    ".site-nav-dock{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:4px;padding:8px;border-radius:999px;border:1px solid var(--al-border,rgba(255,255,255,0.13));background:var(--al-card,#1C1C1E);box-shadow:inset 0 1px 0 var(--al-border-strong,rgba(255,255,255,0.16)),inset 0 -1px 0 rgba(0,0,0,0.35),0 22px 50px -28px rgba(0,0,0,0.9);animation:siteNavRise .8s cubic-bezier(.22,1,.36,1) .1s both;}",
+    ".site-nav-dock{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:4px;padding:8px;border-radius:999px;border:1px solid var(--al-border,rgba(255,255,255,0.13));background:var(--al-card,#1C1C1E);box-shadow:inset 0 1px 0 var(--al-border-strong,rgba(255,255,255,0.16)),inset 0 -1px 0 rgba(0,0,0,0.35),0 22px 50px -28px rgba(0,0,0,0.9);}",
+    // this rise plays once per browser tab, not on every single page —
+    // see the sessionStorage check in navHTML() below. Split into its own
+    // modifier class rather than left on .site-nav-dock unconditionally,
+    // so a return page load can render the dock already fully in place
+    // instead of replaying the same pop-in it just did a moment ago
+    ".site-nav-dock.site-nav-dock-enter{animation:siteNavRise .8s cubic-bezier(.22,1,.36,1) .1s both;}",
     // same border-only cursor-tracked glow as the case-study "More work"
     // cards: a real sibling span (not ::before — see case-labels.js for
     // why), masked to just the border ring, lit by a radial-gradient
@@ -119,10 +125,32 @@
     );
   }
 
+  // every internal navigation between this site's own pages is a full
+  // page reload, not a route change within one app — so without this,
+  // the dock's entrance rise replays in full on every single click
+  // between Home/Work/About, reading as a recurring pop rather than a
+  // first-impression flourish. sessionStorage scopes "seen" to this one
+  // tab: a genuinely fresh visit (new tab, new session) still gets the
+  // full rise, but clicking around the site within it doesn't see the
+  // dock leave and re-enter over and over. Wrapped in try/catch since
+  // sessionStorage can throw (private browsing in older Safari, storage
+  // disabled) — worst case it just falls back to always animating, the
+  // same behavior as before this existed
+  function dockHasAlreadyRisenThisSession() {
+    try {
+      if (sessionStorage.getItem('al-nav-seen') === '1') return true;
+      sessionStorage.setItem('al-nav-seen', '1');
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
   function navHTML(links) {
     function cls(key) { return 'site-nav-link' + (links.active === key ? ' is-active' : ''); }
+    var dockClass = 'site-nav-dock' + (dockHasAlreadyRisenThisSession() ? '' : ' site-nav-dock-enter');
     return (
-      '<nav class="site-nav-dock" aria-label="Primary">' +
+      '<nav class="' + dockClass + '" aria-label="Primary">' +
         '<span class="site-nav-glow" data-nav-glow aria-hidden="true"></span>' +
         '<a class="' + cls('home') + '" href="' + links.home + '">Home</a>' +
         '<a class="' + cls('work') + '" href="' + links.work + '">Work</a>' +
