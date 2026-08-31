@@ -96,7 +96,7 @@
   // brought to full opacity so it still reads as an accent, just a
   // visible one here
   function thickenAccentBorders(html) {
-    return html.replace(/border-left:\s*1px solid rgba\(239,\s*68,\s*24,\s*0\.55\)/gi, 'border-left: 4px solid #EF4418');
+    return html.replace(/border-left:\s*1px solid rgba\(10,\s*132,\s*255,\s*0\.55\)/gi, 'border-left: 4px solid #0A84FF');
   }
 
   // each project's own page is the single source of truth for its title,
@@ -220,6 +220,11 @@
     // currently holds the center slot, since that rotates between the
     // four real cards on every navigation
     ".al-pv-close-anchor{position:absolute;top:50%;left:50%;width:var(--al-cw);height:90vh;transform:translate(-50%,-50%);pointer-events:none;z-index:7;}",
+    // taller on desktop only — phone's 90vh already reads correctly, and
+    // the mobile media query below has its own header/padding numbers
+    // tuned to that height, not worth retuning for a screen where the
+    // extra room isn't needed
+    "@media (min-width: 701px){.al-pv-card,.al-pv-close-anchor{height:94vh;}}",
     // center: the resting point every transform below is built from — a
     // no-op translateX(0), then translate(-50%,-50%) to center the full-
     // size box on the screen, then scale(1) — full opacity, full scale.
@@ -285,7 +290,7 @@
     ".al-pv-card a{color:#636262;text-decoration:none;transition:color .35s cubic-bezier(.22,1,.36,1);}",
     ".al-pv-card a:hover{color:#000;}",
     ".al-pv-card a:focus-visible,.al-pv-card button:focus-visible{outline:2px solid var(--al-green,#EF4418);outline-offset:3px;border-radius:4px;}",
-    ".al-pv-card ::selection{background:#ff3b12;color:#fff;}",
+    ".al-pv-card ::selection{background:#54A9FF;color:#0a0606;}",
     // the case-study pages' body copy runs a size or two larger than the
     // About page's own — 17.5px/15.5px/15px against About's consistent
     // 14.5px body-paragraph size. Matched here at every width, not just
@@ -582,9 +587,9 @@
       if (isCurrent) row.setAttribute('aria-current', 'true');
       row.innerHTML =
         '<span style="flex:0 0 auto;width:28px;font-family:Poppins,Helvetica,sans-serif;font-size:13px;color:#636262;">' + String(i + 1).padStart(2, '0') + '</span>' +
-        '<span data-pv-more-title style="flex:1 1 auto;font-family:Poppins,Helvetica,sans-serif;font-size:1rem;font-weight:500;color:' + (isCurrent ? 'var(--al-green,#EF4418)' : '#000') + ';"></span>' +
+        '<span data-pv-more-title style="flex:1 1 auto;font-family:Poppins,Helvetica,sans-serif;font-size:1rem;font-weight:500;color:' + (isCurrent ? '#007AFF' : '#000') + ';"></span>' +
         (isCurrent ?
-          '<span aria-hidden="true" style="flex:0 0 auto;font-family:Poppins,Helvetica,sans-serif;font-size:12px;color:var(--al-green,#EF4418);">Currently viewing</span>' :
+          '<span aria-hidden="true" style="flex:0 0 auto;font-family:Poppins,Helvetica,sans-serif;font-size:12px;color:#007AFF;">Currently viewing</span>' :
           '<span aria-hidden="true" style="flex:0 0 auto;color:#636262;">&rarr;</span>');
       if (supportsHover) row.addEventListener('mouseenter', playSwitchOnRealHover);
       grid.appendChild(row);

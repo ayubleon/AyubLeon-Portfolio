@@ -30,14 +30,10 @@
   .content-inner { display: inline-flex; flex-direction: column; align-items: center; pointer-events: auto; }
   h1 { margin: 0 0 6px; font-size: 28px; font-weight: 600; letter-spacing: -0.03em; color: #f4eeeb; }
   p.desc { margin: 0 0 32px; max-width: 46ch; font-size: 16px; line-height: 1.6; color: rgba(239,232,229,0.78); }
-  a.home {
-    display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 10px;
-    background: rgba(255,255,255,0.95); color: #120a08; font-size: 15px; font-weight: 500;
-    text-decoration: none; transition: background .25s ease, transform .2s ease;
-  }
-  a.home:hover { background: #fff; }
-  a.home:active { transform: scale(0.97); }
-  a.home:focus-visible { outline: 2px solid #73C41E; outline-offset: 3px; }
+  .notfound-kb { position: relative; width: min(420px, 90vw); aspect-ratio: 444 / 142; }
+  .notfound-kb-key { position: absolute; display: block; opacity: 0; background-repeat: no-repeat; transition: opacity .12s ease; }
+  .notfound-kb-key:hover, .notfound-kb-key:focus-visible { opacity: 1; }
+  .notfound-kb-key:focus-visible { outline: 2px solid #73C41E; outline-offset: 3px; }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
@@ -47,7 +43,11 @@
     <div class="content-inner">
       <h1>Page not found.</h1>
       <p class="desc">This page was deleted in a git commit that nobody wants to talk about.</p>
-      <a class="home" href="/">Back to home</a>
+      <div class="notfound-kb">
+        <img src="images/404-keyboard-default.svg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block;">
+        <a href="/" class="notfound-kb-key" aria-label="Esc: back to home" style="left: 0.901%; top: 2.817%; width: 31.757%; height: 45.070%; background-image: url(images/404-keyboard-hover.svg); background-size: 314.894% 221.875%; background-position: 1.320% 5.128%;"></a>
+        <a href="/" class="notfound-kb-key" aria-label="Take me home" style="left: 19.144%; top: 52.817%; width: 61.261%; height: 44.366%; background-image: url(images/404-keyboard-hover.svg); background-size: 163.235% 225.397%; background-position: 49.419% 94.937%;"></a>
+      </div>
     </div>
   </div>
   <script>

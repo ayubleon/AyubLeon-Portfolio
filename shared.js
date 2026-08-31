@@ -126,6 +126,23 @@
     return { home: 'Ayub%20Leon%20-%20Landing%20Page.dc.html', work: 'Ayub%20Leon%20-%20Landing%20Page.dc.html#work', about: 'Ayub Leon - About.dc.html', active: 'work' };
   };
 
+  // shared by every cursor-following tooltip (the About page's Behance
+  // trigger, the footer's Figma key): follows the pointer at a fixed
+  // offset, anchored to the right of the cursor by default or the left
+  // when `side` is 'left' (for a trigger that already sits at the right
+  // edge of the screen, so the tag has nowhere to grow into on that side).
+  // Either way the result is clamped so it never overflows the viewport —
+  // an unclamped offset still pushes the tag off-screen top/bottom, or
+  // off the opposite edge on a narrow window
+  AL.positionCursorTooltip = function (tip, e, offsetX, offsetY, side) {
+    var rect = tip.getBoundingClientRect();
+    var x = side === 'left' ? e.clientX - offsetX - rect.width : e.clientX + offsetX;
+    var y = e.clientY + offsetY;
+    x = Math.max(8, Math.min(x, window.innerWidth - rect.width - 8));
+    y = Math.max(8, Math.min(y, window.innerHeight - rect.height - 8));
+    tip.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+  };
+
   // buffered Web Audio playback on one shared AudioContext sitewide —
   // plain `new Audio().play()` re-fetches/decodes on every call, slow
   // enough on mobile to land audibly behind the animation, so each sound

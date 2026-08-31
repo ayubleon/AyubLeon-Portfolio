@@ -17,9 +17,7 @@
 <meta name="twitter:title" content="BuzzIQ — Ayub Leon">
 <meta name="twitter:description" content="Case study: BuzzIQ, a TikTok Shop intelligence platform built for a US-based creator commerce company. Sole product designer, IGNITEAMZ, Sep 2025 – 2026.">
 <meta name="twitter:image" content="https://ayub-leon-portfolio.vercel.app/images/work-buzziq-cover.png">
-<style>html, body { background: #000000; margin: 0; }</style>
-<link rel="preload" as="font" type="font/otf" href="fonts/Gastroe-Demo.otf" crossorigin>
-<link rel="preload" as="script" href="./support.js">
+<style>html, body { background: #000000; margin: 0; }</style><link rel="preload" as="script" href="./support.js">
 <script src="./support.js" defer></script>
 <script src="shared.js" defer></script>
 <script src="project-viewer.js" defer></script>
@@ -43,7 +41,7 @@
   a:hover { color: #fff8f4; }
   a:focus-visible, button:focus-visible { outline: 2px solid #EF4418; outline-offset: 3px; border-radius: 4px; }
   a:active, button:active { opacity: 0.7; }
-  ::selection { background: #ff3b12; color: #0a0606; }
+  ::selection { background: #54A9FF; color: #0a0606; }
   @keyframes alRise { from { transform: translate3d(0, 110%, 0); } to { transform: translate3d(0,0,0); } }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation-duration: .01ms !important; transition: none !important; } }
   @media (max-width: 700px) {
@@ -51,6 +49,7 @@
     .case-label-grid { grid-template-columns: 1fr !important; gap: 14px 0 !important; }
     .case-split-grid { grid-template-columns: 1fr !important; gap: 56px 0 !important; }
     .case-figure-grid { grid-template-columns: 1fr !important; }
+    .case-prototype-figure { max-width: none !important; }
     /* the Role/Client/Timeline/Platforms/Project contributors grid below
        has no class of its own — it already auto-fits into however many
        190px-minimum columns the available width allows, no override
@@ -104,7 +103,7 @@
       </div>
       <div style="display: flex; flex-direction: column; gap: 9px;">
         <p style="margin: 0; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: none; color: rgba(239,232,229,0.45)">Project contributors</p>
-        <a href="https://www.linkedin.com/in/nelsonkuria/" target="_blank" rel="noopener noreferrer" style="margin: 0; display: inline-flex; align-items: center; gap: 6px; font-size: 15px; line-height: 1.5; color: rgba(244,238,235,0.94); text-decoration: underline; text-underline-offset: 3px;" style-hover="color: #EF4418;">Nelson Kuria <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></a>
+        <a href="https://www.linkedin.com/in/nelsonkuria/" target="_blank" rel="noopener noreferrer" style="margin: 0; display: inline-flex; align-items: center; gap: 6px; font-size: 15px; line-height: 1.5; color: rgba(244,238,235,0.94); text-decoration: underline; text-underline-offset: 3px;" style-hover="color: #0A84FF;">Nelson Kuria <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; flex: 0 0 auto;"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg></a>
       </div>
     </div>
 
@@ -127,19 +126,19 @@
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 28px; padding: 32px 0; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1);">
           <div style="display: flex; flex-direction: column; gap: 8px;">
-            <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(2rem, 3.4vw, 2.9rem); font-weight: 700; letter-spacing: -0.04em; line-height: 1; color: #EF4418;">550+</p>
+            <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(2rem, 3.4vw, 2.9rem); font-weight: 700; letter-spacing: -0.04em; line-height: 1; color: #0A84FF;">550+</p>
             <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: rgba(239,232,229,0.82);">screens across mobile, tablet, and web</p>
           </div>
           <div style="display: flex; flex-direction: column; gap: 8px;">
-            <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(2rem, 3.4vw, 2.9rem); font-weight: 700; letter-spacing: -0.04em; line-height: 1; color: #EF4418;">3+</p>
+            <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(2rem, 3.4vw, 2.9rem); font-weight: 700; letter-spacing: -0.04em; line-height: 1; color: #0A84FF;">3+</p>
             <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: rgba(239,232,229,0.82);">months of rework saved by prototyping before build</p>
           </div>
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 18px;">
-          <p style="margin: 0; padding-left: 20px; border-left: 1px solid rgba(239, 68, 24,0.55); font-size: 15.5px; line-height: 1.75; color: rgba(239,232,229,0.86); text-wrap: pretty;">Brought in a design system I had already built independently, adapting and extending it to fit BuzzIQ's needs, since the project had no existing design infrastructure of its own.</p>
-          <p style="margin: 0; padding-left: 20px; border-left: 1px solid rgba(239, 68, 24,0.55); font-size: 15.5px; line-height: 1.75; color: rgba(239,232,229,0.86); text-wrap: pretty;">Used shadcn as a base but pushed past the default look with custom variants and assets, so it never read as an off-the-shelf UI kit.</p>
-          <p style="margin: 0; padding-left: 20px; border-left: 1px solid rgba(239, 68, 24,0.55); font-size: 15.5px; line-height: 1.75; color: rgba(239,232,229,0.86); text-wrap: pretty;">Ran constant check-ins with the team and stakeholders as the product took shape.</p>
+          <p style="margin: 0; padding-left: 20px; border-left: 1px solid rgba(10,132,255,0.55); font-size: 15.5px; line-height: 1.75; color: rgba(239,232,229,0.86); text-wrap: pretty;">Brought in a design system I had already built independently, adapting and extending it to fit BuzzIQ's needs, since the project had no existing design infrastructure of its own.</p>
+          <p style="margin: 0; padding-left: 20px; border-left: 1px solid rgba(10,132,255,0.55); font-size: 15.5px; line-height: 1.75; color: rgba(239,232,229,0.86); text-wrap: pretty;">Used shadcn as a base but pushed past the default look with custom variants and assets, so it never read as an off-the-shelf UI kit.</p>
+          <p style="margin: 0; padding-left: 20px; border-left: 1px solid rgba(10,132,255,0.55); font-size: 15.5px; line-height: 1.75; color: rgba(239,232,229,0.86); text-wrap: pretty;">Ran constant check-ins with the team and stakeholders as the product took shape.</p>
         </div>
       </div>
     </div>
@@ -181,8 +180,8 @@
     </div>
 
     <p style="margin: 96px 0 20px; font-family: Poppins; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(239,232,229,0.66)">Prototype</p>
-    <figure style="margin: 0; display: flex; flex-direction: column; gap: 12px;">
-      <div style="position: relative; aspect-ratio: 1600 / 1144; border-radius: 12px; overflow: hidden; background: #0e0c0b; border: 1px solid rgba(255,255,255,0.07);">
+    <figure class="case-prototype-figure" style="margin: 0 auto; max-width: 700px; display: flex; flex-direction: column; gap: 12px;">
+      <div style="position: relative; aspect-ratio: 1600 / 1144; border-radius: 8px; overflow: hidden; background: #0e0c0b; border: 1px solid rgba(255,255,255,0.07);">
         <video src="images/buzziq-prototype.mp4" poster="images/buzziq-prototype-poster.jpg" title="Prototype" autoplay playsinline preload="metadata" aria-label="Prototype for BuzzIQ" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block;"></video>
       </div>
       <figcaption style="margin: 0; font-family: Poppins, Helvetica, Arial, sans-serif; font-size: 11px; line-height: 1.6; letter-spacing: 0.02em; color: rgba(239,232,229,0.5);">03 — Prototype for BuzzIQ.</figcaption>
@@ -197,7 +196,7 @@
         <p style="margin: 0; font-size: 15.5px; line-height: 1.78; color: rgba(239,232,229,0.86); text-wrap: pretty;">Everything was analyzed from both sides, what the business needed and what users needed, before a single screen was final.</p>
         <p style="margin: 0; font-size: 15.5px; line-height: 1.78; color: rgba(239,232,229,0.86); text-wrap: pretty;">Once designs were handed off, the dev team flagged anything hard to build so we could solve it before it slowed anyone down.</p>
         <p style="margin: 0; font-size: 15.5px; line-height: 1.78; color: rgba(239,232,229,0.86); text-wrap: pretty;">A prototype was delivered before development started, which helped save an estimated 3+ months of rework.</p>
-        <p style="margin: 24px 0 0; font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-size: clamp(1.3rem, 2.2vw, 1.85rem); line-height: 1.35; letter-spacing: -0.01em; color: #EF4418; text-wrap: pretty;">That back and forth is what let a solo designer keep pace with a moving team.</p>
+        <p style="margin: 24px 0 0; font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-size: clamp(1.3rem, 2.2vw, 1.85rem); line-height: 1.35; letter-spacing: -0.01em; color: #0A84FF; text-wrap: pretty;">That back and forth is what let a solo designer keep pace with a moving team.</p>
       </div>
     </div>
   </section>

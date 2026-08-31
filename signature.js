@@ -20,16 +20,39 @@
 
   function place() {
     if (document.querySelector('[data-signature]')) return;
-    var target = Array.from(document.querySelectorAll('p')).find(function (p) {
-      return p.textContent.trim() === 'Thanks for stopping by!';
+    var heading = Array.from(document.querySelectorAll('h3')).find(function (h) {
+      return h.textContent.trim() === 'Thanks for Stopping By';
     });
-    if (!target) return;
+    if (!heading) return;
+    // sign off below the whole two-column row (Off the Clock + Thanks for
+    // Stopping By), not just the column this heading happens to live in —
+    // reads as one shared closing flourish for the story section, the way
+    // a signature closes a letter, rather than an appendage to a single
+    // paragraph
+    var row = heading.closest('.story-grid-2') || heading.parentElement;
+
+    // flanking fade-out lines, same gradient recipe as the "I am Ayub Leon"
+    // byline on the homepage hero, just stretched to fill the row instead
+    // of sitting as a short fixed-width tick
+    var wrap = document.createElement('div');
+    wrap.setAttribute('data-signature', '1');
+    wrap.style.cssText = 'display:flex;align-items:center;gap:28px;margin:84px 0 0;';
+
+    var lineLeft = document.createElement('span');
+    lineLeft.style.cssText = 'flex:1 1 auto;height:1px;background:linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.45) 100%);';
+
     var img = document.createElement('img');
     img.src = 'images/signature.svg';
     img.alt = 'Ayub Leon signature';
-    img.setAttribute('data-signature', '1');
-    img.style.cssText = 'display:block;margin-top:20px;width:122px;height:42px;';
-    target.insertAdjacentElement('afterend', img);
+    img.style.cssText = 'display:block;flex:0 0 auto;width:122px;height:42px;';
+
+    var lineRight = document.createElement('span');
+    lineRight.style.cssText = 'flex:1 1 auto;height:1px;background:linear-gradient(270deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.45) 100%);';
+
+    wrap.appendChild(lineLeft);
+    wrap.appendChild(img);
+    wrap.appendChild(lineRight);
+    row.insertAdjacentElement('afterend', wrap);
   }
 
   // same template-lock, same fix — "People I've built with" ships with the

@@ -68,16 +68,17 @@
     ".site-contact-avatar-flip.is-hint .site-contact-avatar-face-back{animation:siteContactBackHint .6s cubic-bezier(.22,1,.36,1);}",
     ".site-contact-avatar{width:76px;height:76px;border-radius:50%;background:#fff;display:block;object-fit:cover;}",
     ".site-contact-name{margin:0;font-family:Poppins,Helvetica,sans-serif;font-weight:600;font-size:20px;color:#fff;}",
-    ".site-contact-role{margin:2px 0 0;font-family:'Schibsted Grotesk',Helvetica,Arial,sans-serif;font-size:13px;font-weight:500;color:var(--al-green,#EF4418);}",
+    ".site-contact-role{margin:2px 0 0;font-family:'Schibsted Grotesk',Helvetica,Arial,sans-serif;font-size:13px;font-weight:500;color:#0A84FF;}",
     ".site-contact-blurb{margin:18px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size:13.5px;line-height:1.55;color:rgba(244,238,235,0.82);}",
-    ".site-contact-link{display:block;color:var(--al-green,#EF4418);text-decoration:none;}",
-    ".site-contact-link:hover{color:var(--al-green-hover,#F37352);}",
+    ".site-contact-link{display:block;color:#0A84FF;text-decoration:none;}",
+    ".site-contact-link:hover{color:#54A9FF;}",
     ".site-contact-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px;}",
     ".site-contact-action{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px;border-radius:16px;background:var(--al-card-hover,#2A2A2C);text-decoration:none;color:var(--al-section-title,rgba(239,232,229,0.66));transition:background .25s ease,color .25s ease;}",
     ".site-contact-action:hover{background:#343438;color:#fff;}",
     ".site-contact-action span{font-family:Poppins,Helvetica,sans-serif;font-size:12px;color:rgba(244,238,235,0.75);transition:color .25s ease;}",
     ".site-contact-action:hover span{color:#fff;}",
-    ".site-contact-action svg{display:block;}"
+    ".site-contact-action svg{display:block;}",
+    ".site-contact-email{margin:16px 0 0;text-align:center;font-family:Poppins,Helvetica,sans-serif;font-size:12.5px;color:var(--al-text-muted,rgba(239,232,229,0.45));}"
   ].join('');
   var styleTag = document.createElement('style');
   styleTag.textContent = CSS;
@@ -110,9 +111,9 @@
   function copyEmail(e) {
     e.preventDefault();
     AL.copyText(
-      'ayubleon9@gmail.com',
+      'ayubleon.pd@gmail.com',
       function () { AL.showToast('Copied to Clipboard'); },
-      function () { AL.showToast("Couldn't copy — email is ayubleon9@gmail.com", { glow: false }); }
+      function () { AL.showToast("Couldn't copy — email is ayubleon.pd@gmail.com", { glow: false }); }
     );
   }
 
@@ -143,12 +144,13 @@
             '<p class="site-contact-role">Product Designer</p>' +
           '</div>' +
         '</div>' +
-        '<p class="site-contact-blurb">I\'m currently open to full time roles, contract work, and high impact product builds. If you need a designer who takes ownership from first sketch to final QA, <a class="site-contact-link" href="mailto:ayubleon9@gmail.com">let\'s talk.</a></p>' +
+        '<p class="site-contact-blurb">I\'m currently open to full time roles, contract work, and high impact product builds. If you need a designer who takes ownership from first sketch to final QA, <a class="site-contact-link" href="mailto:ayubleon.pd@gmail.com">let\'s talk.</a></p>' +
         '<div class="site-contact-actions">' +
-          '<a class="site-contact-action" href="mailto:ayubleon9@gmail.com" data-contact-copy-email>' + MAIL_SVG + '<span>Email</span></a>' +
+          '<a class="site-contact-action" href="mailto:ayubleon.pd@gmail.com" data-contact-copy-email>' + MAIL_SVG + '<span>Email</span></a>' +
           '<a class="site-contact-action" href="Ayub%20Leon%20-%20Resume.pdf" target="_blank" rel="noopener noreferrer">' + RESUME_SVG + '<span>Resume</span></a>' +
           '<a class="site-contact-action" href="https://www.linkedin.com/in/ayubleon" target="_blank" rel="noopener noreferrer">' + LINKEDIN_SVG + '<span>Linked in</span></a>' +
         '</div>' +
+        '<p class="site-contact-email">ayubleon.pd@gmail.com</p>' +
       '</div>'
     );
   }
@@ -219,6 +221,7 @@
     };
 
     el.querySelectorAll('.site-nav-link').forEach(function (link) {
+      if (supportsHover) link.addEventListener('mouseenter', playSwitchOnRealHover);
       link.addEventListener('click', function (e) {
         playClick();
         var href = link.getAttribute('href') || '';
@@ -232,6 +235,7 @@
       });
     });
 
+    if (supportsHover) toggleBtn.addEventListener('mouseenter', playSwitchOnRealHover);
     toggleBtn.addEventListener('click', function (e) {
       e.stopPropagation();
       playClick();

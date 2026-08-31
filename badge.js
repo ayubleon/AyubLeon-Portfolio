@@ -109,7 +109,6 @@
 
     var angle = 0;
     var spinning = false;
-    var scrollTriggered = false;
 
     var dragging = false;
     var dragDelta = 0;
@@ -131,7 +130,6 @@
     function startDrag() {
       dragging = true;
       dragDelta = 0;
-      scrollTriggered = true;
       inner.style.transition = 'none';
       clearTimeout(maxTimer);
       maxTimer = setTimeout(endDrag, MAX_DRAG_MS);
@@ -186,9 +184,13 @@
     // this must only catch further downward attempts (delta > 0) — since
     // isAtBottom() only goes false once the page has actually moved away
     // from the bottom, hijacking upward scroll ticks there too would
-    // preventDefault() every attempt to leave the bottom and trap the page
+    // preventDefault() every attempt to leave the bottom and trap the page.
+    // Always gated on isAtBottom(): the earlier `if (!scrollTriggered)
+    // return true` unconditionally hijacked the very first scroll/touch/
+    // key gesture of the page, anywhere — even at the very top, nowhere
+    // near this badge — silently eating whatever scroll the user actually
+    // meant to make once per page load
     function canTrigger(delta) {
-      if (!scrollTriggered) return true;
       return isAtBottom() && delta > 0;
     }
     function guard(e, delta) {
@@ -228,12 +230,10 @@
         e.preventDefault();
         return;
       }
-      if (!scrollTriggered) {
-        scrollTriggered = true;
-        spinOnce();
-        e.preventDefault();
-        return;
-      }
+      // same fix as canTrigger() above: this used to hijack the very
+      // first scroll-key press of the page, anywhere, before the badge
+      // had ever been reached — now it's just a decorative spin once the
+      // user is actually at the bottom, same as every later press
       if (isAtBottom()) spinOnce();
     }
 
