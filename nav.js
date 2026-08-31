@@ -116,6 +116,56 @@
   window.addEventListener('mousemove', function () { mouseHasMoved = true; }, { once: true, passive: true });
   function playSwitchOnRealHover() { if (mouseHasMoved) playSwitch(); }
 
+  // every element inside the contact card a keyboard user could
+  // legitimately land on right now — recomputed on each Tab press rather
+  // than cached once, matching the same approach used for the project
+  // popup's own focus trap
+  function getContactFocusable(card) {
+    return Array.from(card.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+      .filter(function (el) { return el.offsetParent !== null; });
+  }
+
+  // the contact card's Escape-to-close and Tab-trap need a single, page-
+  // lifetime document listener — but initContactCard() itself can run
+  // more than once (support.js can wipe and rebuild the nav mount in more
+  // than one wave), each time building a fresh card/setOpen closure.
+  // Registering the actual listener from inside that function would
+  // either duplicate it on every rebuild (each firing its own close
+  // animation + whoosh, so N rebuilds means N sounds on one Escape press)
+  // or, if guarded to only ever attach once, permanently wire it to the
+  // FIRST rebuild's now-stale card. Keeping the listener itself here at
+  // module scope, bound exactly once, and always reading through these
+  // two mutable references — updated on every initContactCard() call —
+  // keeps it correctly wired to whichever card is actually live, no
+  // matter how many times the mount gets rebuilt
+  var currentContactCard = null;
+  var currentContactSetOpen = null;
+  document.addEventListener('keydown', function (e) {
+    // without this guard, pressing Escape/Tab anywhere on the page — the
+    // card was never opened — would still run the close transition
+    // (Escape) or, worse, silently trap Tab focus inside a hidden card
+    if (!currentContactCard || !currentContactCard.classList.contains('is-open')) return;
+    if (e.key === 'Escape') {
+      if (currentContactSetOpen) currentContactSetOpen(false);
+      return;
+    }
+    if (e.key !== 'Tab') return;
+    // a focus trap: only intervenes right at the two ends of the tab
+    // order, wrapping back to the other end, rather than fighting the
+    // browser's own tab order in between
+    var focusable = getContactFocusable(currentContactCard);
+    if (!focusable.length) return;
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
+
   function copyEmail(e) {
     e.preventDefault();
     AL.copyText(
@@ -162,7 +212,7 @@
         '</button>' +
       '</nav>' +
       '<div class="site-contact-backdrop" data-contact-backdrop aria-hidden="true"></div>' +
-      '<div class="site-contact-card" data-contact-card role="dialog" aria-modal="false" aria-label="Contact Ayub Leon">' +
+      '<div class="site-contact-card" data-contact-card role="dialog" aria-modal="true" aria-label="Contact Ayub Leon">' +
         '<button type="button" class="site-contact-close" data-contact-close aria-label="Close">' + CLOSE_SVG + '</button>' +
         '<div class="site-contact-header">' +
           '<button type="button" class="site-contact-avatar-flip" data-avatar-flip aria-label="Flip photo">' +
@@ -223,6 +273,10 @@
         requestAnimationFrame(function () {
           card.style.transform = OPEN_TRANSFORM;
           card.classList.add('is-open');
+          // moves keyboard focus into the dialog itself rather than
+          // leaving it on the trigger button now sitting behind an
+          // inert-looking backdrop
+          if (closeBtn) closeBtn.focus();
         });
         if (backdrop) backdrop.classList.add('is-open');
         // wait for the card's own open transition to settle before
@@ -246,6 +300,11 @@
         card.style.transform = closedTransformFromAvatar();
         card.classList.remove('is-open');
         if (backdrop) backdrop.classList.remove('is-open');
+        // returns focus to the control that expands/collapses this
+        // dialog, matching its own aria-haspopup semantics — without
+        // this a keyboard user closing the card loses their place
+        // entirely, landing back on the document body
+        toggleBtn.focus();
       }
       toggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
     };
@@ -277,7 +336,6 @@
     }
     if (backdrop) backdrop.addEventListener('click', function () { setOpen(false); });
 
-    var avatarFlip = el.querySelector('[data-avatar-flip]');
     if (avatarFlip) {
       // touch devices fire a synthetic mouseenter right before click on
       // first tap, so with both handlers always active a tap added
@@ -301,9 +359,8 @@
         });
       }
     }
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') setOpen(false);
-    });
+    currentContactCard = card;
+    currentContactSetOpen = setOpen;
 
     var emailLink = el.querySelector('[data-contact-copy-email]');
     if (emailLink) emailLink.addEventListener('click', copyEmail);

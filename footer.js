@@ -2,6 +2,14 @@
   var CSS = [
     ".footer-kb-key{opacity:0;transition:opacity .12s ease;}",
     ".footer-kb-key:hover{opacity:1;}",
+    // hover alone reveals these (opacity:0 at rest) but never covered
+    // keyboard focus — a tabbing user got no visible feedback at all on
+    // this whole keyboard-style nav. Same outline treatment used
+    // everywhere else on the site (nav.js's tooltip trigger, the project
+    // popup's cards), plus the same opacity reveal :hover already gets,
+    // since an outline drawn around a fully transparent key would look
+    // like a floating, unexplained box
+    ".footer-kb-key:focus-visible{opacity:1;outline:2px solid var(--al-green,#EF4418);outline-offset:2px;border-radius:4px;}",
     ".footer-kb-figma-color{opacity:0;transition:opacity .12s ease;}",
     ".footer-kb:has(.footer-kb-key:last-child:hover) .footer-kb-figma-color{opacity:1;}",
     ".site-footer-link{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:400;color:rgba(244,238,235,0.88);text-decoration:none;transition:color .3s cubic-bezier(.22,1,.36,1),font-weight .3s cubic-bezier(.22,1,.36,1);}",
@@ -59,6 +67,17 @@
   // rebuilt node — keeping the current mode here instead means fill()
   // can always re-apply it to whatever fresh markup shows up
   var footerMode = 'keyboard';
+
+  // fill() can rebuild the footer mount more than once (same support.js
+  // rebuild-wave behavior noted above), each time creating a fresh
+  // [data-wordmark] element and wiring its own resize handling to it.
+  // window and its ResizeObserver registry both outlive that rebuild, so
+  // without tearing the previous pair down first here, every rebuild
+  // stacks another permanent 'resize' listener and another live
+  // ResizeObserver, both holding the now-detached previous wordmark node
+  // in memory indefinitely
+  var wordmarkResizeListener = null;
+  var wordmarkResizeObserver = null;
 
   // sizes the wordmark so its rendered width is always exactly 80% of the
   // footer's content width, measured directly rather than approximated
@@ -243,12 +262,16 @@
 
     var wordmark = el.querySelector('[data-wordmark]');
     if (wordmark) {
+      if (wordmarkResizeListener) window.removeEventListener('resize', wordmarkResizeListener);
+      if (wordmarkResizeObserver) wordmarkResizeObserver.disconnect();
       var resize = function () { sizeWordmark(wordmark); };
+      wordmarkResizeListener = resize;
       resize();
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(resize);
       window.addEventListener('resize', resize);
       if (window.ResizeObserver) {
-        new ResizeObserver(resize).observe(wordmark.parentElement);
+        wordmarkResizeObserver = new ResizeObserver(resize);
+        wordmarkResizeObserver.observe(wordmark.parentElement);
       }
     }
 

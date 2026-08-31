@@ -22,10 +22,10 @@
   styleTag.textContent = CSS;
   document.head.appendChild(styleTag);
 
+  // AL.pageLinks() (shared.js) already computes this exact value from the
+  // same [data-screen-label] check — no reason to re-derive it here too
   function homeHref() {
-    var root = document.querySelector('[data-screen-label]');
-    var label = root ? root.getAttribute('data-screen-label') : '';
-    return label === 'Hero' ? '#top' : 'Ayub%20Leon%20-%20Landing%20Page.dc.html';
+    return AL.pageLinks().home;
   }
 
   function badgeHTML() {
@@ -89,6 +89,12 @@
   var SETTLE_MS = 320;        // full-arc duration for the commit/revert snap
   var MIN_SETTLE_MS = 120;    // floor on that duration so a near-finished drag still gets a visible snap
   var SCROLL_KEYS = { ' ': 1, 'Spacebar': 1, 'PageDown': 1, 'PageUp': 1, 'ArrowDown': 1, 'ArrowUp': 1, 'Home': 1, 'End': 1 };
+  // the subset of SCROLL_KEYS that means "scroll further down" — the only
+  // direction canTrigger()'s wheel/touch path ever spins for (delta > 0).
+  // guardKey() used to spin for any key in SCROLL_KEYS, including PageUp/
+  // ArrowUp/Home — pressing one of those while already at the bottom is
+  // clearly an attempt to leave it, not a reason to spin the badge again
+  var DOWN_SCROLL_KEYS = { ' ': 1, 'Spacebar': 1, 'PageDown': 1, 'ArrowDown': 1, 'End': 1 };
 
   function isAtBottom() {
     var doc = document.documentElement;
@@ -119,12 +125,13 @@
     var lastTouchY = null;
     var settling = false;
 
+    var spinTimer = null;
     function spinOnce() {
       if (spinning || dragging || settling) return;
       spinning = true;
       angle += 90;
       inner.style.transform = 'rotateY(' + angle + 'deg)';
-      setTimeout(function () {
+      spinTimer = setTimeout(function () {
         spinning = false;
       }, SPIN_MS);
     }
@@ -236,7 +243,7 @@
       // first scroll-key press of the page, anywhere, before the badge
       // had ever been reached — now it's just a decorative spin once the
       // user is actually at the bottom, same as every later press
-      if (isAtBottom()) spinOnce();
+      if (isAtBottom() && DOWN_SCROLL_KEYS[e.key]) spinOnce();
     }
 
     window.addEventListener('wheel', guardWheel, { passive: false });
@@ -255,6 +262,14 @@
       window.removeEventListener('keydown', guardKey);
       badgeEl.removeEventListener('mouseenter', spinOnce);
       badgeEl.removeEventListener('mouseenter', playIconTap);
+      // without these, a badge re-mounted mid-drag or mid-spin leaves its
+      // pending timers running against this now-detached `inner` element
+      // — harmless in effect (mutating a node nothing else references),
+      // but the same "timer with no cancellation path on teardown" gap
+      // already fixed once in project-viewer.js
+      clearTimeout(idleTimer);
+      clearTimeout(maxTimer);
+      clearTimeout(spinTimer);
     };
   }
 
