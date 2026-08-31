@@ -63,7 +63,9 @@
     }).catch(function () {});
   }
 
-  var playIconTap = AL.makeSoundPlayer('sounds/icon-tap.mp3', 0.6);
+  // shared across every component file that needs it (see shared.js) —
+  // each used to build its own independent player for the same sound
+  var playIconTap = AL.playIconTap;
 
   // the first wheel/touch scroll attempt is held (preventDefault) and
   // dragged 1:1 with the scroll motion instead of snapping instantly —

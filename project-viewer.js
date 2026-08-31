@@ -25,7 +25,9 @@
   var SWIPE_MIN_PX = 60; // shorter horizontal drags read as scroll wobble, not an intentional swipe
   var MOVE_MS = 480; // duration of the slot-shift scroll on a project change
 
-  var playSwitch = AL.makeSoundPlayer('sounds/switch.mp3', 0.35);
+  // shared across every component file that needs it (see shared.js) —
+  // each used to build its own independent player for the same sound
+  var playSwitch = AL.playSwitch;
   // touch devices fire a synthetic mouseenter right before click on first
   // tap, so a hover-triggered sound would double up with a click sound on
   // a real tap — gating behind real hover support keeps touch to one sound
@@ -51,7 +53,11 @@
   // paragraphs — and goes to #636262. Both hold regardless of the
   // original alpha, since alpha alone was tuned for the old dark
   // background, not for meaning
-  var TEXT_COLOR_RE = /color:\s*(?:#f4eeeb\b|rgba\(\s*(244,\s*238,\s*235|239,\s*232,\s*229)\s*,\s*[\d.]+\s*\))/gi;
+  // the (?<!-) guards against matching inside background-color/border-color/
+  // stop-color — without it, any future case-study markup using one of
+  // these exact rgba tuples on a -color property (not just plain `color`)
+  // would get silently rewritten to solid black/grey instead of left alone
+  var TEXT_COLOR_RE = /(?<!-)color:\s*(?:#f4eeeb\b|rgba\(\s*(244,\s*238,\s*235|239,\s*232,\s*229)\s*,\s*[\d.]+\s*\))/gi;
   function darkenTextColors(html) {
     return html.replace(TEXT_COLOR_RE, function (match) {
       var bright = match.indexOf('#f4eeeb') !== -1 || /244,\s*238,\s*235/.test(match);
@@ -290,6 +296,11 @@
     ".al-pv-card a{color:#636262;text-decoration:none;transition:color .35s cubic-bezier(.22,1,.36,1);}",
     ".al-pv-card a:hover{color:#000;}",
     ".al-pv-card a:focus-visible,.al-pv-card button:focus-visible{outline:2px solid var(--al-green,#EF4418);outline-offset:3px;border-radius:4px;}",
+    // the peek cards themselves (role=button, see setSlotA11y) are focusable
+    // but weren't covered by the rule above, which only targets real <a>/
+    // <button> descendants — falling back to the browser default outline
+    // instead of this site's own focus treatment
+    ".al-pv-card:focus-visible{outline:2px solid var(--al-green,#EF4418);outline-offset:-3px;border-radius:24px;}",
     ".al-pv-card ::selection{background:#54A9FF;color:#0a0606;}",
     // the case-study pages' body copy runs a size or two larger than the
     // About page's own — 17.5px/15.5px/15px against About's consistent
@@ -427,6 +438,9 @@
   var currentIndex = 0;
   var animating = false;
   var lastFocused = null;
+  // the pending "clear the outgoing card + reveal the header again" timer
+  // from an in-flight go() — tracked so close() can cancel it (see close())
+  var moveTimer = null;
 
   // four identical plain divs — none of them can be a <button>, since
   // whichever one is currently 'center' needs to host real nested
@@ -754,7 +768,13 @@
     var header = overlay.querySelector('.al-pv-header');
     if (header) header.classList.add('al-pv-header-hidden');
     animating = true;
-    setTimeout(function () {
+    // cancels any timer still pending from a previous go() — can only
+    // actually be one (this function's own `if (animating) return;` guard
+    // blocks re-entry while animating), but close() can reset `animating`
+    // out from under a still-pending timer (see close()), so a stale one
+    // could otherwise survive into whatever this next go() schedules
+    clearTimeout(moveTimer);
+    moveTimer = setTimeout(function () {
       outgoingInner.innerHTML = '';
       animating = false;
       if (header) header.classList.remove('al-pv-header-hidden');
@@ -783,6 +803,23 @@
 
   function close() {
     if (!overlay) return;
+    // a go() transition can still be in flight when the overlay closes —
+    // without this, its pending timeout fires later (up to MOVE_MS after
+    // close), and by then `animating` is still true from that stale timer
+    // never having run, so the very first peek-card click after reopening
+    // is silently swallowed by go()'s own guard. Worse, if the same
+    // physical card the stale timeout targets has already become the
+    // center card again by the time it fires, its `innerHTML = ''` wipes
+    // out content fillCenter() only just finished loading. Running the
+    // same cleanup synchronously instead of just cancelling it also keeps
+    // the header's hidden class from surviving into the next open()
+    if (moveTimer) {
+      clearTimeout(moveTimer);
+      moveTimer = null;
+      var header = overlay.querySelector('.al-pv-header');
+      if (header) header.classList.remove('al-pv-header-hidden');
+      animating = false;
+    }
     overlay.classList.remove('al-pv-open');
     overlay.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';

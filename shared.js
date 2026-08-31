@@ -189,6 +189,15 @@
       else startWhenReady();
     };
   };
+  // shared instances for sounds used by more than one component file —
+  // switch.mp3 alone was independently fetched and decoded up to four
+  // times per page load (nav.js, footer.js, project-viewer.js, and the
+  // About page's own script each built their own player for the exact
+  // same file), and icon-tap.mp3 twice (nav.js, badge.js). One shared
+  // instance per file means one fetch/decode each, reused by whichever
+  // components need it, sitewide
+  AL.playSwitch = AL.makeSoundPlayer('sounds/switch.mp3', 0.35);
+  AL.playIconTap = AL.makeSoundPlayer('sounds/icon-tap.mp3', 0.6);
   // browsers only unlock a suspended AudioContext on a real user gesture
   // (click/tap/keypress) — hovering doesn't count, so a hover-triggered
   // sound (the badge, the contact card avatar) can land permanently silent

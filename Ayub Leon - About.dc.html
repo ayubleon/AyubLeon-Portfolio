@@ -231,12 +231,13 @@ class Component extends DCLogic {
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     trigger.dataset.tipBound = '1';
     this.behanceTrigger = trigger;
-    const playHover = AL.makeSoundPlayer('sounds/switch.mp3', 0.35);
+    // shared across every component file that needs it (see shared.js) —
+    // each used to build its own independent player for the same sound
     this.onBehanceMove = (e) => { AL.positionCursorTooltip(tip, e, 18, 20); };
     this.onBehanceEnter = (e) => {
       tip.style.opacity = '1';
       this.onBehanceMove(e);
-      playHover();
+      AL.playSwitch();
     };
     this.onBehanceLeave = () => { tip.style.opacity = '0'; };
     trigger.addEventListener('mouseenter', this.onBehanceEnter);

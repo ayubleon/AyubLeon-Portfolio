@@ -94,8 +94,10 @@
 
   var playWhoosh = AL.makeSoundPlayer('sounds/whoosh.wav', 0.20);
   var playClick = AL.makeSoundPlayer('sounds/click.mp3', 0.6);
-  var playIconTap = AL.makeSoundPlayer('sounds/icon-tap.mp3', 0.6);
-  var playSwitch = AL.makeSoundPlayer('sounds/switch.mp3', 0.35);
+  // shared across every component file that needs them (see shared.js) —
+  // each used to build its own independent player for the same sound
+  var playIconTap = AL.playIconTap;
+  var playSwitch = AL.playSwitch;
 
   // the nav dock sits at the same fixed screen position on every page, so
   // clicking a link that navigates away can land the cursor exactly over

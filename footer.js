@@ -45,7 +45,9 @@
   // sound), and ignored until a genuine mousemove has happened since load
   // (a click can leave the cursor resting over a freshly-laid-out element
   // at the same screen position with no actual mouse movement)
-  var playSwitch = AL.makeSoundPlayer('sounds/switch.mp3', 0.35);
+  // shared across every component file that needs it (see shared.js) —
+  // each used to build its own independent player for the same sound
+  var playSwitch = AL.playSwitch;
   var supportsHover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   var mouseHasMoved = false;
   window.addEventListener('mousemove', function () { mouseHasMoved = true; }, { once: true, passive: true });
