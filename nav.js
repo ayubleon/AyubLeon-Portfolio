@@ -383,9 +383,21 @@
     });
   }
 
+  // guarded by a flag on the actual wired button rather than plain
+  // childElementCount: something outside this file's control has been
+  // observed re-populating this mount with matching-but-unwired markup
+  // (support.js can rebuild the page from its own template after this
+  // first fill) — a childElementCount check alone can't tell that apart
+  // from nav.js's own already-wired content, and skips re-wiring for
+  // good. Checking a flag this file itself sets means a fresh, unwired
+  // button is always caught and re-wired, while an already-wired one is
+  // still left alone
   function fill(el) {
-    if (el.childElementCount > 0) return;
+    var probe = el.querySelector('[data-contact-toggle]');
+    if (probe && probe.dataset.navWired) return;
     el.innerHTML = navHTML(AL.pageLinks());
+    var toggleBtn = el.querySelector('[data-contact-toggle]');
+    if (toggleBtn) toggleBtn.dataset.navWired = '1';
     initContactCard(el);
     initNavGlow(el);
   }

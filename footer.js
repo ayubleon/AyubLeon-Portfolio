@@ -242,9 +242,18 @@
     );
   }
 
+  // guarded by a flag on the actual wired toggle rather than plain
+  // childElementCount — see the identical comment in nav.js's fill() for
+  // why: something outside this file's control has been observed
+  // re-populating this mount with matching-but-unwired markup, and a
+  // childElementCount check alone can't tell that apart from this file's
+  // own already-wired content
   function fill(el) {
-    if (el.childElementCount > 0) return;
+    var probe = el.querySelector('[data-footer-mode-toggle]');
+    if (probe && probe.dataset.footerWired) return;
     el.innerHTML = FOOTER_HTML_FN(AL.pageLinks());
+    var wiredToggle = el.querySelector('[data-footer-mode-toggle]');
+    if (wiredToggle) wiredToggle.dataset.footerWired = '1';
 
     el.querySelectorAll('[data-copy-email]').forEach(function (emailLink) {
       emailLink.addEventListener('click', copyEmail);

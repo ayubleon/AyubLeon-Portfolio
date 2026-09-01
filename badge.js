@@ -273,11 +273,20 @@
     };
   }
 
+  // guarded by a flag on the actual wired badge rather than plain
+  // childElementCount — see the identical comment in nav.js's fill() for
+  // why: something outside this file's control has been observed
+  // re-populating this mount with matching-but-unwired markup, and a
+  // childElementCount check alone can't tell that apart from this file's
+  // own already-wired content
   function fill(el) {
-    if (el.childElementCount > 0) return;
+    var probe = el.querySelector('.al-badge');
+    if (probe && probe.dataset.badgeWired) return;
     el.innerHTML = badgeHTML();
+    var badgeEl = el.querySelector('.al-badge');
+    if (badgeEl) badgeEl.dataset.badgeWired = '1';
     fillFaces(el);
-    initSpin(el.querySelector('.al-badge'), el.querySelector('[data-badge-inner]'));
+    initSpin(badgeEl, el.querySelector('[data-badge-inner]'));
   }
 
   function fillAll() {
