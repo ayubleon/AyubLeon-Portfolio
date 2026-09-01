@@ -179,14 +179,24 @@
     }
     return function play() {
       if (!AL.audioCtx) return;
-      // starting a buffer source while the context is still (technically)
-      // suspended, even a moment after calling resume() on it, silently
-      // drops the sound on some mobile WebKit versions instead of queuing
-      // it for once resume() actually finishes — so on that path, wait for
-      // resume()'s own promise before starting, rather than firing both in
-      // the same tick
-      if (AL.audioCtx.state === 'suspended') AL.audioCtx.resume().then(startWhenReady);
-      else startWhenReady();
+      // before the page's first real gesture, the context is suspended
+      // and calling resume() here — from a hover, not a click/tap/key —
+      // is exactly the case the browser's autoplay policy logs "not
+      // allowed to start" for, since hovering doesn't count as a
+      // gesture. Silently doing nothing is correct anyway: this sound
+      // would only land dropped regardless (see unlockAudio's own
+      // comment below), so there's nothing to gain from the attempt,
+      // only console noise. Once a real gesture has happened anywhere on
+      // the page, unlockAudio has already resumed the context — this
+      // still calls resume() itself for a sound triggered directly by
+      // that same gesture, in case its own resume() call hasn't
+      // resolved yet, which is a real user-gesture context and doesn't
+      // log the warning
+      if (AL.audioCtx.state === 'suspended') {
+        if (AL.audioGestureSeen) AL.audioCtx.resume().then(startWhenReady);
+      } else {
+        startWhenReady();
+      }
     };
   };
   // shared instances for sounds used by more than one component file —
@@ -203,8 +213,10 @@
   // sound (the badge, the contact card avatar) can land permanently silent
   // if a hover happens to be the very first interaction on the page. Grab
   // the first genuine gesture anywhere on the page to unlock it early.
+  AL.audioGestureSeen = false;
   if (AL.audioCtx) {
     var unlockAudio = function () {
+      AL.audioGestureSeen = true;
       if (AL.audioCtx.state === 'suspended') AL.audioCtx.resume();
       // iOS Safari specifically: calling resume() alone can leave the
       // context reporting "running" while still producing no audible
