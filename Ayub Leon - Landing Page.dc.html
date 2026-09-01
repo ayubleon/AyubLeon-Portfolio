@@ -688,11 +688,18 @@ class Component extends DCLogic {
     const count = blocks.length;
     const clamp01 = (v) => Math.min(1, Math.max(0, v));
 
-    // scroll progress at which block 0 starts fading out — not 0, so the
-    // first block sits fully visible for a stretch before any scroll
-    // input starts fading it away, matching how every later block gets a
-    // full slot of visibility before its own fade-out begins
-    const START_AT = 0.62;
+    // block 0's own q starts at this value when the section is first
+    // engaged (p=0) — 0, same as every other block's q at the moment it
+    // arrives, so block 0 gets the same full [0,1] slot of scroll
+    // distance to itself before exiting as blocks 1-3 each get. A
+    // leftover value inherited from this effect's old per-glyph-burn
+    // predecessor (where it served a different purpose — giving block 0
+    // some cushion before its burn-away threshold) had been carried over
+    // uncritically here, which instead shortchanged block 0 to roughly an
+    // eighth of a full slot: it would already be exiting a few percent
+    // into the very first scroll input, well before its "fully visible"
+    // hold should even begin
+    const START_AT = 0;
     // fraction of a block's own [0,1] slot spent fading in and (mirrored)
     // fading out — the two overlap by construction: this block's fade-in
     // and the previous block's fade-out both run over the same handoff
