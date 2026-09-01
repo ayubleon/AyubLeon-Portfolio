@@ -420,7 +420,18 @@ class Component extends DCLogic {
     if (!nodes.length) return;
     nodes.forEach((n) => { this.revealedNodes.add(n); });
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    nodes.forEach((n) => {
+    // an element already on screen when the page loads (the About hero
+    // photos, above the fold) would otherwise still get offset then
+    // immediately transitioned back to place, reading as an unwanted
+    // bounce on load rather than a scroll reveal — matches the observer's
+    // own rootMargin/threshold below, so anything it would count as
+    // already-intersecting never gets the offset in the first place
+    const inViewOnLoad = (n) => {
+      const r = n.getBoundingClientRect();
+      return r.bottom > 0 && r.top < window.innerHeight * 0.88;
+    };
+    const toReveal = nodes.filter((n) => reduce || !inViewOnLoad(n));
+    toReveal.forEach((n) => {
       if (reduce) return;
       n.style.transform = 'translate3d(0, 26px, 0)';
       n.style.transition = 'transform 1.1s cubic-bezier(.22,1,.36,1)';
@@ -437,7 +448,7 @@ class Component extends DCLogic {
         });
       }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
     }
-    nodes.forEach((n) => this.io.observe(n));
+    toReveal.forEach((n) => this.io.observe(n));
   }
 
   // guarded the same way, but on the whole [data-parallax] set rather than
