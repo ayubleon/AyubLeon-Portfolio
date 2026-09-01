@@ -72,30 +72,33 @@
      across the whole phrase (not per-word), including where it wraps
      across lines */
   .hl { background: rgba(255, 221, 79, 0.45); padding: 2px 6px; border-radius: 0; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
-  /* a Figma-style selection frame around "designing," — dashed outline,
-     four corner handles, and a label above, all painted via ::before/
-     ::after on an inline-block wrapper so nothing here disturbs the
-     surrounding text's own layout. The four handles are one background
-     image with four layers rather than four elements, each a tiny solid
-     square positioned at one corner (offset by half its own size so it
-     straddles the corner point, matching how Figma's own handles sit) */
+  /* a Figma-style selection frame around "designing," — solid outline,
+     four corner handles, and a label above, all painted via ::before
+     plus four real (but pointer-events:none, aria-hidden) handle spans
+     on an inline-block wrapper, so nothing here disturbs the
+     surrounding text's own layout. Matches Figma's own selected-layer
+     look: a thin solid stroke (real Figma selections are solid, not
+     dashed — dashed is reserved for other UI, like auto-layout guides)
+     and small white squares with a thin blue border at each corner,
+     rather than flat blue squares. The horizontal inset (-6px) matches
+     .hl's own horizontal padding, so the frame's right edge lands
+     flush with the yellow highlight's right edge, since "designing," is
+     the last word of the highlighted run. */
   [data-figma-frame] { position: relative; display: inline-block; }
   [data-figma-frame]::before {
-    content: ''; position: absolute; inset: -2px -5px;
-    border: 1.5px dashed #0D99FF; pointer-events: none;
+    content: ''; position: absolute; inset: -2px -6px;
+    border: 1px solid #0D99FF; pointer-events: none;
   }
-  [data-figma-frame]::after {
-    content: ''; position: absolute; inset: -2px -5px; pointer-events: none;
-    background-repeat: no-repeat; background-size: 6px 6px;
-    background-image:
-      linear-gradient(#0D99FF, #0D99FF), linear-gradient(#0D99FF, #0D99FF),
-      linear-gradient(#0D99FF, #0D99FF), linear-gradient(#0D99FF, #0D99FF);
-    background-position:
-      calc(0% - 3px) calc(0% - 3px), calc(100% - 3px) calc(0% - 3px),
-      calc(0% - 3px) calc(100% - 3px), calc(100% - 3px) calc(100% - 3px);
+  .figma-frame-handle {
+    position: absolute; width: 6px; height: 6px; box-sizing: border-box;
+    background: #ffffff; border: 1px solid #0D99FF; pointer-events: none;
   }
+  .figma-frame-handle[data-corner="tl"] { top: -2px; left: -6px; transform: translate(-50%, -50%); }
+  .figma-frame-handle[data-corner="tr"] { top: -2px; right: -6px; transform: translate(50%, -50%); }
+  .figma-frame-handle[data-corner="bl"] { bottom: -2px; left: -6px; transform: translate(-50%, 50%); }
+  .figma-frame-handle[data-corner="br"] { bottom: -2px; right: -6px; transform: translate(50%, 50%); }
   .figma-frame-label {
-    position: absolute; left: -5px; bottom: 100%; margin-bottom: 6px;
+    position: absolute; left: -6px; bottom: 100%; margin-bottom: 6px;
     font-size: 11px; font-weight: 500; color: #0D99FF; white-space: nowrap; line-height: 1;
   }
   [data-burn-grain] { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='gamma' exponent='4'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"); background-size: 180px; }
@@ -199,7 +202,7 @@
           <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">I don't just execute a brief. I've pitched features the team hadn't considered, presented directly to customers, and weighed in on hiring, the kind of input most designers never get pulled into.</p>
         </div>
         <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; visibility: hidden;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">That <span data-process-icon-origin>curiosity</span> is also why I've spent the last year learning to <span class="hl">bring AI into my process <img data-burn-icon src="images/claude-ai-icon.svg" alt="" style="height: 0.85em; width: 0.85em; vertical-align: -0.1em; display: inline-block;"></span>, not as a shortcut, but to <span class="hl">dig deeper into problems before <span data-figma-frame>designing,<span class="figma-frame-label" aria-hidden="true">Frame 1403</span></span></span> and move faster to working code. It's changed how I research, prototype, and build on my own.</p>
+          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">That <span data-process-icon-origin>curiosity</span> is also why I've spent the last year learning to <span class="hl">bring AI into my process <img data-burn-icon src="images/claude-ai-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block;"></span>, not as a shortcut, but to <span class="hl">dig deeper into problems before <span data-figma-frame>designing,<span class="figma-frame-label" aria-hidden="true">Frame 1403</span><span class="figma-frame-handle" data-corner="tl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tr" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="bl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="br" aria-hidden="true"></span></span></span> and move faster to working code. It's changed how I research, prototype, and build on my own.</p>
         </div>
         <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; visibility: hidden;">
           <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">It's also why my path through UI/UX hasn't run in one straight lane. I've moved across industries and problems, <span class="hl">adapting fast</span> each time, because staying curious means staying stimulated.</p>
