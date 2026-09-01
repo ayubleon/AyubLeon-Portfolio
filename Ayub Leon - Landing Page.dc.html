@@ -425,7 +425,14 @@ class Component extends DCLogic {
     };
     this.onHeadingFitResize = apply;
     apply();
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(apply);
+    // only schedule the fonts.ready correction if Poppins Bold genuinely
+    // isn't loaded yet — re-measuring against a font that's already active
+    // produces an identical result, so this skips a needless second reflow
+    // (and the late, unannounced height shift it causes this far up the
+    // page) on the common case where the font is already cached
+    if (document.fonts && document.fonts.ready && !document.fonts.check('700 1em Poppins')) {
+      document.fonts.ready.then(apply);
+    }
     window.addEventListener('resize', this.onHeadingFitResize);
   }
 
