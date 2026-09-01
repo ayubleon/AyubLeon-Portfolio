@@ -397,11 +397,17 @@ class Component extends DCLogic {
   // linearly with viewport width the way a fixed baseline measurement
   // does once you solve for the multiplier). Guarded + wrapped in
   // AL.selfHeal like initBurnText below — see that method's comment for
-  // why: support.js can rebuild this content after mount
+  // why: support.js can rebuild this content after mount.
+  // Guarded on an instance property (like initCycleConnectors' own
+  // onCycleResize below), not a DOM dataset flag: support.js can also
+  // unmount and remount this whole component while reusing the same DOM
+  // nodes, and a flag left on a node from the previous instance would
+  // wrongly tell a fresh instance "already done", permanently skipping
+  // re-init with no listener left alive to ever revive it
   initHeadingFit() {
     const heading = document.querySelector('[data-fit-heading]');
-    if (!heading || heading.dataset.fitBound) return;
-    heading.dataset.fitBound = '1';
+    if (!heading || this.fitBound) return;
+    this.fitBound = true;
     let measureCanvas = null;
     const measureWidth = (text, fontSizePx, fontWeight, fontFamily) => {
       if (!measureCanvas) measureCanvas = document.createElement('canvas');
@@ -512,11 +518,16 @@ class Component extends DCLogic {
   // ambient WebGL water-like flow behind the #cycle section's copy — kept
   // entirely within the site's existing blue (a darker and a lighter shade
   // mixed with the section's own #0056FF) rather than introducing a new
-  // color. Plays on its own, driven only by u_time — no mouse interaction
+  // color. Plays on its own, driven only by u_time — no mouse interaction.
+  // Guarded on an instance property, not a DOM dataset flag — see
+  // initHeadingFit's comment above for why: a stale flag on a reused
+  // canvas would block a remounted instance from ever starting a new
+  // draw loop, freezing the shader on whatever frame the previous
+  // instance's cancelAnimationFrame caught it on
   initCycleShader() {
     const canvas = document.querySelector('[data-cycle-shader]');
-    if (!canvas || canvas.dataset.shaderBound) return;
-    canvas.dataset.shaderBound = '1';
+    if (!canvas || this.shaderBound) return;
+    this.shaderBound = true;
     const gl = canvas.getContext('webgl');
     if (!gl) return;
 
@@ -1280,11 +1291,17 @@ class Component extends DCLogic {
     document.addEventListener('click', this.onDocClick);
   }
 
+  // Guarded on an instance property, not a DOM dataset flag — see
+  // initHeadingFit's comment for why: support.js can unmount and remount
+  // this whole component while reusing the same DOM nodes, and a flag
+  // left on the list from a previous instance would tell a fresh one
+  // "already done", leaving the scroll-scrub permanently dead since the
+  // previous instance's own listener was already torn down on unmount
   initWork() {
     const section = document.querySelector('[data-work-section]');
     const list = document.querySelector('[data-work-list]');
     const viewport = document.querySelector('[data-work-viewport]');
-    if (!section || !list || list.dataset.workBound) return;
+    if (!section || !list || this.workBound) return;
     const rows = Array.from(section.querySelectorAll('[data-work-row]'));
     // the wrapper section/list can exist before support.js has actually
     // rendered the rows into it — bail without setting the bound flag so
@@ -1292,7 +1309,7 @@ class Component extends DCLogic {
     // again, instead of crashing paint() on an empty rows array and
     // permanently locking this out via a flag set before that crash
     if (!rows.length) return;
-    list.dataset.workBound = '1';
+    this.workBound = true;
     // tear down the previous rebuild's window listener before replacing it
     // with a fresh closure over the current live rows/panels — same
     // teardown-before-rebind shape as footer.js's wordmark resize wiring,
