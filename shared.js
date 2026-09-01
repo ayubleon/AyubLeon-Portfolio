@@ -178,7 +178,7 @@
       else if (ready) ready.then(start);
     }
     return function play() {
-      if (!AL.audioCtx) return;
+      if (!AL.audioCtx || AL.audioMuted) return;
       // before the page's first real gesture, the context is suspended
       // and calling resume() here — from a hover, not a click/tap/key —
       // is exactly the case the browser's autoplay policy logs "not
@@ -208,6 +208,71 @@
   // components need it, sitewide
   AL.playSwitch = AL.makeSoundPlayer('sounds/switch.mp3', 0.35);
   AL.playIconTap = AL.makeSoundPlayer('sounds/icon-tap.mp3', 0.6);
+
+  // sitewide sound on/off, persisted across page loads (every internal
+  // navigation is a full reload, not an SPA route change, so without this
+  // the choice would silently reset on every click) — read once at
+  // startup rather than inside makeSoundPlayer's play(), since that gets
+  // called far more often than the preference could possibly change
+  var AUDIO_MUTE_KEY = 'al-audio-muted';
+  AL.audioMuted = (function () {
+    try { return localStorage.getItem(AUDIO_MUTE_KEY) === '1'; } catch (e) { return false; }
+  })();
+
+  var AUDIO_TOGGLE_CSS = [
+    // no card/pill of its own — plain white content, blended against
+    // whatever's actually behind it (mix-blend-mode:difference inverts
+    // per-pixel: white-on-white reads black, white-on-black stays white),
+    // so it reads clearly over every section without tracking each
+    // section's own background color by hand. isolation:isolate keeps
+    // the label/state/icon compositing together as one group first, so
+    // they blend against the page as a single unit rather than each
+    // possibly double-blending against each other where they'd overlap
+    ".al-audio-toggle{position:fixed;top:28px;right:28px;z-index:46;display:inline-flex;align-items:center;gap:7px;border:0;background:none;padding:0;color:#fff;font-family:Poppins,Helvetica,sans-serif;font-size:13px;font-weight:600;letter-spacing:-0.005em;cursor:pointer;-webkit-tap-highlight-color:transparent;mix-blend-mode:difference;isolation:isolate;opacity:0;transform:scale(0.85);animation:alAudioEnter .5s cubic-bezier(.22,1,.36,1) .15s forwards;}",
+    ".al-audio-toggle:hover{opacity:0.7;}",
+    "@keyframes alAudioEnter{to{opacity:1;transform:scale(1);}}",
+    "@media (prefers-reduced-motion: reduce){.al-audio-toggle{animation:none;opacity:1;transform:none;}}",
+    // the label reads the same weight/color as the state word now that
+    // both sit on the same blended white — no separate muted tone, since
+    // a partially transparent color would blend against the page
+    // differently than the solid state text/icon next to it
+    ".al-audio-toggle-label{font-weight:600;}",
+    ".al-audio-toggle svg{display:block;flex:0 0 auto;}",
+    "@media (max-width:700px){.al-audio-toggle{top:18px;right:18px;font-size:12px;}}"
+  ].join('');
+  var audioToggleStyle = document.createElement('style');
+  audioToggleStyle.textContent = AUDIO_TOGGLE_CSS;
+  document.head.appendChild(audioToggleStyle);
+
+  var AUDIO_ON_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg>';
+  var AUDIO_OFF_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/></svg>';
+
+  function renderAudioToggle(btn) {
+    btn.innerHTML =
+      '<span class="al-audio-toggle-label">Audio</span>' +
+      (AL.audioMuted ? 'Off' : 'On') +
+      (AL.audioMuted ? AUDIO_OFF_SVG : AUDIO_ON_SVG);
+    btn.setAttribute('aria-pressed', AL.audioMuted ? 'false' : 'true');
+    btn.setAttribute('aria-label', AL.audioMuted ? 'Turn sound effects on' : 'Turn sound effects off');
+  }
+  // one shared instance per page, built directly rather than through a
+  // dedicated mount + self-heal pair like nav/footer/badge — nothing here
+  // depends on page-specific content (AL.pageLinks() etc.), so there's no
+  // rebuild-wave risk of it losing its wiring the way those do
+  if (!document.querySelector('[data-audio-toggle]')) {
+    var audioToggleBtn = document.createElement('button');
+    audioToggleBtn.type = 'button';
+    audioToggleBtn.className = 'al-audio-toggle';
+    audioToggleBtn.setAttribute('data-audio-toggle', '1');
+    renderAudioToggle(audioToggleBtn);
+    audioToggleBtn.addEventListener('click', function () {
+      AL.audioMuted = !AL.audioMuted;
+      try { localStorage.setItem(AUDIO_MUTE_KEY, AL.audioMuted ? '1' : '0'); } catch (e) {}
+      renderAudioToggle(audioToggleBtn);
+    });
+    document.body.appendChild(audioToggleBtn);
+  }
+
   // browsers only unlock a suspended AudioContext on a real user gesture
   // (click/tap/keypress) — hovering doesn't count, so a hover-triggered
   // sound (the badge, the contact card avatar) can land permanently silent
