@@ -281,12 +281,19 @@
   // own already-wired content
   function fill(el) {
     var probe = el.querySelector('.al-badge');
-    if (probe && probe.dataset.badgeWired) return;
+    if (probe && probe.__badgeWired) return;
     el.innerHTML = badgeHTML();
     var badgeEl = el.querySelector('.al-badge');
-    if (badgeEl) badgeEl.dataset.badgeWired = '1';
     fillFaces(el);
     initSpin(badgeEl, el.querySelector('[data-badge-inner]'));
+    // a plain JS property, not a data-* attribute: set only now that
+    // initSpin has actually run, and — unlike an attribute — it can
+    // never end up on a node that only looks like this one. If something
+    // outside this file ever recreates this badge from serialized HTML
+    // (which carries attributes but not JS properties, and can't carry
+    // listeners either), the copy correctly reads as unwired instead of
+    // falsely inheriting "already done"
+    if (badgeEl) badgeEl.__badgeWired = true;
   }
 
   function fillAll() {

@@ -250,10 +250,8 @@
   // own already-wired content
   function fill(el) {
     var probe = el.querySelector('[data-footer-mode-toggle]');
-    if (probe && probe.dataset.footerWired) return;
+    if (probe && probe.__footerWired) return;
     el.innerHTML = FOOTER_HTML_FN(AL.pageLinks());
-    var wiredToggle = el.querySelector('[data-footer-mode-toggle]');
-    if (wiredToggle) wiredToggle.dataset.footerWired = '1';
 
     el.querySelectorAll('[data-copy-email]').forEach(function (emailLink) {
       emailLink.addEventListener('click', copyEmail);
@@ -267,6 +265,15 @@
         footerMode = footerMode === 'keyboard' ? 'links' : 'keyboard';
         rightGroup.classList.toggle('footer-mode-keyboard', footerMode === 'keyboard');
       });
+      // a plain JS property, not a data-* attribute: set only now that
+      // the click listener above is actually attached, and — unlike an
+      // attribute — it can never end up on a node that only looks like
+      // this one. If something outside this file ever recreates this
+      // toggle from serialized HTML (which carries attributes but not JS
+      // properties, and can't carry listeners either), the copy
+      // correctly reads as unwired instead of falsely inheriting
+      // "already done"
+      modeToggle.__footerWired = true;
     }
 
     var wordmark = el.querySelector('[data-wordmark]');

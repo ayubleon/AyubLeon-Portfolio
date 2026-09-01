@@ -364,6 +364,15 @@
 
     var emailLink = el.querySelector('[data-contact-copy-email]');
     if (emailLink) emailLink.addEventListener('click', copyEmail);
+
+    // a plain JS property, not a data-* attribute: set only now that the
+    // click listener above is actually attached, and — unlike an
+    // attribute — it can never end up on a node that only looks like
+    // this one. If something outside this file ever recreates this
+    // button from serialized HTML (which carries attributes but not JS
+    // properties, and can't carry listeners either), the copy correctly
+    // reads as unwired instead of falsely inheriting "already done"
+    toggleBtn.__navWired = true;
   }
 
   function initNavGlow(el) {
@@ -394,10 +403,8 @@
   // still left alone
   function fill(el) {
     var probe = el.querySelector('[data-contact-toggle]');
-    if (probe && probe.dataset.navWired) return;
+    if (probe && probe.__navWired) return;
     el.innerHTML = navHTML(AL.pageLinks());
-    var toggleBtn = el.querySelector('[data-contact-toggle]');
-    if (toggleBtn) toggleBtn.dataset.navWired = '1';
     initContactCard(el);
     initNavGlow(el);
   }
