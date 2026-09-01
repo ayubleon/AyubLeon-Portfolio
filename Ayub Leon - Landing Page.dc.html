@@ -125,6 +125,10 @@
     [data-burn-viewport] { position: static !important; height: auto !important; overflow: visible !important; padding: 32px 0; }
     [data-burn-block] { position: static !important; visibility: visible !important; opacity: 1 !important; transform: none !important; display: block !important; margin-bottom: 28px; }
     [data-burn-progress], [data-burn-grain] { display: none !important; }
+    /* [data-burn-icon] sits display:none by default, only switched on by
+       playProcessIcon()'s fly-in — which never runs here, since that
+       method's own reduced-motion check returns before touching it */
+    [data-burn-icon] { display: inline-block !important; }
   }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
   /* replicates object-fit:cover for the whole hero-desk group (photo +
@@ -215,7 +219,7 @@
           <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">I don't just execute a brief. I've pitched features the team hadn't considered, presented directly to customers, and weighed in on hiring, the kind of input most designers never get pulled into.</p>
         </div>
         <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; visibility: hidden;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">That <span data-process-icon-origin>curiosity</span> is also why I've spent the last year learning to <span class="hl">bring AI into my process <img data-burn-icon src="images/claude-ai-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block;"></span>, not as a shortcut, but to <span class="hl">dig deeper into problems before</span> <span data-figma-frame>designing,<span class="figma-frame-label" aria-hidden="true">Frame 1403</span><span class="figma-frame-handle" data-corner="tl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tr" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="bl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="br" aria-hidden="true"></span></span> and move faster to working code. It's changed how I research, prototype, and build on my own.</p>
+          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">That <span data-process-icon-origin>curiosity</span> is also why I've spent the last year learning to <span class="hl">bring AI into my process <img data-burn-icon src="images/claude-ai-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: none; margin-right: 0.15em;"><img data-figma-icon src="images/figma-logo.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block;"></span>, not as a shortcut, but to <span class="hl">dig deeper into problems before</span> <span data-figma-frame>designing,<span class="figma-frame-label" aria-hidden="true">Frame 1403</span><span class="figma-frame-handle" data-corner="tl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tr" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="bl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="br" aria-hidden="true"></span></span> and move faster to working code. It's changed how I research, prototype, and build on my own.</p>
         </div>
         <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; visibility: hidden;">
           <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">It's also why my path through UI/UX hasn't run in one straight lane. I've moved across industries and problems, <span class="hl">adapting fast</span> each time, because staying curious means staying stimulated.</p>
@@ -1182,6 +1186,14 @@ class Component extends DCLogic {
     const icon = document.querySelector('[data-burn-icon]');
     if (!icon) return;
     icon.getAnimations().forEach((a) => a.cancel());
+    // sits display:none by default (see the reduced-motion override in
+    // <style> above, which forces it back on for anyone who never gets
+    // this animation at all) so the sentence reads "process [Figma logo],"
+    // on its own until this fires — switched on here, before the flight's
+    // own position is measured below, so it's actually laid out in its
+    // resting spot (right before the Figma logo) rather than measuring a
+    // collapsed, not-yet-rendered element
+    icon.style.display = 'inline-block';
 
     const origin = document.querySelector('[data-process-icon-origin]');
     const iconRect = icon.getBoundingClientRect();
