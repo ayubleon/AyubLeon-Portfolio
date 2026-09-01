@@ -717,10 +717,26 @@ class Component extends DCLogic {
     // a hard cut
     const FADE_SPAN = 0.28;
 
+    // TEST: plays the curiosity bulb/car icon the instant the section
+    // becomes fully pinned, rather than consuming a dedicated first swipe
+    // for it (that reserved-swipe version lived in initBurnSwipe until
+    // now). Checked here rather than in initBurnSwipe because update()
+    // already runs on every scroll tick regardless of input method (wheel,
+    // touch, keyboard, or a programmatic scrollTo), so this is the one
+    // place that reliably catches the exact frame engagement begins
+    this.curiosityIconArmed = true;
+
     const update = () => {
       queued = false;
       const rect = runway.getBoundingClientRect();
       const vh = window.innerHeight;
+      const nowEngaged = rect.top <= 1 && rect.bottom >= vh - 1;
+      if (nowEngaged && this.curiosityIconArmed) {
+        this.curiosityIconArmed = false;
+        this.playCuriosityIcon();
+      } else if (!nowEngaged) {
+        this.curiosityIconArmed = true;
+      }
       const p = clamp01(-rect.top / (rect.height - vh || 1));
       const t = START_AT + p * (count - 1);
 
@@ -768,12 +784,11 @@ class Component extends DCLogic {
     }
   }
 
-  // turns the scroll-scrub into one-gesture-per-step, with the very first
-  // step reserved for the curiosity-icon animation rather than a block
-  // change: once the section is fully pinned (the white card has covered
-  // the hero), the first swipe plays the bulb/car animation in place —
-  // block 1's text doesn't move — and only the swipes after that advance
-  // to block 2, block 3, and so on, one block per swipe
+  // turns the scroll-scrub into one-gesture-per-step: each swipe advances
+  // exactly one block, from block 1 through the last one. (The curiosity
+  // bulb/car icon used to consume a reserved first swipe here instead of
+  // advancing — TEST: it now plays automatically on arrival, from
+  // initBurnText's update() above, so every swipe here just advances.)
   initBurnSwipe(runway, count) {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     // guards against being bound twice: initBurnText() re-runs whenever
@@ -787,13 +802,6 @@ class Component extends DCLogic {
     let index = 0; // 0 = block 1 ... count-1 = the last block
     let animating = false;
     let settleTimer = null;
-    // true when the next forward swipe at block 1 should play the icon
-    // instead of advancing — starts true, goes false once played, and
-    // resets to true whenever block 1 becomes current again (scrolling
-    // back to it, or leaving the section and re-entering), so returning
-    // to the top of this section always asks for that swipe again first
-    let iconArmed = true;
-    const playIcon = () => { this.playCuriosityIcon(); };
     // block 3 (0-indexed) — the one whose text carries the inline AI icon
     // right after "process". Landing on it, from either direction, is what
     // cues that icon's own little flip-and-settle (see playProcessIcon)
@@ -942,7 +950,7 @@ class Component extends DCLogic {
       }
       wasEngaged = nowEngaged;
 
-      if (!nowEngaged) { iconArmed = true; return; }
+      if (!nowEngaged) return;
       if (animating) { e.preventDefault(); return; }
       if (performance.now() < cooldownUntil) {
         if (gapSinceLastTick >= RENEWED_SWIPE_GAP_MS) {
@@ -965,12 +973,6 @@ class Component extends DCLogic {
         e.preventDefault();
         gestureDelta += Math.abs(e.deltaY);
         if (gestureDelta < MIN_SWIPE_DELTA) return;
-        if (index === 0 && iconArmed) {
-          iconArmed = false;
-          startCooldown();
-          playIcon();
-          return;
-        }
         startCooldown();
         goTo(index + 1);
         return;
@@ -985,13 +987,12 @@ class Component extends DCLogic {
       startCooldown();
       const next = index - 1;
       goTo(next);
-      if (next === 0) iconArmed = true;
     };
 
     let touchStartY = null;
     this.onBurnTouchStart = (e) => { touchStartY = e.touches[0].clientY; };
     this.onBurnTouchMove = (e) => {
-      if (!engaged()) { iconArmed = true; return; }
+      if (!engaged()) return;
       if (touchStartY === null) return;
       // prevented unconditionally, before the drag-distance check below —
       // iOS Safari only honors preventDefault() called on a touchmove
@@ -1008,11 +1009,6 @@ class Component extends DCLogic {
       touchStartY = null;
 
       if (dir > 0) {
-        if (index === 0 && iconArmed) {
-          iconArmed = false;
-          playIcon();
-          return;
-        }
         if (index >= count - 1) return;
         goTo(index + 1);
         return;
@@ -1021,7 +1017,6 @@ class Component extends DCLogic {
       if (index === 0) return;
       const next = index - 1;
       goTo(next);
-      if (next === 0) iconArmed = true;
     };
 
     // keyboard scrolling (arrow keys, Space, Page Up/Down) previously
@@ -1043,7 +1038,7 @@ class Component extends DCLogic {
       const advancing = ADVANCE_KEYS[e.key];
       const retreating = RETREAT_KEYS[e.key];
       if (!advancing && !retreating) return;
-      if (!engaged()) { iconArmed = true; return; }
+      if (!engaged()) return;
       if (animating) { e.preventDefault(); return; }
       if (performance.now() < cooldownUntil) { e.preventDefault(); return; }
 
@@ -1053,12 +1048,6 @@ class Component extends DCLogic {
         // user against a clamped index that never moves
         if (index >= count - 1) return;
         e.preventDefault();
-        if (index === 0 && iconArmed) {
-          iconArmed = false;
-          startCooldown();
-          playIcon();
-          return;
-        }
         startCooldown();
         goTo(index + 1);
         return;
@@ -1071,7 +1060,6 @@ class Component extends DCLogic {
       startCooldown();
       const next = index - 1;
       goTo(next);
-      if (next === 0) iconArmed = true;
     };
 
     window.addEventListener('wheel', this.onBurnWheel, { passive: false });
@@ -1081,11 +1069,12 @@ class Component extends DCLogic {
   }
 
   // the "Curiosity" block's bulb-falls-bounces-twice-then-drives-off-as-a-
-  // car bit, replayed from scratch every time a swipe at block 1 triggers
-  // it (see initBurnSwipe above). Driven by the Web
-  // Animations API rather than a CSS class toggle so replaying it is just
-  // calling .animate() again — no forced-reflow trick needed to restart a
-  // CSS animation already in the "finished" state
+  // car bit, replayed from scratch every time the section becomes fully
+  // pinned (see the engagement check in initBurnText's update() above).
+  // Driven by the Web Animations API rather than a CSS class toggle so
+  // replaying it is just calling .animate() again — no forced-reflow
+  // trick needed to restart a CSS animation already in the "finished"
+  // state
   playCuriosityIcon() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const wrap = document.querySelector('[data-curiosity-icon]');
