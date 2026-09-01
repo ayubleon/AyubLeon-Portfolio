@@ -624,15 +624,32 @@ class Component extends DCLogic {
   // as direct style/custom-property writes instead of Tailwind arbitrary
   // values and Framer-style refs.
   //
-  // Guarded with a dataset flag AND a spans-exist check (like initBurnText's
-  // predecessor initTextReveal used to be) and wrapped in AL.selfHeal:
-  // support.js can rebuild this section's markup after first paint, which
-  // would otherwise silently strip the injected .burn-glyph spans back to
-  // plain text and leave this method's `blocks` array pointing at detached
-  // nodes that no longer affect anything on screen
+  // Guarded on an instance property AND a spans-exist check, and wrapped
+  // in AL.selfHeal: support.js can rebuild this section's markup after
+  // first paint, which would otherwise silently strip the injected
+  // .burn-glyph spans back to plain text and leave this method's
+  // `blocks` array pointing at detached nodes that no longer affect
+  // anything on screen — the spans-exist check alone re-detects that and
+  // lets this legitimately re-run within the same instance. The instance
+  // property is needed on top of it for a different reason: support.js
+  // can also unmount and remount this whole component while reusing the
+  // same DOM nodes, in which case the spans survive from the previous
+  // instance and would otherwise tell a fresh instance "already done" —
+  // a plain spans-exist check alone can't tell "still correctly running"
+  // apart from "frozen mid-burn since the previous instance's own
+  // scroll listener was already torn down on unmount", which is exactly
+  // what glyphs stuck overlapping mid-fade looks like
   initBurnText() {
     const runway = document.querySelector('[data-burn-runway]');
-    if (!runway || runway.querySelector('.burn-glyph')) return;
+    if (!runway) return;
+    if (this.burnTextBound && runway.querySelector('.burn-glyph')) return;
+    this.burnTextBound = true;
+    // tear down the previous run's listeners before rebuilding — this
+    // can legitimately re-run within the same instance (see above), and
+    // window outlives that the same way it does for every other rebind
+    // in this file
+    if (this.onBurnScroll) window.removeEventListener('scroll', this.onBurnScroll);
+    if (this.onBurnResize) window.removeEventListener('resize', this.onBurnResize);
 
     const progressFills = Array.from(runway.querySelectorAll('.burn-progress-seg-fill'));
     const srText = runway.querySelector('[data-burn-srtext]');
