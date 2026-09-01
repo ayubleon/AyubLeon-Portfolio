@@ -365,6 +365,14 @@
     var emailLink = el.querySelector('[data-contact-copy-email]');
     if (emailLink) emailLink.addEventListener('click', copyEmail);
 
+    // same hover tick as the nav links/toggle/close button above, on the
+    // card's own 3 action icons (email/resume/linkedin)
+    if (supportsHover) {
+      el.querySelectorAll('.site-contact-action').forEach(function (action) {
+        action.addEventListener('mouseenter', playSwitchOnRealHover);
+      });
+    }
+
     // a plain JS property, not a data-* attribute: set only now that the
     // click listener above is actually attached, and — unlike an
     // attribute — it can never end up on a node that only looks like

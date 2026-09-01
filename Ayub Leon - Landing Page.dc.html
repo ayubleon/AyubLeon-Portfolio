@@ -664,6 +664,7 @@ class Component extends DCLogic {
     // in this file
     if (this.onBurnScroll) window.removeEventListener('scroll', this.onBurnScroll);
     if (this.onBurnResize) window.removeEventListener('resize', this.onBurnResize);
+    if (this.burnResizeObserver) this.burnResizeObserver.disconnect();
 
     const progressFills = Array.from(runway.querySelectorAll('.burn-progress-seg-fill'));
     const srText = runway.querySelector('[data-burn-srtext]');
@@ -858,7 +859,21 @@ class Component extends DCLogic {
     update();
     window.addEventListener('scroll', this.onBurnScroll, { passive: true });
     window.addEventListener('resize', this.onBurnResize);
+    // document.fonts.ready alone only catches the one specific layout
+    // shift a font swap causes — reordering initHeadingFit ahead of this
+    // method (see componentDidMount) fixed the one race that mattered in
+    // practice, but anything else that changes page height above this
+    // section (a slow image finishing layout, a future edit elsewhere)
+    // would silently leave these numbers stale the same way. Watching
+    // document.body's own size is the general case: it changes whenever
+    // anything anywhere on the page changes height, so this re-measures
+    // on the actual condition that matters — the runway's real on-screen
+    // position moved — rather than only the one specific cause of that
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(this.onBurnResize);
+    if (window.ResizeObserver) {
+      this.burnResizeObserver = new ResizeObserver(this.onBurnResize);
+      this.burnResizeObserver.observe(document.body);
+    }
   }
 
   // turns the scroll-scrub into one-gesture-per-step, with the very first
@@ -978,6 +993,25 @@ class Component extends DCLogic {
     // 24px drag threshold already used for touch below
     const MIN_SWIPE_DELTA = 24;
     let gestureDelta = 0;
+    // lets a genuinely new, separate swipe break through the entry
+    // cooldown above instead of waiting out the rest of its ~900ms. A
+    // magnitude comparison against recent ticks was tried here first and
+    // measured to be unreliable: a real swipe often ramps up for its
+    // first couple ticks before decaying, so the exact tick that crosses
+    // into engagement can be much bigger than the (still small) ticks
+    // before it while still being that same gesture's own ramp-up, not a
+    // new one — confirmed live, where that comparison fired on the third
+    // tick of one single continuous swipe. Real elapsed time since the
+    // last tick doesn't have that problem: it's shape-independent. This
+    // needs to be meaningfully larger than GESTURE_GAP_MS below (30ms) —
+    // that constant governs a different, narrower question (does this
+    // tick still belong to the same gesture for delta-summing purposes),
+    // and is deliberately tight enough that real momentum's uneven decay
+    // routinely exceeds it while still unbroken. This threshold answers
+    // a coarser question — has the physical gesture actually ended — so
+    // it can afford to be far more conservative
+    const RENEWED_SWIPE_GAP_MS = 120;
+    let lastTickTime = 0;
 
     this.onBurnWheel = (e) => {
       // tracked on every tick, before the engaged() check below — a hard
@@ -988,6 +1022,9 @@ class Component extends DCLogic {
       // resetting it while !engaged(), which used to wipe it right as the
       // section engaged) means most of an entry swipe's tail already
       // reads as "not a new gesture" once it crosses into engagement
+      const now = performance.now();
+      const gapSinceLastTick = now - lastTickTime;
+      lastTickTime = now;
       const isNewGesture = !gestureActive;
       gestureActive = true;
       extendGesture();
@@ -1006,14 +1043,23 @@ class Component extends DCLogic {
         // masquerade as a fresh gesture and fire early. Starting the
         // cooldown right here, before anything has fired, closes that —
         // nothing in this tail can act until it expires, no matter how
-        // its own gaps happen to fall
+        // its own gaps happen to fall. RENEWED_SWIPE_GAP_MS below is what
+        // keeps this from also swallowing a genuinely separate follow-up
+        // swipe that happens to land inside that same window
         startCooldown();
       }
       wasEngaged = nowEngaged;
 
       if (!nowEngaged) { iconArmed = true; return; }
       if (animating) { e.preventDefault(); return; }
-      if (performance.now() < cooldownUntil) { e.preventDefault(); return; }
+      if (performance.now() < cooldownUntil) {
+        if (gapSinceLastTick >= RENEWED_SWIPE_GAP_MS) {
+          cooldownUntil = 0;
+        } else {
+          e.preventDefault();
+          return;
+        }
+      }
       const dir = e.deltaY > 0 ? 1 : -1;
 
       if (dir > 0) {
@@ -1437,6 +1483,7 @@ class Component extends DCLogic {
     if (this.cycleShaderFrame) cancelAnimationFrame(this.cycleShaderFrame);
     window.removeEventListener('scroll', this.onBurnScroll);
     window.removeEventListener('resize', this.onBurnResize);
+    if (this.burnResizeObserver) this.burnResizeObserver.disconnect();
     window.removeEventListener('resize', this.onHeadingFitResize);
     window.removeEventListener('wheel', this.onBurnWheel);
     window.removeEventListener('touchstart', this.onBurnTouchStart);

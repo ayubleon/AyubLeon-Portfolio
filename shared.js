@@ -213,11 +213,21 @@
   // navigation is a full reload, not an SPA route change, so without this
   // the choice would silently reset on every click) — read once at
   // startup rather than inside makeSoundPlayer's play(), since that gets
-  // called far more often than the preference could possibly change
+  // called far more often than the preference could possibly change.
+  // Starts muted on a genuinely fresh visit; unlockAudio below turns it
+  // on the moment the user's first real gesture lands, so sound arrives
+  // as a natural side effect of using the page rather than something
+  // they have to go find a toggle for first — but only until they've
+  // actually touched the toggle themselves, at which point AL.audioExplicit
+  // makes their own choice stick instead of being overridden by that
   var AUDIO_MUTE_KEY = 'al-audio-muted';
-  AL.audioMuted = (function () {
-    try { return localStorage.getItem(AUDIO_MUTE_KEY) === '1'; } catch (e) { return false; }
+  var AUDIO_EXPLICIT_KEY = 'al-audio-explicit';
+  AL.audioExplicit = (function () {
+    try { return localStorage.getItem(AUDIO_EXPLICIT_KEY) === '1'; } catch (e) { return false; }
   })();
+  AL.audioMuted = AL.audioExplicit ? (function () {
+    try { return localStorage.getItem(AUDIO_MUTE_KEY) === '1'; } catch (e) { return true; }
+  })() : true;
 
   var AUDIO_TOGGLE_CSS = [
     // no card/pill of its own — plain white content, blended against
@@ -267,7 +277,11 @@
     renderAudioToggle(audioToggleBtn);
     audioToggleBtn.addEventListener('click', function () {
       AL.audioMuted = !AL.audioMuted;
-      try { localStorage.setItem(AUDIO_MUTE_KEY, AL.audioMuted ? '1' : '0'); } catch (e) {}
+      AL.audioExplicit = true;
+      try {
+        localStorage.setItem(AUDIO_MUTE_KEY, AL.audioMuted ? '1' : '0');
+        localStorage.setItem(AUDIO_EXPLICIT_KEY, '1');
+      } catch (e) {}
       renderAudioToggle(audioToggleBtn);
     });
     document.body.appendChild(audioToggleBtn);
@@ -282,6 +296,15 @@
   if (AL.audioCtx) {
     var unlockAudio = function () {
       AL.audioGestureSeen = true;
+      // the site's own optimistic default (see AL.audioMuted's own
+      // comment above): turn sound on now that the user has actually
+      // engaged with the page, unless they've already made an explicit
+      // choice of their own via the toggle — that choice always wins
+      if (!AL.audioExplicit && AL.audioMuted) {
+        AL.audioMuted = false;
+        try { localStorage.setItem(AUDIO_MUTE_KEY, '0'); } catch (e) {}
+        if (audioToggleBtn) renderAudioToggle(audioToggleBtn);
+      }
       if (AL.audioCtx.state === 'suspended') AL.audioCtx.resume();
       // iOS Safari specifically: calling resume() alone can leave the
       // context reporting "running" while still producing no audible
