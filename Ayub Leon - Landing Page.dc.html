@@ -1127,9 +1127,60 @@ class Component extends DCLogic {
       if (next === 0) iconArmed = true;
     };
 
+    // keyboard scrolling (arrow keys, Space, Page Up/Down) previously
+    // fell straight through to the browser's own native scroll, which —
+    // unlike wheel/touch above — was never hijacked into the same one-
+    // step-per-input model, so it could jump straight past several
+    // blocks in one press instead of playing through them. Simpler than
+    // the wheel handler above: a keydown is inherently one discrete
+    // event, not a continuous stream of decaying momentum ticks, so
+    // there's no gesture-grouping or entry-cooldown-escape-hatch to
+    // reason about — engaged() is checked before this event's own
+    // native scroll would happen, so a press that's what carries the
+    // page into engagement is naturally left un-prevented (handled as a
+    // later, separate press once actually engaged), the same "entering
+    // stays separate" behavior the wheel handler works much harder for
+    const ADVANCE_KEYS = { ' ': 1, 'Spacebar': 1, 'PageDown': 1, 'ArrowDown': 1 };
+    const RETREAT_KEYS = { PageUp: 1, ArrowUp: 1 };
+    this.onBurnKey = (e) => {
+      const advancing = ADVANCE_KEYS[e.key];
+      const retreating = RETREAT_KEYS[e.key];
+      if (!advancing && !retreating) return;
+      if (!engaged()) { iconArmed = true; return; }
+      if (animating) { e.preventDefault(); return; }
+      if (performance.now() < cooldownUntil) { e.preventDefault(); return; }
+
+      if (advancing) {
+        // at the last block, let the key through un-prevented so it
+        // exits the section via native scroll instead of trapping the
+        // user against a clamped index that never moves
+        if (index >= count - 1) return;
+        e.preventDefault();
+        if (index === 0 && iconArmed) {
+          iconArmed = false;
+          startCooldown();
+          playIcon();
+          return;
+        }
+        startCooldown();
+        goTo(index + 1);
+        return;
+      }
+
+      // scrolling back up: let it exit at block 1 rather than trapping
+      // the user, same reasoning as the forward case at the last block
+      if (index === 0) return;
+      e.preventDefault();
+      startCooldown();
+      const next = index - 1;
+      goTo(next);
+      if (next === 0) iconArmed = true;
+    };
+
     window.addEventListener('wheel', this.onBurnWheel, { passive: false });
     window.addEventListener('touchstart', this.onBurnTouchStart, { passive: true });
     window.addEventListener('touchmove', this.onBurnTouchMove, { passive: false });
+    window.addEventListener('keydown', this.onBurnKey, { passive: false });
   }
 
   // the "Curiosity" block's bulb-falls-bounces-twice-then-drives-off-as-a-
@@ -1488,6 +1539,7 @@ class Component extends DCLogic {
     window.removeEventListener('wheel', this.onBurnWheel);
     window.removeEventListener('touchstart', this.onBurnTouchStart);
     window.removeEventListener('touchmove', this.onBurnTouchMove);
+    window.removeEventListener('keydown', this.onBurnKey);
   }
 }
 
