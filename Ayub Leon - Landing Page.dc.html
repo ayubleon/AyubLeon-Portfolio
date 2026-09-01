@@ -61,13 +61,6 @@
   a:active, button:active { opacity: 0.7; }
   ::selection { background: #54A9FF; color: #0a0606; }
   @keyframes alFade { from { opacity: 0; transform: translate3d(0, 14px, 0); } to { opacity: 1; transform: none; } }
-  /* the #curiosity section's "Curiosity is what..." copy: split into
-     full-viewport-pinned blocks that scroll-scrub through a scale-up, then
-     a per-glyph "burn" fade, before the next block is already approaching
-     behind it. initBurnText()'s update() loop writes --t (per-glyph burn
-     threshold, set once by its measure pass) and --b (per-block burn
-     progress, written every scroll frame) */
-  .burn-glyph { opacity: calc((var(--t, 1) + 0.09 - var(--b, 0)) * 11); }
   /* light-yellow highlighter mark behind key phrases — a continuous block
      across the whole phrase (not per-word), including where it wraps
      across lines */
@@ -80,14 +73,20 @@
      look: a thin solid stroke (real Figma selections are solid, not
      dashed — dashed is reserved for other UI, like auto-layout guides)
      and small white squares with a thin blue border at each corner,
-     rather than flat blue squares. The horizontal inset (-6px) matches
-     .hl's own horizontal padding, so the frame's right edge lands
-     flush with the yellow highlight's right edge, since "designing," is
-     the last word of the highlighted run. */
-  [data-figma-frame] { position: relative; display: inline-block; }
+     rather than flat blue squares. This element sits OUTSIDE the .hl
+     span (a sibling, not nested inside it) so the yellow highlight
+     stops cleanly at the end of "before" instead of wrapping around
+     "designing," too. line-height is reset to normal because inline-
+     block boxes (unlike plain inline text) size themselves to the full
+     inherited line-height rather than just the font's own glyph
+     metrics — left at the paragraph's line-height: 2, this box would
+     come out oddly tall. background is pinned to the section's own
+     base color rather than left transparent, as a second guarantee
+     against any highlight color showing through here. */
+  [data-figma-frame] { position: relative; display: inline-block; line-height: normal; margin-left: 14px; margin-right: 14px; background: rgb(253, 251, 248); }
   [data-figma-frame]::before {
     content: ''; position: absolute; inset: -2px -6px;
-    border: 1px solid #0D99FF; pointer-events: none;
+    border: 1.5px solid #0D99FF; pointer-events: none;
   }
   .figma-frame-handle {
     position: absolute; width: 6px; height: 6px; box-sizing: border-box;
@@ -102,7 +101,7 @@
     font-size: 11px; font-weight: 500; color: #0D99FF; white-space: nowrap; line-height: 1;
   }
   [data-burn-grain] { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='gamma' exponent='4'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"); background-size: 180px; }
-  /* the burn is a scroll-position effect, not a CSS animation, so the
+  /* the crossfade is a scroll-position effect, not a CSS animation, so the
      generic `* { animation-duration: .01ms }` rule below can't neutralize
      it — this collapses the pinned runway back into a plain static stack
      of fully-visible paragraphs instead */
@@ -111,7 +110,6 @@
     [data-burn-viewport] { position: static !important; height: auto !important; overflow: visible !important; padding: 32px 0; }
     [data-burn-block] { position: static !important; visibility: visible !important; opacity: 1 !important; transform: none !important; display: block !important; margin-bottom: 28px; }
     [data-burn-progress], [data-burn-grain] { display: none !important; }
-    .burn-glyph { opacity: 1 !important; }
   }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
   /* replicates object-fit:cover for the whole hero-desk group (photo +
@@ -202,7 +200,7 @@
           <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">I don't just execute a brief. I've pitched features the team hadn't considered, presented directly to customers, and weighed in on hiring, the kind of input most designers never get pulled into.</p>
         </div>
         <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; visibility: hidden;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">That <span data-process-icon-origin>curiosity</span> is also why I've spent the last year learning to <span class="hl">bring AI into my process <img data-burn-icon src="images/claude-ai-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block;"></span>, not as a shortcut, but to <span class="hl">dig deeper into problems before <span data-figma-frame>designing,<span class="figma-frame-label" aria-hidden="true">Frame 1403</span><span class="figma-frame-handle" data-corner="tl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tr" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="bl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="br" aria-hidden="true"></span></span></span> and move faster to working code. It's changed how I research, prototype, and build on my own.</p>
+          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">That <span data-process-icon-origin>curiosity</span> is also why I've spent the last year learning to <span class="hl">bring AI into my process <img data-burn-icon src="images/claude-ai-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block;"></span>, not as a shortcut, but to <span class="hl">dig deeper into problems before</span> <span data-figma-frame>designing,<span class="figma-frame-label" aria-hidden="true">Frame 1403</span><span class="figma-frame-handle" data-corner="tl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tr" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="bl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="br" aria-hidden="true"></span></span> and move faster to working code. It's changed how I research, prototype, and build on my own.</p>
         </div>
         <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; visibility: hidden;">
           <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">It's also why my path through UI/UX hasn't run in one straight lane. I've moved across industries and problems, <span class="hl">adapting fast</span> each time, because staying curious means staying stimulated.</p>
@@ -394,13 +392,13 @@ class Component extends DCLogic {
     AL.selfHeal(() => this.initSignatureClearance(), 5000);
     // initHeadingFit before initBurnText, not just alphabetically tidy:
     // both register a document.fonts.ready callback, and those fire in
-    // registration order. initBurnText's own callback re-measures glyph
-    // positions and the runway's scroll geometry — on a cold load, before
-    // Poppins is cached, if that ran before initHeadingFit's own
-    // font-ready resize, it would compute burn positions against the
-    // heading's pre-resize height, before the very layout shift that
-    // moves the runway. Heading first means its resize has already
-    // landed by the time burn text recalculates
+    // registration order. initBurnText's own callback re-measures the
+    // runway's scroll geometry — on a cold load, before Poppins is
+    // cached, if that ran before initHeadingFit's own font-ready resize,
+    // it would compute positions against the heading's pre-resize height,
+    // before the very layout shift that moves the runway. Heading first
+    // means its resize has already landed by the time the runway
+    // recalculates
     AL.selfHeal(() => this.initHeadingFit(), 5000);
     AL.selfHeal(() => this.initBurnText(), 5000);
     AL.selfHeal(() => this.initCycleConnectors(), 5000);
@@ -631,37 +629,27 @@ class Component extends DCLogic {
     draw(0);
   }
 
-  // "burn" scroll effect for the "Curiosity is what..." copy: 4 blocks,
-  // each pinned full-screen in its own slot of a tall runway. A block
-  // approaches from small/far, grows to reading size, holds, then burns
-  // away glyph-by-glyph while the next block is already approaching behind
-  // it. Ported from a React/Tailwind
-  // reference component to this site's vanilla stack — same per-glyph
-  // threshold math (measure() below), same tunable constants, just written
-  // as direct style/custom-property writes instead of Tailwind arbitrary
-  // values and Framer-style refs.
+  // scroll effect for the "Curiosity is what..." copy: 4 blocks, each
+  // pinned full-screen in its own slot of a tall runway, one crossfading
+  // into the next as you scroll.
   //
-  // Guarded on an instance property AND a spans-exist check, and wrapped
-  // in AL.selfHeal: support.js can rebuild this section's markup after
-  // first paint, which would otherwise silently strip the injected
-  // .burn-glyph spans back to plain text and leave this method's
-  // `blocks` array pointing at detached nodes that no longer affect
-  // anything on screen — the spans-exist check alone re-detects that and
-  // lets this legitimately re-run within the same instance. The instance
-  // property is needed on top of it for a different reason: support.js
-  // can also unmount and remount this whole component while reusing the
-  // same DOM nodes, in which case the spans survive from the previous
-  // instance and would otherwise tell a fresh instance "already done" —
-  // a plain spans-exist check alone can't tell "still correctly running"
-  // apart from "frozen mid-burn since the previous instance's own
-  // scroll listener was already torn down on unmount", which is exactly
-  // what glyphs stuck overlapping mid-fade looks like
+  // Guarded on an instance property AND a per-block marker property (a
+  // plain JS property set directly on each block element, not a data-*
+  // attribute) — support.js can unmount and remount this whole component
+  // while reusing the same DOM nodes, in which case the instance property
+  // alone would wrongly read "already bound" on a fresh instance whose
+  // scroll listener was never actually attached. The per-block property
+  // survives that same node reuse, but resets to undefined if support.js
+  // ever swaps in genuinely fresh block nodes — exactly the case where
+  // this needs to legitimately re-run and rebind
   initBurnText() {
     const runway = document.querySelector('[data-burn-runway]');
     if (!runway) return;
-    if (this.burnTextBound && runway.querySelector('.burn-glyph')) return;
+    const blockEls = Array.from(runway.querySelectorAll('[data-burn-block]'));
+    if (this.burnTextBound && blockEls.every((el) => el.__burnTextWired)) return;
     this.burnTextBound = true;
-    // tear down the previous run's listeners before rebuilding — this
+    blockEls.forEach((el) => { el.__burnTextWired = true; });
+    // tear down the previous run's listeners before rebinding — this
     // can legitimately re-run within the same instance (see above), and
     // window outlives that the same way it does for every other rebind
     // in this file
@@ -671,194 +659,63 @@ class Component extends DCLogic {
 
     const progressFills = Array.from(runway.querySelectorAll('.burn-progress-seg-fill'));
     const srText = runway.querySelector('[data-burn-srtext]');
-    const blockEls = Array.from(runway.querySelectorAll('[data-burn-block]'));
 
     srText.textContent = blockEls.map((el) => el.querySelector('[data-burn-text]').textContent).join(' ');
 
-    // reduced motion: the pin/scale/burn is scroll-position math, not a CSS
+    // reduced motion: the pin/fade is scroll-position math, not a CSS
     // animation, so the site's usual `* { animation-duration: .01ms }`
     // catch-all can't neutralize it — this skips straight to plain text,
     // and the reduced-motion CSS block above unwinds the pinned layout
     // back into a normal static stack for it to sit in
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    // built from each block's child nodes (not p.textContent) so the
-    // hand-marked <span class="hl"> phrases survive the rebuild below — the
-    // glyphs inside still burn individually, but the .hl wrapper around
-    // them keeps its own soft-grey highlight background continuous across
-    // the whole phrase instead of gapping at every word/glyph boundary
-    // a plain text node becomes one .burn-glyph span per character; a
-    // [data-burn-icon] node (the Claude mark inline in "bring AI into my
-    // process") isn't text and can't be split into characters, so it's
-    // kept whole but still tagged .burn-glyph so it fades/burns in step
-    // with the letters around it instead of sitting there fully solid;
-    // an .hl wrapper just recurses so its highlight background survives;
-    // [data-curiosity-flash] (the word "drives") recurses the same way so
-    // playCuriosityIcon can still find and flash it after the rebuild;
-    // [data-process-icon-origin] (the word "curiosity") recurses the same
-    // way so playProcessIcon can measure where that word actually sits and
-    // fly the AI icon in from there; [data-figma-frame] (the word
-    // "designing," and its Figma-style frame decoration) is kept whole
-    // like the icon rather than recursed — its own label span has no
-    // sensible per-character burn order of its own, so the whole frame
-    // just fades as one piece with the rest of the sentence
-    const renderNode = (node) => {
-      if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('hl')) {
-        return '<span class="hl">' + Array.from(node.childNodes).map(renderNode).join('') + '</span>';
-      }
-      if (node.nodeType === Node.ELEMENT_NODE && node.hasAttribute('data-curiosity-flash')) {
-        return '<span data-curiosity-flash>' + Array.from(node.childNodes).map(renderNode).join('') + '</span>';
-      }
-      if (node.nodeType === Node.ELEMENT_NODE && node.hasAttribute('data-process-icon-origin')) {
-        return '<span data-process-icon-origin>' + Array.from(node.childNodes).map(renderNode).join('') + '</span>';
-      }
-      if (node.nodeType === Node.ELEMENT_NODE && node.hasAttribute('data-burn-icon')) {
-        const icon = node.cloneNode(true);
-        icon.classList.add('burn-glyph');
-        return icon.outerHTML;
-      }
-      if (node.nodeType === Node.ELEMENT_NODE && node.hasAttribute('data-figma-frame')) {
-        const frame = node.cloneNode(true);
-        frame.classList.add('burn-glyph');
-        return frame.outerHTML;
-      }
-      return (node.textContent || '').split('').map((ch) => {
-        return ch === ' ' ? ' ' : '<span class="burn-glyph">' + ch + '</span>';
-      }).join('');
-    };
-    const blocks = blockEls.map((blockEl) => {
-      const p = blockEl.querySelector('[data-burn-text]');
-      p.innerHTML = Array.from(p.childNodes).map(renderNode).join('');
-      return { wrap: blockEl, p, glyphs: Array.from(p.querySelectorAll('.burn-glyph')) };
-    });
+    const blocks = blockEls.map((blockEl) => ({ wrap: blockEl, para: blockEl.querySelector('[data-burn-text]') }));
     const count = blocks.length;
-
-    // progress through a block's own slot at which it starts to burn
-    const BURN_AT = 0.62;
-    // how much of the slot the burn takes to eat the block whole
-    const BURN_SPAN = 0.38;
-    // slots of approach before the first block reaches the front
-    const LEAD = 0.7;
-    // alpha of a block still standing behind the one up front
-    const DIM = 0.05;
-    // extra headroom in each block's own fade-in curve — keeps the
-    // approach from feeling like it snaps in right at its threshold
-    const OPEN = 0.22;
-    // distance a block is born at, in units of the distance it's read at
-    const FAR = 4;
-    // distance it's closed to by the time it's gone
-    const NEAR = 0.25;
-    // burn a single glyph fades over, kept in step with the `0.09` baked
-    // into .burn-glyph's own opacity formula in the CSS above
-    const RAMP = 0.09;
     const clamp01 = (v) => Math.min(1, Math.max(0, v));
 
-    // block 0 has zero headroom before its own front position counts as
-    // "about to burn": unlike every later block, which arrives with LEAD
-    // time before reaching BURN_AT, it's sitting exactly AT that
-    // threshold the instant the section engages — so any natural scroll
-    // settling right at that moment starts visibly eating its text. This
-    // cushion delays when block 0's own burn actually starts; shrinking
-    // its burn span by the same amount keeps it finishing at exactly the
-    // same q=1 point it always did (right as block 1 arrives), so this
-    // only adds tolerance at the fragile start, without changing the
-    // timing anywhere else. No scroll position is ever touched for this —
-    // it's purely how q maps to visible burn for this one block
-    const BLOCK0_CUSHION = 0.2;
-    const burnAtFor = (i) => (i === 0 ? BURN_AT + BLOCK0_CUSHION : BURN_AT);
-    const burnSpanFor = (i) => (i === 0 ? BURN_SPAN - BLOCK0_CUSHION : BURN_SPAN);
-
-    // where a glyph sits in its block is a layout-time fact, so the burn
-    // order is measured once rather than derived from character index —
-    // index order would eat the copy in reading order, which is a wipe,
-    // not a burn
-    const measure = () => {
-      blocks.forEach(({ p, glyphs }) => {
-        const w = p.offsetWidth || 1, h = p.offsetHeight || 1;
-        glyphs.forEach((node) => {
-          const x = (node.offsetLeft + node.offsetWidth / 2) / w;
-          const y = (node.offsetTop + node.offsetHeight / 2) / h;
-          // two crossed sine waves instead of per-glyph random: they land
-          // their blobs at the scale of a few glyphs, which is the bite a
-          // real burn takes — random would give static, not holes
-          const blob = 0.5 + 0.28 * Math.sin(x * 11.3 + y * 6.1 + 1.7) + 0.22 * Math.sin(x * 5.7 - y * 13.9 + 4.2);
-          // middle of the block goes first, corners hold out longest, so
-          // the copy is eaten from the inside the way paper takes a flame
-          const middle = Math.hypot(x - 0.5, (y - 0.5) * 1.15) / 0.62;
-          node.style.setProperty('--t', clamp01(0.05 + 0.55 * middle + 0.45 * blob).toFixed(4));
-        });
-      });
-    };
-
-    const burnt = [];
+    // scroll progress at which block 0 starts fading out — not 0, so the
+    // first block sits fully visible for a stretch before any scroll
+    // input starts fading it away, matching how every later block gets a
+    // full slot of visibility before its own fade-out begins
+    const START_AT = 0.62;
+    // fraction of a block's own [0,1] slot spent fading in and (mirrored)
+    // fading out — the two overlap by construction: this block's fade-in
+    // and the previous block's fade-out both run over the same handoff
+    // window, which is what makes the transition a crossfade rather than
+    // a hard cut
+    const FADE_SPAN = 0.28;
 
     const update = () => {
       queued = false;
       const rect = runway.getBoundingClientRect();
       const vh = window.innerHeight;
       const p = clamp01(-rect.top / (rect.height - vh || 1));
-      // starts at BURN_AT rather than -LEAD: the first block should be
-      // already fully arrived at the front on the opening frame (nothing
-      // to scroll INTO), so the very first scroll input starts burning it
-      // away immediately instead of spending scroll distance growing it
-      // into place first. Still ends with the last block at the moment its
-      // own burn would start, so the section ends on that copy whole
-      // rather than on a frame of ash
-      const t = BURN_AT + p * (count - 1);
+      const t = START_AT + p * (count - 1);
 
-      blocks.forEach(({ wrap, p: para }, i) => {
+      blocks.forEach(({ wrap }, i) => {
         const q = t - i;
-        const burnAt = burnAtFor(i);
-        // each segment fills over the same q range its own block uses to
-        // go from "just arrived" (q=0) to "about to burn" (q=burnAt) —
-        // set unconditionally, ahead of the visibility check below, so a
-        // block that's already fully burnt still reports its segment done
-        if (progressFills[i]) progressFills[i].style.width = (clamp01(q / burnAt) * 100).toFixed(2) + '%';
+        // fills over the same q range this block uses to go from "just
+        // arrived" (q=0) to "fully faded out" (q=1) — set unconditionally,
+        // ahead of the visibility check below, so a block that's already
+        // gone still reports its segment done
+        if (progressFills[i]) progressFills[i].style.width = (clamp01(q) * 100).toFixed(2) + '%';
 
-        const alpha = clamp01((q + LEAD + OPEN) / 0.45) * (DIM + (1 - DIM) * clamp01(q / 0.45));
-
-        // nothing to paint before it arrives, nothing left once it's burnt
-        if (alpha <= 0 || q > 1) {
+        const entrance = clamp01((q + FADE_SPAN) / FADE_SPAN);
+        const exit = clamp01((q - (1 - FADE_SPAN)) / FADE_SPAN);
+        if (entrance <= 0 || q > 1) {
           wrap.style.visibility = 'hidden';
           return;
         }
         wrap.style.visibility = 'visible';
-        wrap.style.opacity = alpha.toFixed(4);
-        // a lens, not an easing: distance falls at a steady rate and size
-        // is one over distance, so a block creeps while far off and rushes
-        // once close — the same curve anything coming toward you follows.
-        // Frozen at BURN_AT (the plain constant, not the per-block `burnAt`
-        // above) rather than left running through the burn itself —
-        // letting the zoom keep rushing in while the glyphs are also
-        // fading out compounded into a fast, uncomfortable blur right at
-        // the moment of disappearing. Past that point the block holds its
-        // size and only fades, so the phase-out reads as gentle.
-        // Deliberately NOT burnAtFor(i): block 0's cushion pushes its own
-        // burnAt well past BURN_AT so the text has more scroll-drift
-        // headroom before it visibly burns, but freezing the zoom that
-        // much later let it keep scaling up over a much wider q range —
-        // on a touch device, one entrance swipe can easily carry scroll
-        // well into that range in a single gesture, blowing the block up
-        // past 1.5x and overflowing off both edges of a phone screen. The
-        // burn threshold and the zoom-freeze point are different concerns
-        // that happened to share one constant; they need to stay decoupled
-        const depth = Math.max(FAR - (FAR - NEAR) * (Math.min(q, BURN_AT) + LEAD) / (1 + LEAD), NEAR);
-        wrap.style.transform = 'scale(' + (1 / depth).toFixed(4) + ')';
-
-        const burn = clamp01((q - burnAt) / burnSpanFor(i)) * (1 + RAMP);
-        if (burnt[i] !== burn) {
-          burnt[i] = burn;
-          para.style.setProperty('--b', burn.toFixed(4));
-        }
+        wrap.style.opacity = (entrance * (1 - exit)).toFixed(4);
       });
     };
 
     let queued = false;
     this.onBurnScroll = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
-    this.onBurnResize = () => { measure(); update(); };
+    this.onBurnResize = update;
     this.initBurnSwipe(runway, count);
 
-    measure();
     update();
     window.addEventListener('scroll', this.onBurnScroll, { passive: true });
     window.addEventListener('resize', this.onBurnResize);
@@ -888,9 +745,9 @@ class Component extends DCLogic {
   initBurnSwipe(runway, count) {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     // guards against being bound twice: initBurnText() re-runs whenever
-    // AL.selfHeal sees the DOM change, and its own guard only checks
-    // whether .burn-glyph spans still exist — if a support.js rebuild wave
-    // ever strips them back to plain text, initBurnText() (and this) would
+    // AL.selfHeal sees the DOM change, and its own guard only checks each
+    // block element's own marker property — if a support.js rebuild wave
+    // ever swaps in fresh block nodes, initBurnText() (and this) would
     // otherwise run again in full, stacking a second, independent set of
     // listeners with their own index/animating state racing the first
     if (this.onBurnWheel) return;
@@ -1383,7 +1240,7 @@ class Component extends DCLogic {
   // Always instant, never smooth: a smooth jump here would animate through
   // every intermediate scroll position on the way to the target, including
   // the whole #curiosity runway if it sits in between — replaying its
-  // entire approach/burn sequence for every block just because a nav link
+  // entire crossfade sequence for every block just because a nav link
   // was clicked. That continuous animation is reserved for genuine manual
   // scrolling (wheel/touch), which drives it directly via onBurnScroll —
   // a nav-triggered jump should land on the destination immediately
@@ -1406,7 +1263,7 @@ class Component extends DCLogic {
     // hash) doesn't actually change window.location.hash, so it never
     // fires 'hashchange' above — nothing would catch it, and the browser's
     // own default click behavior would smooth-scroll there uninterrupted,
-    // replaying the #curiosity runway's whole approach/burn sequence as a
+    // replaying the #curiosity runway's whole crossfade sequence as a
     // side effect of passing through it. Intercepting the click itself
     // catches that case too, on top of the normal one where the hash
     // does change, and jumps straight to the destination either way
