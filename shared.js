@@ -246,11 +246,12 @@
     ".al-audio-toggle:hover{opacity:0.7;}",
     "@keyframes alAudioEnter{to{opacity:1;transform:scale(1);}}",
     "@media (prefers-reduced-motion: reduce){.al-audio-toggle{animation:none;opacity:1;transform:none;}}",
-    // the label reads the same weight/color as the state word now that
-    // both sit on the same blended white — no separate muted tone, since
-    // a partially transparent color would blend against the page
+    // lighter than the state word ("On"/"Off") next to it, so the label
+    // reads as a quieter caption and the actual state carries the visual
+    // weight — no separate muted color for this instead, since a
+    // partially transparent color would blend against the page
     // differently than the solid state text/icon next to it
-    ".al-audio-toggle-label{font-weight:600;}",
+    ".al-audio-toggle-label{font-weight:400;}",
     ".al-audio-toggle svg{display:block;flex:0 0 auto;}",
     "@media (max-width:700px){.al-audio-toggle{top:18px;right:18px;font-size:12px;}}"
   ].join('');
