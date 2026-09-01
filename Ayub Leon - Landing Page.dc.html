@@ -384,8 +384,17 @@ class Component extends DCLogic {
     // never see again
     AL.selfHeal(() => this.initWork(), 5000);
     AL.selfHeal(() => this.initSignatureClearance(), 5000);
-    AL.selfHeal(() => this.initBurnText(), 5000);
+    // initHeadingFit before initBurnText, not just alphabetically tidy:
+    // both register a document.fonts.ready callback, and those fire in
+    // registration order. initBurnText's own callback re-measures glyph
+    // positions and the runway's scroll geometry — on a cold load, before
+    // Poppins is cached, if that ran before initHeadingFit's own
+    // font-ready resize, it would compute burn positions against the
+    // heading's pre-resize height, before the very layout shift that
+    // moves the runway. Heading first means its resize has already
+    // landed by the time burn text recalculates
     AL.selfHeal(() => this.initHeadingFit(), 5000);
+    AL.selfHeal(() => this.initBurnText(), 5000);
     AL.selfHeal(() => this.initCycleConnectors(), 5000);
     AL.selfHeal(() => this.initCycleShader(), 5000);
   }
