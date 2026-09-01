@@ -365,13 +365,18 @@
     ".al-pv-overlay.al-pv-open .al-pv-close{pointer-events:auto;}",
     // every page's own base stylesheet has a blanket
     // `button:focus-visible { border-radius: 4px }` (for square-ish
-    // buttons elsewhere on the site) that would otherwise override this
-    // button's circular shape the moment it's focused — which happens
-    // immediately on open, since open() below moves focus straight to
-    // this button. This class-scoped rule outranks that plain-tag one on
-    // specificity alone, so it wins without needing !important, and keeps
-    // the ring while restoring the circle
-    ".al-pv-close:focus-visible{outline:2px solid var(--al-green,#EF4418);outline-offset:3px;border-radius:50%;}",
+    // buttons elsewhere on the site) that would otherwise reshape this
+    // button's own black circle into a rounded-square the moment it's
+    // focused — which happens immediately on open, since open() below
+    // moves focus straight to this button. That's not a deliberate
+    // keyboard-navigation moment from the visitor's own perspective, so
+    // the ring itself reads as a stray visual glitch rather than an
+    // affordance — dropped outright rather than just reshaped. This
+    // class-scoped rule outranks that plain-tag one on specificity alone,
+    // so it wins without needing !important; border-radius still needs
+    // overriding on its own even with no visible ring, since it'd
+    // otherwise reshape the button's actual black circle, not just a ring
+    ".al-pv-close:focus-visible{outline:none;border-radius:50%;}",
     // the circle itself just scales and rotates — stays solid black, no
     // color shift — while the X inside does its own crossing animation
     // (below)
