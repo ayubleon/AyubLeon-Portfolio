@@ -222,12 +222,16 @@
   // makes their own choice stick instead of being overridden by that
   var AUDIO_MUTE_KEY = 'al-audio-muted';
   var AUDIO_EXPLICIT_KEY = 'al-audio-explicit';
+  // touch devices skip the mute/explicit-choice machinery below entirely —
+  // there's no toggle for them to have set a preference with (see the
+  // button-creation guard further down), sound is just always on
+  var isTouchDevice = window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
   AL.audioExplicit = (function () {
     try { return localStorage.getItem(AUDIO_EXPLICIT_KEY) === '1'; } catch (e) { return false; }
   })();
-  AL.audioMuted = AL.audioExplicit ? (function () {
+  AL.audioMuted = isTouchDevice ? false : (AL.audioExplicit ? (function () {
     try { return localStorage.getItem(AUDIO_MUTE_KEY) === '1'; } catch (e) { return true; }
-  })() : true;
+  })() : true);
 
   var AUDIO_TOGGLE_CSS = [
     // no card/pill of its own — plain white content, blended against
@@ -268,8 +272,10 @@
   // one shared instance per page, built directly rather than through a
   // dedicated mount + self-heal pair like nav/footer/badge — nothing here
   // depends on page-specific content (AL.pageLinks() etc.), so there's no
-  // rebuild-wave risk of it losing its wiring the way those do
-  if (!document.querySelector('[data-audio-toggle]')) {
+  // rebuild-wave risk of it losing its wiring the way those do. Skipped
+  // entirely on touch devices — sound is just always on there (see
+  // AL.audioMuted above), so there's nothing for a toggle to control
+  if (!isTouchDevice && !document.querySelector('[data-audio-toggle]')) {
     var audioToggleBtn = document.createElement('button');
     audioToggleBtn.type = 'button';
     audioToggleBtn.className = 'al-audio-toggle';

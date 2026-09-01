@@ -100,6 +100,21 @@
     position: absolute; left: -6px; bottom: 100%; margin-bottom: 6px;
     font-size: 11px; font-weight: 500; color: #0D99FF; white-space: nowrap; line-height: 1;
   }
+  /* on narrow viewports the paragraph wraps such that "designing," can
+     land right under the previous line, leaving less gap above the frame
+     than this label needs — hiding it there is simpler and more robust
+     than chasing an exact collision threshold that shifts with however
+     the text happens to wrap at a given width; the border and corner
+     handles alone still read as a Figma selection without it */
+  @media (max-width: 480px) {
+    .figma-frame-label { display: none; }
+    /* the clamp() on [data-burn-text]'s inline font-size already bottoms
+       out at its 1.35rem floor by this width, so this needs !important to
+       size it down further — combined with the tighter line-height, this
+       is what keeps the copy from reading oversized and overly
+       spaced-out on a phone screen */
+    [data-burn-text] { font-size: 1.15rem !important; line-height: 1.65 !important; }
+  }
   [data-burn-grain] { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='gamma' exponent='4'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"); background-size: 180px; }
   /* the crossfade is a scroll-position effect, not a CSS animation, so the
      generic `* { animation-duration: .01ms }` rule below can't neutralize
@@ -961,7 +976,15 @@ class Component extends DCLogic {
     this.onBurnTouchMove = (e) => {
       if (!engaged()) { iconArmed = true; return; }
       if (touchStartY === null) return;
-      if (animating) { e.preventDefault(); return; }
+      // prevented unconditionally, before the drag-distance check below —
+      // iOS Safari only honors preventDefault() called on a touchmove
+      // before native scrolling has started for that gesture; waiting
+      // until the 24px threshold is crossed calls it one tick too late; by
+      // then the page has already started its own native scroll, which
+      // then fights the programmatic scrollTo() in goTo() below, landing
+      // short of the target block and needing a second swipe to finish
+      e.preventDefault();
+      if (animating) return;
       const dy = touchStartY - e.touches[0].clientY;
       if (Math.abs(dy) < 24) return;
       const dir = dy > 0 ? 1 : -1;
@@ -969,19 +992,16 @@ class Component extends DCLogic {
 
       if (dir > 0) {
         if (index === 0 && iconArmed) {
-          e.preventDefault();
           iconArmed = false;
           playIcon();
           return;
         }
         if (index >= count - 1) return;
-        e.preventDefault();
         goTo(index + 1);
         return;
       }
 
       if (index === 0) return;
-      e.preventDefault();
       const next = index - 1;
       goTo(next);
       if (next === 0) iconArmed = true;
