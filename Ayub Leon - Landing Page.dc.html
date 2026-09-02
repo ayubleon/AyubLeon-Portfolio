@@ -1086,11 +1086,20 @@ class Component extends DCLogic {
       // programmatic scrollTo() in goTo() below, landing short of the
       // target block and needing a second swipe to finish
       e.preventDefault();
+      // one step per gesture, but the gesture stays captured for the rest
+      // of the finger's travel rather than being released the moment it
+      // steps. Releasing early (this used to null touchStartY, so every
+      // later touchmove returned above before ever reaching the
+      // preventDefault) handed the tail of a long swipe back to native
+      // scroll, which then dragged the page on past the block goTo() was
+      // busy animating to — landing between blocks with the progress bar
+      // part-filled, and needing another swipe to finish. Short flicks
+      // that ended right on the threshold snapped cleanly, which is what
+      // made it look intermittent rather than simply broken
+      if (touchDidDrag) return;
       if (animating) return;
       if (Math.abs(dy) < 24) return;
       const dir = dy > 0 ? 1 : -1;
-      touchStartX = null;
-      touchStartY = null;
       touchDidDrag = true;
 
       if (dir > 0) {
