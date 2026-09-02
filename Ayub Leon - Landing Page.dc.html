@@ -494,6 +494,7 @@ class Component extends DCLogic {
     AL.selfHeal(() => this.initBurnText(), 5000);
     AL.selfHeal(() => this.initCycleConnectors(), 5000);
     AL.selfHeal(() => this.initCycleShader(), 5000);
+    AL.selfHeal(() => this.initThemeColor(), 5000);
   }
 
   // sizes the "Ayub Leon" heading so its rendered width is always exactly
@@ -663,6 +664,68 @@ class Component extends DCLogic {
     if (!this.onCycleResize) {
       this.onCycleResize = apply;
       window.addEventListener('resize', this.onCycleResize);
+    }
+  }
+
+  // iOS Safari paints its status bar and bottom toolbar with theme-color,
+  // and a single static #000000 is what reads as black bars above and below
+  // the page once a cream or blue section fills the screen. The About page
+  // never shows it because that page is dark-framed throughout, so black
+  // chrome passes as part of the design — this one isn't, so the colour has
+  // to follow the section on screen. Picks whichever covers the most of the
+  // viewport rather than whichever sits at the top edge, because Safari uses
+  // this one value for BOTH its top and bottom chrome: at the very bottom of
+  // the page the top edge is still #cycle's blue while the black footer owns
+  // most of the screen, and tinting both bars blue there is the worse of the
+  // two errors. Everywhere else the two rules agree, since #curiosity and
+  // #cycle each fill the viewport on their own
+  initThemeColor() {
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta) return;
+    // the hero sits above all of these and is black, so no visible section
+    // means the page's own black background is what's on screen
+    const FALLBACK = '#000000';
+
+    const apply = () => {
+      const sections = Array.from(
+        document.querySelectorAll('#philosophy, #curiosity, #work, #cycle, [data-footer-mount]')
+      );
+      const viewportHeight = window.innerHeight;
+      let color = FALLBACK;
+      let widest = 0;
+      sections.forEach((section) => {
+        const rect = section.getBoundingClientRect();
+        const visible = Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0);
+        // the bail is `< widest`, not `<= widest`, so a section tying the
+        // current best still replaces it — leaving the last such section in
+        // document order as the winner, which is the one painted on top.
+        // That's what keeps #philosophy from claiming the colour while it
+        // sits pinned underneath the sections scrolling over it
+        if (visible <= 0 || visible < widest) return;
+        const background = window.getComputedStyle(section).backgroundColor;
+        // a transparent section says nothing about what's on screen; skip it
+        // rather than let it count as the answer
+        if (!background || background === 'rgba(0, 0, 0, 0)' || background === 'transparent') return;
+        widest = visible;
+        color = background;
+      });
+      if (meta.content !== color) meta.content = color;
+    };
+
+    apply();
+    // apply() is safe to re-run on every AL.selfHeal call; the listeners
+    // are not, and would stack duplicates without this guard — same shape
+    // as initCycleConnectors' own onCycleResize above
+    if (!this.onThemeColorScroll) {
+      let frame = null;
+      // coalesced to one pass per frame: this fires on every scroll event
+      // and getBoundingClientRect forces layout each time
+      this.onThemeColorScroll = () => {
+        if (frame) return;
+        frame = requestAnimationFrame(() => { frame = null; apply(); });
+      };
+      window.addEventListener('scroll', this.onThemeColorScroll, { passive: true });
+      window.addEventListener('resize', this.onThemeColorScroll);
     }
   }
 
@@ -1652,6 +1715,8 @@ class Component extends DCLogic {
     window.removeEventListener('touchmove', this.onBurnTouchMove);
     window.removeEventListener('touchend', this.onBurnTouchEnd);
     window.removeEventListener('keydown', this.onBurnKey);
+    window.removeEventListener('scroll', this.onThemeColorScroll);
+    window.removeEventListener('resize', this.onThemeColorScroll);
   }
 }
 
