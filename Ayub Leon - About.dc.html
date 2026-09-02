@@ -11,15 +11,24 @@
 <meta property="og:title" content="About — Ayub Leon">
 <meta property="og:description" content="Get to know Ayub Leon, a product designer — how he got into design, what drives his work, and what he does outside of Figma.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://ayub-leon-portfolio.vercel.app/Ayub%20Leon%20-%20About.dc.html">
-<meta property="og:image" content="https://ayub-leon-portfolio.vercel.app/images/link-preview.png">
+<link rel="canonical" href="https://ayubleon.vercel.app/about">
+<meta property="og:url" content="https://ayubleon.vercel.app/about">
+<meta property="og:image" content="https://ayubleon.vercel.app/images/link-preview.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="About — Ayub Leon">
 <meta name="twitter:description" content="Get to know Ayub Leon, a product designer — how he got into design, what drives his work, and what he does outside of Figma.">
-<meta name="twitter:image" content="https://ayub-leon-portfolio.vercel.app/images/link-preview.png">
+<meta name="twitter:image" content="https://ayubleon.vercel.app/images/link-preview.png">
 <style>html, body { background: #000000; margin: 0; }
   @view-transition { navigation: auto; }
   [data-settle-veil] { position: fixed; inset: 0; z-index: 9999; background: #000000; opacity: 1; transition: opacity .35s ease; }</style>
+<!-- the settle veil is opaque black until shared.js fades it, so anything
+     that renders this page without running the scripts — a crawler, an AI
+     fetcher, a reader with JS off — sees a black screen over the whole
+     page. Everything below is the no-JS counterpart of a state JS would
+     otherwise have cleared -->
+<noscript><style>
+  [data-settle-veil] { display: none !important; }
+</style></noscript>
 <link rel="preload" as="script" href="./support.js">
 <!-- support.js's own boot() re-fetches this exact document a second time
      right after first paint (unless window.__resources is already set —

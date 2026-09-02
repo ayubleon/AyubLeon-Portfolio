@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- the clean paths from vercel.json rewrites, not the underlying
+     "Ayub Leon - Landing Page.dc.html" filenames, so crawlers index the
+     URLs the site actually links to rather than a second set of duplicates -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://ayubleon.vercel.app/</loc>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://ayubleon.vercel.app/about</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ayubleon.vercel.app/buzziq</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ayubleon.vercel.app/danadana</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ayubleon.vercel.app/building-a-shadcn-system-from-scratch</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ayubleon.vercel.app/kenyan-banking-redesign</loc>
+    <priority>0.8</priority>
+  </url>
+</urlset>

@@ -227,7 +227,7 @@
         '<p class="site-contact-blurb">I\'m currently open to full time roles, contract work, and high impact product builds. If you need a designer who takes ownership from first sketch to final QA, <a class="site-contact-link" href="mailto:ayubleon.pd@gmail.com">let\'s talk.</a></p>' +
         '<div class="site-contact-actions">' +
           '<a class="site-contact-action" href="mailto:ayubleon.pd@gmail.com" data-contact-copy-email>' + MAIL_SVG + '<span>Email</span></a>' +
-          '<a class="site-contact-action" href="Ayub%20Leon%20-%20Resume.pdf" target="_blank" rel="noopener noreferrer">' + RESUME_SVG + '<span>Resume</span></a>' +
+          '<a class="site-contact-action" href="/resume" target="_blank" rel="noopener noreferrer">' + RESUME_SVG + '<span>Resume</span></a>' +
           '<a class="site-contact-action" href="https://www.linkedin.com/in/ayubleon" target="_blank" rel="noopener noreferrer">' + LINKEDIN_SVG + '<span>Linked in</span></a>' +
         '</div>' +
         '<p class="site-contact-email">ayubleon.pd@gmail.com</p>' +

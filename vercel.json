@@ -1,10 +1,64 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/Ayub%20Leon%20-%20Landing%20Page.dc.html" },
-    { "source": "/about", "destination": "/Ayub%20Leon%20-%20About.dc.html" },
-    { "source": "/work/buzziq", "destination": "/BuzzIQ.dc.html" },
-    { "source": "/work/danadana", "destination": "/Danadana.dc.html" },
-    { "source": "/work/building-a-shadcn-system-from-scratch", "destination": "/Building%20a%20shadcn%20System%20from%20Scratch.dc.html" },
-    { "source": "/work/kenyan-banking-redesign", "destination": "/Kenyan%20Banking%20Redesign.dc.html" }
+    {
+      "source": "/",
+      "destination": "/Ayub%20Leon%20-%20Landing%20Page.dc.html"
+    },
+    {
+      "source": "/about",
+      "destination": "/Ayub%20Leon%20-%20About.dc.html"
+    },
+    {
+      "source": "/buzziq",
+      "destination": "/BuzzIQ.dc.html"
+    },
+    {
+      "source": "/danadana",
+      "destination": "/Danadana.dc.html"
+    },
+    {
+      "source": "/building-a-shadcn-system-from-scratch",
+      "destination": "/Building%20a%20shadcn%20System%20from%20Scratch.dc.html"
+    },
+    {
+      "source": "/kenyan-banking-redesign",
+      "destination": "/Kenyan%20Banking%20Redesign.dc.html"
+    },
+    {
+      "source": "/resume",
+      "destination": "/Ayub%20Leon%20-%20Resume.pdf"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/Ayub Leon - Landing Page.dc.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/Ayub Leon - About.dc.html",
+      "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/BuzzIQ.dc.html",
+      "destination": "/buzziq",
+      "permanent": true
+    },
+    {
+      "source": "/Danadana.dc.html",
+      "destination": "/danadana",
+      "permanent": true
+    },
+    {
+      "source": "/Building a shadcn System from Scratch.dc.html",
+      "destination": "/building-a-shadcn-system-from-scratch",
+      "permanent": true
+    },
+    {
+      "source": "/Kenyan Banking Redesign.dc.html",
+      "destination": "/kenyan-banking-redesign",
+      "permanent": true
+    }
   ]
 }

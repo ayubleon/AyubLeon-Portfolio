@@ -11,15 +11,24 @@
 <meta property="og:title" content="Danadana — Ayub Leon">
 <meta property="og:description" content="Case study: Danadana, the first Kenyan-made crash betting game, designed with built-in player protection. Product designer, Plexus Core, Aug 2024 – Jun 2025.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://ayub-leon-portfolio.vercel.app/Danadana.dc.html">
-<meta property="og:image" content="https://ayub-leon-portfolio.vercel.app/images/work-danadana-cover.png">
+<link rel="canonical" href="https://ayubleon.vercel.app/danadana">
+<meta property="og:url" content="https://ayubleon.vercel.app/danadana">
+<meta property="og:image" content="https://ayubleon.vercel.app/images/work-danadana-cover.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Danadana — Ayub Leon">
 <meta name="twitter:description" content="Case study: Danadana, the first Kenyan-made crash betting game, designed with built-in player protection. Product designer, Plexus Core, Aug 2024 – Jun 2025.">
-<meta name="twitter:image" content="https://ayub-leon-portfolio.vercel.app/images/work-danadana-cover.png">
+<meta name="twitter:image" content="https://ayubleon.vercel.app/images/work-danadana-cover.png">
 <style>html, body { background: #000000; margin: 0; }
   @view-transition { navigation: auto; }
-  [data-settle-veil] { position: fixed; inset: 0; z-index: 9999; background: #000000; opacity: 1; transition: opacity .35s ease; }</style><link rel="preload" as="script" href="./support.js">
+  [data-settle-veil] { position: fixed; inset: 0; z-index: 9999; background: #000000; opacity: 1; transition: opacity .35s ease; }</style>
+<!-- the settle veil is opaque black until shared.js fades it, so anything
+     that renders this page without running the scripts — a crawler, an AI
+     fetcher, a reader with JS off — sees a black screen over the whole
+     page. Everything below is the no-JS counterpart of a state JS would
+     otherwise have cleared -->
+<noscript><style>
+  [data-settle-veil] { display: none !important; }
+</style></noscript><link rel="preload" as="script" href="./support.js">
 <!-- support.js's own boot() re-fetches this exact document a second time
      right after first paint (unless window.__resources is already set —
      it's meant for a build mode that bundles resources locally, which
@@ -246,12 +255,12 @@
     <div style="padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1);">
       <p class="case-section-label">More work</p>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 30px;">
-        <a href="BuzzIQ.dc.html" style="display: flex; flex-direction: column; gap: 12px; padding: 30px 32px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.09); color: inherit;">
+        <a href="/buzziq" style="display: flex; flex-direction: column; gap: 12px; padding: 30px 32px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.09); color: inherit;">
           <p class="case-field-label">← Previous</p>
           <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.4rem; font-weight: 600; letter-spacing: -0.025em; color: #f4eeeb;">BuzzIQ</p>
           <p style="margin: 0; font-size: 14px; line-height: 1.55; color: rgba(239,232,229,0.66);">TikTok Shop intelligence platform built for IGNITEAMZ, a US-based creator commerce company</p>
         </a>
-        <a href="Building a shadcn System from Scratch.dc.html" style="display: flex; flex-direction: column; gap: 12px; padding: 30px 32px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.09); color: inherit; text-align: right;">
+        <a href="/building-a-shadcn-system-from-scratch" style="display: flex; flex-direction: column; gap: 12px; padding: 30px 32px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.09); color: inherit; text-align: right;">
           <p class="case-field-label">Next →</p>
           <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.4rem; font-weight: 600; letter-spacing: -0.025em; color: #f4eeeb;">Building a shadcn System from Scratch</p>
           <p style="margin: 0; font-size: 14px; line-height: 1.55; color: rgba(239,232,229,0.66);">A shadcn component system built from scratch as a personal project, later adapted to power BuzzIQ</p>

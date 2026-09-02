@@ -180,12 +180,12 @@
     var root = document.querySelector('[data-screen-label]');
     var label = root ? root.getAttribute('data-screen-label') : '';
     if (label === 'Hero') {
-      return { home: '#top', work: '#work', about: 'Ayub Leon - About.dc.html', active: 'home' };
+      return { home: '#top', work: '#work', about: '/about', active: 'home' };
     }
     if (label === 'About') {
-      return { home: 'Ayub%20Leon%20-%20Landing%20Page.dc.html', work: 'Ayub%20Leon%20-%20Landing%20Page.dc.html#work', about: '#top', active: 'about' };
+      return { home: '/', work: '/#work', about: '#top', active: 'about' };
     }
-    return { home: 'Ayub%20Leon%20-%20Landing%20Page.dc.html', work: 'Ayub%20Leon%20-%20Landing%20Page.dc.html#work', about: 'Ayub Leon - About.dc.html', active: 'work' };
+    return { home: '/', work: '/#work', about: '/about', active: 'work' };
   };
 
   // shared by every cursor-following tooltip (the About page's Behance

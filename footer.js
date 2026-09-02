@@ -169,7 +169,7 @@
       case 'work': return ' href="' + links.work + '"';
       case 'about': return ' href="' + links.about + '"';
       case 'copy-email': return ' href="mailto:ayubleon.pd@gmail.com" data-copy-email';
-      case 'resume': return ' href="Ayub%20Leon%20-%20Resume.pdf" target="_blank" rel="noopener noreferrer"';
+      case 'resume': return ' href="/resume" target="_blank" rel="noopener noreferrer"';
       case 'linkedin': return ' href="https://www.linkedin.com/in/ayubleon" target="_blank" rel="noopener noreferrer"';
       case 'figma': return ' href="' + FIGMA_URL + '" target="_blank" rel="noopener noreferrer" data-figma-key';
       default: return '';
@@ -225,7 +225,7 @@
                 '</div>' +
                 '<div style="display:flex;flex-direction:column;gap:14px;">' +
                   '<p style="margin:0;font-family:Poppins;font-size:11px;color:var(--al-section-title,rgba(239,232,229,0.66))">RESOURCES</p>' +
-                  '<a class="site-footer-link" href="Ayub%20Leon%20-%20Resume.pdf" target="_blank" rel="noopener noreferrer">Download Resume</a>' +
+                  '<a class="site-footer-link" href="/resume" target="_blank" rel="noopener noreferrer">Download Resume</a>' +
                   '<a class="site-footer-link" href="' + FIGMA_URL + '" target="_blank" rel="noopener noreferrer" aria-label="Figma" data-figma-key>' + figmaIconHTML(14) + '</a>' +
                 '</div>' +
               '</div>' +

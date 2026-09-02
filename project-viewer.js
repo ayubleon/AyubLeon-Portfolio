@@ -16,10 +16,10 @@
   // Previous/Next links each case study page already ships with (which
   // form the same loop) — one canonical order, not re-decided here.
   var ORDER = [
-    'BuzzIQ.dc.html',
-    'Danadana.dc.html',
-    'Building a shadcn System from Scratch.dc.html',
-    'Kenyan Banking Redesign.dc.html'
+    '/buzziq',
+    '/danadana',
+    '/building-a-shadcn-system-from-scratch',
+    '/kenyan-banking-redesign'
   ];
 
   var SWIPE_MIN_PX = 60; // shorter horizontal drags read as scroll wobble, not an intentional swipe
