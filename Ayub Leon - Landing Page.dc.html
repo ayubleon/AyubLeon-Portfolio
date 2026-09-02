@@ -122,6 +122,31 @@
     [data-burn-text] { font-size: 1.15rem !important; line-height: 1.65 !important; }
   }
   [data-burn-grain] { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='gamma' exponent='4'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"); background-size: 180px; }
+  /* the block-4 curiosity cat: three drawn poses (looking up, arm low →
+     looking down, arm raised → arm lowered, still looking down) held in a
+     fixed-size box and continuously cross-faded into one another rather
+     than tweened — the three drawings don't share point counts, so
+     there's no path to interpolate between; an opacity crossfade with
+     equal hold/transition timing is what reads as smooth motion instead.
+     The three keyframes are the same 4.5s cycle viewed from each frame's
+     own opacity, offset by a third each, so the last crossfade (frame 3
+     back to frame 1) lands exactly on the loop point for a seamless
+     repeat rather than a visible jump-cut */
+  .curiosity-cat-frame { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: left bottom; animation: 4.5s cubic-bezier(.22,1,.36,1) infinite; }
+  .curiosity-cat-frame-1 { animation-name: curiosityCatFrame1; }
+  .curiosity-cat-frame-2 { animation-name: curiosityCatFrame2; }
+  .curiosity-cat-frame-3 { animation-name: curiosityCatFrame3; }
+  /* holds each frame at full opacity, cross-fading briefly into the next —
+     a continuous 3-way blend (all three always partially visible) was
+     tried here and looked blurry/ghosted, since these are three distinct
+     drawings rather than one shape tweened, and two of them overlapping
+     at once reads as a double exposure rather than motion. Keeping only
+     one frame fully opaque at a time, with a short crossfade between,
+     stays crisp while the site's own signature easing (used for every
+     other motion on this page) keeps the transition itself soft */
+  @keyframes curiosityCatFrame1 { 0%, 22.22% { opacity: 1; } 33.33%, 88.89% { opacity: 0; } 100% { opacity: 1; } }
+  @keyframes curiosityCatFrame2 { 0%, 22.22% { opacity: 0; } 33.33%, 55.55% { opacity: 1; } 66.67%, 100% { opacity: 0; } }
+  @keyframes curiosityCatFrame3 { 0%, 55.55% { opacity: 0; } 66.67%, 88.89% { opacity: 1; } 100% { opacity: 0; } }
   /* the crossfade is a scroll-position effect, not a CSS animation, so the
      generic `* { animation-duration: .01ms }` rule below can't neutralize
      it — this collapses the pinned runway back into a plain static stack
@@ -131,10 +156,11 @@
     [data-burn-viewport] { position: static !important; height: auto !important; overflow: visible !important; padding: 32px 0; }
     [data-burn-block] { position: static !important; visibility: visible !important; opacity: 1 !important; transform: none !important; display: block !important; margin-bottom: 28px; }
     [data-burn-progress], [data-burn-grain] { display: none !important; }
-    /* [data-burn-icon] sits display:none by default, only switched on by
-       playProcessIcon()'s fly-in — which never runs here, since that
-       method's own reduced-motion check returns before touching it */
-    [data-burn-icon] { display: inline-block !important; }
+    /* [data-burn-icon] sits opacity:0 by default (see its inline style),
+       only revealed by playProcessIcon()'s fly-in — which never runs
+       here, since that method's own reduced-motion check returns before
+       touching it */
+    [data-burn-icon] { opacity: 1 !important; }
   }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
   /* replicates object-fit:cover for the whole hero-desk group (photo +
@@ -225,10 +251,10 @@
           <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">I don't just execute a brief. I've pitched features the team hadn't considered, presented directly to customers, and weighed in on hiring, the kind of input most designers never get pulled into.</p>
         </div>
         <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; visibility: hidden;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">That <span data-process-icon-origin>curiosity</span> is also why I've spent the last year learning to <span class="hl">bring AI into my process <img data-burn-icon src="images/claude-ai-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: none; margin-right: 0.15em;"><img data-figma-icon src="images/figma-logo.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block;"></span>, not as a shortcut, but to <span class="hl">dig deeper into problems before</span> <span data-figma-frame>designing,<span class="figma-frame-label" aria-hidden="true">Frame 1403</span><span class="figma-frame-handle" data-corner="tl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tr" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="bl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="br" aria-hidden="true"></span></span> and move faster to working code. It's changed how I research, prototype, and build on my own.</p>
+          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">That <span data-process-icon-origin>curiosity</span> is also why I've spent the last year learning to <span class="hl">bring AI into my process <img data-burn-icon src="images/claude-ai-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block; opacity: 0; margin-right: 0.15em;"><img data-figma-icon src="images/figma-logo.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block;"></span>, not as a shortcut, but to <span class="hl">dig deeper into problems before</span> <span data-figma-frame>designing,<span class="figma-frame-label" aria-hidden="true">Frame 1403</span><span class="figma-frame-handle" data-corner="tl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tr" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="bl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="br" aria-hidden="true"></span></span> and move faster to working code. It's changed how I research, prototype, and build on my own.</p>
         </div>
         <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; visibility: hidden;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">It's also why my path through UI/UX hasn't run in one <span class="wavy-underline">straight lane. I've moved across</span> industries and problems, <span class="hl">adapting fast</span> each time, because staying curious means staying stimulated.<img src="images/cat.svg" alt="" style="height: 1.6em; width: auto; vertical-align: -0.4em; display: inline-block; margin-left: 0.2em; transform: scaleX(-1);"></p>
+          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">It's also why my path through UI/UX hasn't run in one <span class="wavy-underline">straight lane. I've moved across</span> industries and problems, <span class="hl">adapting fast</span> each time, because staying curious means staying stimulated.<span class="curiosity-cat" aria-hidden="true" style="position: relative; display: inline-block; height: 1.6em; width: 2em; vertical-align: -0.4em; margin-left: 0.2em;"><img src="images/cat-frame-1.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-1"><img src="images/cat-frame-2.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-2"><img src="images/cat-frame-3.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-3"></span></p>
         </div>
         <div data-burn-grain aria-hidden="true" style="position: absolute; inset: 0; z-index: 4; opacity: 0.4; pointer-events: none;"></div>
       </div>
@@ -1181,14 +1207,15 @@ class Component extends DCLogic {
     const icon = document.querySelector('[data-burn-icon]');
     if (!icon) return;
     icon.getAnimations().forEach((a) => a.cancel());
-    // sits display:none by default (see the reduced-motion override in
-    // <style> above, which forces it back on for anyone who never gets
-    // this animation at all) so the sentence reads "process [Figma logo],"
-    // on its own until this fires — switched on here, before the flight's
-    // own position is measured below, so it's actually laid out in its
-    // resting spot (right before the Figma logo) rather than measuring a
-    // collapsed, not-yet-rendered element
-    icon.style.display = 'inline-block';
+    // sits opacity:0 by default (see the reduced-motion override in
+    // <style> above, which forces it back to visible for anyone who never
+    // gets this animation at all) but stays display:inline-block and
+    // laid out in its resting spot the whole time — toggling display
+    // instead would reserve its space only at this exact moment, snapping
+    // the rest of the sentence over in one instant jump right after it's
+    // already been read, which is jarring in a way revealing an
+    // already-reserved, already-invisible box isn't
+    icon.style.opacity = '1';
 
     const origin = document.querySelector('[data-process-icon-origin]');
     const iconRect = icon.getBoundingClientRect();
