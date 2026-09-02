@@ -6,7 +6,7 @@
   // on a flush, gapless edge. The portrait SVG is a near-identical 47:140,
   // so it fills the same face with an imperceptible sub-2% letterbox.
   var CSS = [
-    ".al-badge{position:fixed;top:28px;left:28px;z-index:45;perspective:900px;display:block;cursor:pointer;-webkit-tap-highlight-color:transparent;--face-h:130px;--face-w:43.03px;--r:21.51px;}",
+    ".al-badge{position:fixed;top:calc(28px + env(safe-area-inset-top));left:28px;z-index:45;perspective:900px;display:block;cursor:pointer;-webkit-tap-highlight-color:transparent;--face-h:130px;--face-w:43.03px;--r:21.51px;}",
     ".al-badge-inner{position:relative;width:var(--face-w);height:var(--face-h);transform-style:preserve-3d;will-change:transform;transition:transform 1s cubic-bezier(.65,0,.35,1);}",
     ".al-badge-face{position:absolute;top:0;left:0;width:var(--face-w);height:var(--face-h);backface-visibility:hidden;}",
     ".al-badge-face svg{display:block;width:100%;height:100%;}",

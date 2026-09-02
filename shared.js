@@ -145,7 +145,7 @@
     var wrap = document.createElement('div');
     wrap.setAttribute('role', 'status');
     wrap.setAttribute('aria-live', 'polite');
-    wrap.style.cssText = 'position:fixed;left:50%;bottom:92px;z-index:60;padding:1.6px;border-radius:999px;overflow:hidden;isolation:isolate;box-shadow:0 30px 70px -26px rgba(0,0,0,0.98);opacity:0;transform:translate(-50%,18px);pointer-events:none;transition:opacity .45s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1);';
+    wrap.style.cssText = 'position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));z-index:60;padding:1.6px;border-radius:999px;overflow:hidden;isolation:isolate;box-shadow:0 30px 70px -26px rgba(0,0,0,0.98);opacity:0;transform:translate(-50%,18px);pointer-events:none;transition:opacity .45s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1);';
     wrap.innerHTML =
       '<div data-toast-glow aria-hidden="true" style="position:absolute;left:50%;top:50%;width:260%;aspect-ratio:1;background:conic-gradient(from 0deg, rgba(255,255,255,0) 0deg, rgba(255,255,255,0) 200deg, rgba(255,255,255,0.55) 292deg, rgba(255,255,255,0.92) 330deg, #ffffff 348deg, rgba(255,255,255,0) 360deg);animation:alToastSpin 2.6s linear infinite;"></div>' +
       '<div style="position:relative;display:flex;align-items:center;padding:14px 24px;border-radius:999px;background:var(--al-card,#1C1C1E);font-family:\'Schibsted Grotesk\',Helvetica,sans-serif;font-size:14px;letter-spacing:-0.005em;color:#f4eeeb;">' +
@@ -304,7 +304,7 @@
     // the label/state/icon compositing together as one group first, so
     // they blend against the page as a single unit rather than each
     // possibly double-blending against each other where they'd overlap
-    ".al-audio-toggle{position:fixed;top:28px;right:28px;z-index:46;display:inline-flex;align-items:center;gap:7px;border:0;background:none;padding:0;color:#fff;font-family:Poppins,Helvetica,sans-serif;font-size:13px;font-weight:600;letter-spacing:-0.005em;cursor:pointer;-webkit-tap-highlight-color:transparent;mix-blend-mode:difference;isolation:isolate;opacity:0;transform:scale(0.85);animation:alAudioEnter .5s cubic-bezier(.22,1,.36,1) .15s forwards;}",
+    ".al-audio-toggle{position:fixed;top:calc(28px + env(safe-area-inset-top));right:28px;z-index:46;display:inline-flex;align-items:center;gap:7px;border:0;background:none;padding:0;color:#fff;font-family:Poppins,Helvetica,sans-serif;font-size:13px;font-weight:600;letter-spacing:-0.005em;cursor:pointer;-webkit-tap-highlight-color:transparent;mix-blend-mode:difference;isolation:isolate;opacity:0;transform:scale(0.85);animation:alAudioEnter .5s cubic-bezier(.22,1,.36,1) .15s forwards;}",
     ".al-audio-toggle:hover{opacity:0.7;}",
     "@keyframes alAudioEnter{to{opacity:1;transform:scale(1);}}",
     "@media (prefers-reduced-motion: reduce){.al-audio-toggle{animation:none;opacity:1;transform:none;}}",
