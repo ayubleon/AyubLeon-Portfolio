@@ -20,6 +20,15 @@
 <meta name="twitter:image" content="https://ayubleon.vercel.app/images/link-preview.png">
 <style>html, body { background: #000000; margin: 0; }
   @view-transition { navigation: auto; }
+  /* the Curiosity blocks and the hero h1 start hidden because JS reveals
+     them — but held here behind .js rather than inline on the elements.
+     Inline visibility:hidden/opacity:0 is exactly what Readability-class
+     extractors strip, and that dropped the page's richest copy and its
+     only h1 before any "read this URL" tool could see them. Gated this way
+     the running site behaves identically, while the markup a fetcher
+     parses carries the text plainly */
+  html.js [data-burn-block] { visibility: hidden; }
+  html.js [data-fit-heading] { opacity: 0; }
   [data-settle-veil] { position: fixed; inset: 0; z-index: 9999; background: #000000; opacity: 1; transition: opacity .35s ease; }</style>
 <!-- the settle veil is opaque black until shared.js fades it, so anything
      that renders this page without running the scripts — a crawler, an AI
@@ -55,7 +64,11 @@
      page randomly jumping mid-scroll on refresh rather than a fresh load.
      Disabling it here, before support.js or anything else runs, makes a
      reload behave like any other fresh navigation: starting at the top -->
-<script>window.__resources = {}; history.scrollRestoration = 'manual';</script>
+<!-- the 'js' class gates the hidden starting states below. Set here, in
+     <head> before <body> is parsed, so those elements are never painted
+     visible first — and absent entirely for anything that does not run
+     scripts, which is the point: see the rules in the stylesheet above -->
+<script>document.documentElement.className += ' js'; window.__resources = {}; history.scrollRestoration = 'manual';</script>
 <!-- shared.js before support.js, and both deferred so they run in document
      order: support.js mounts each page's component, and every page's
      componentDidMount opens by calling AL.selfHeal, which shared.js defines.
@@ -260,7 +273,7 @@
   <section id="philosophy" style="position: sticky; top: 0; z-index: 2; width: 100%; background: #000000;">
     <div class="mobile-gutter" style="max-width: 1400px; margin: 0 auto; padding: 96px 40px;">
       <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; margin: 0 auto;">
-        <h1 data-fit-heading style="margin: 0; white-space: nowrap; font-family: Poppins, Helvetica, sans-serif; font-weight: 700; font-size: 6.5rem; letter-spacing: -0.04em; line-height: 1; color: #f4eeeb; opacity: 0;">Ayub Leon</h1>
+        <h1 data-fit-heading style="margin: 0; white-space: nowrap; font-family: Poppins, Helvetica, sans-serif; font-weight: 700; font-size: 6.5rem; letter-spacing: -0.04em; line-height: 1; color: #f4eeeb;">Ayub Leon</h1>
         <span style="display: inline-block; margin-top: 20px; padding: 6px 12px; background: #0056FF; color: #ffffff; font-family: Poppins, Helvetica, sans-serif; font-size: 12.5px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 0;">Product Designer</span>
         <p style="margin: 0; max-width: 46ch; font-size: 14.5px; line-height: 1.65; color: rgba(239,232,229,0.72); text-wrap: pretty;">4+ years in digital design, focused entirely on clean UI structures, system-driven workflows, and everyday utility.</p>
       </div>
@@ -283,25 +296,25 @@
           <div class="burn-progress-seg" style="flex: 1; height: 100%; border-radius: 999px; overflow: hidden; background: rgba(10,6,6,0.12);"><div class="burn-progress-seg-fill" style="height: 100%; width: 0%; background: #0a0606; border-radius: inherit;"></div></div>
           <div class="burn-progress-seg" style="flex: 1; height: 100%; border-radius: 999px; overflow: hidden; background: rgba(10,6,6,0.12);"><div class="burn-progress-seg-fill" style="height: 100%; width: 0%; background: #0a0606; border-radius: inherit;"></div></div>
         </div>
-        <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; visibility: hidden;">
+        <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
           <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">Curiosity is what <span data-curiosity-flash>drives</span> how I work.</p>
           <div data-curiosity-icon aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 0; height: 0; opacity: 0; pointer-events: none; z-index: 6;">
             <img data-curiosity-bulb src="images/curiosity-bulb.svg" alt="" style="position: absolute; left: 0; top: 0; height: 42px; width: auto; transform: translate(-50%, -50%); filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));">
             <img data-curiosity-car src="images/curiosity-car.png" alt="" style="position: absolute; left: 0; top: 0; height: 22px; width: auto; opacity: 0; transform: translate(-50%, -50%); filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));">
           </div>
         </div>
-        <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; visibility: hidden;">
+        <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
           <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">I don't just execute a brief. <span class="hl" data-pitch-anchor>I've pitched features the team hadn't considered,</span> presented directly to customers, and <span class="hl">weighed in on hiring,</span> the kind of input most designers never get pulled into.<span data-pitch-cursor aria-hidden="true" style="position: absolute; left: 0; top: 0; z-index: 2; display: block; opacity: 0; pointer-events: none; transform-origin: 0 0; will-change: transform, opacity;"><svg width="17" height="18" viewBox="0 0 17 18" fill="none" style="display: block; flex: 0 0 auto; filter: drop-shadow(0 2px 5px rgba(10,6,6,0.28));"><path d="M1.4 1.1 L1.4 13.9 L4.8 10.7 L7.1 15.9 L9.6 14.7 L7.3 9.6 L12 9.4 Z" fill="#0056FF" stroke="#FDFBF8" stroke-width="1.1" stroke-linejoin="round"/></svg></span></p>
         </div>
-        <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; visibility: hidden;">
+        <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
           <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">That <span data-process-icon-origin>curiosity</span> is also why I've spent the last year learning to <span class="hl">bring AI into my process <img data-burn-icon src="images/claude-ai-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block; opacity: 0; margin-right: 0.15em;"><img data-figma-icon src="images/figma-logo.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block;"></span>, not as a shortcut, but to <span class="hl">dig deeper into problems before</span> <span data-figma-frame>designing,<span class="figma-frame-label" aria-hidden="true">Frame 1403</span><span class="figma-frame-handle" data-corner="tl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tr" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="bl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="br" aria-hidden="true"></span></span> and move faster to working code. It's changed how I research, prototype, and build on my own.</p>
         </div>
-        <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; visibility: hidden;">
+        <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
           <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">It's also why my path through UI/UX hasn't run in one <span class="wavy-underline">straight lane. I've moved across</span> industries and problems, <span class="hl">adapting fast</span> each time, because staying curious means staying stimulated.<span class="curiosity-cat" aria-hidden="true" style="position: relative; display: inline-block; height: 1.6em; width: 2em; vertical-align: -0.4em; margin-left: 0.2em;"><img src="images/cat-frame-1.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-1"><img src="images/cat-frame-2.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-2"><img src="images/cat-frame-3.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-3"></span></p>
         </div>
         <div data-burn-grain aria-hidden="true" style="position: absolute; inset: 0; z-index: 4; opacity: 0.4; pointer-events: none;"></div>
       </div>
-      <p data-burn-srtext style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;"></p>
+      <p data-burn-srtext style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;">Curiosity is what drives how I work. I don't just execute a brief. I've pitched features the team hadn't considered, presented directly to customers, and weighed in on hiring, the kind of input most designers never get pulled into. That curiosity is also why I've spent the last year learning to bring AI into my process , not as a shortcut, but to dig deeper into problems before designing,Frame 1403 and move faster to working code. It's changed how I research, prototype, and build on my own. It's also why my path through UI/UX hasn't run in one straight lane. I've moved across industries and problems, adapting fast each time, because staying curious means staying stimulated.</p>
     </div>
   </section>
 
