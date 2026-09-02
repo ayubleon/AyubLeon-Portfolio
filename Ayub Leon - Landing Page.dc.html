@@ -376,24 +376,24 @@
         <p style="margin: 14px 0 0; font-family: Poppins, Helvetica, sans-serif; font-size: 15px; color: rgba(255,255,255,0.7);">and make it work!</p>
       </div>
 
-      <!-- Adapt -> Reinvent connector, right side. Path/viewBox are
-           rewritten by initCycleConnectors() to hit each word's actual
-           measured center — see that method for why this can't just be
-           hand-tuned percentages. preserveAspectRatio="none" is required
-           here: the CSS width (clamp(34px,5.5vw,58px)) and the viewBox
-           width (90) only match at wide viewports where 5.5vw clamps to
-           the 58 max — anywhere narrower, the default "meet" scaling
-           would preserve the viewBox's aspect ratio by shrinking height
-           to fit, centering the whole path short of the target instead
-           of stretching it the full computed height set below -->
-      <svg data-cycle-connector="right" aria-hidden="true" viewBox="0 0 90 170" preserveAspectRatio="none" fill="none" style="position: absolute; right: -8px; top: 8%; width: clamp(34px, 5.5vw, 58px); height: 34%; overflow: visible;">
-        <path data-cycle-elbow d="M2 2 H62 Q84 2 84 24 V132 Q84 154 62 154 H28" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-        <path data-cycle-arrow d="M42 147.5 L24 154 L42 160.5 Z" fill="#ffffff"/>
+      <!-- Adapt -> Reinvent connector, right side. Position, size, viewBox
+           and both paths are all rewritten by initCycleConnectors() from
+           the words' own measured boxes — see that method for why this
+           can't just be hand-tuned percentages. What ships here is only a
+           first-paint placeholder, kept visually close to the resolved
+           result so there's no jump when the measured pass lands.
+           preserveAspectRatio="none" is deliberate: that pass sets a
+           viewBox matching the element's px box exactly, so the mapping is
+           already 1:1 and "none" simply keeps it that way rather than
+           re-introducing letterboxing on a subpixel rounding difference -->
+      <svg data-cycle-connector="right" aria-hidden="true" viewBox="0 0 44 170" preserveAspectRatio="none" fill="none" style="position: absolute; right: 0; top: 8%; width: clamp(34px, 5.5vw, 58px); height: 34%; overflow: visible;">
+        <path data-cycle-elbow d="M1.75 1.75 H30.25 Q42.25 1.75 42.25 13.75 V156.25 Q42.25 168.25 30.25 168.25 H10.75" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+        <path data-cycle-arrow d="M10.75 163.25 L1.75 168.25 L10.75 173.25 Z" fill="#ffffff"/>
       </svg>
       <!-- Reinvent -> Explore connector, left side -->
-      <svg data-cycle-connector="left" aria-hidden="true" viewBox="0 0 90 170" preserveAspectRatio="none" fill="none" style="position: absolute; left: -8px; top: 50%; width: clamp(34px, 5.5vw, 58px); height: 34%; overflow: visible;">
-        <path data-cycle-elbow d="M88 2 H28 Q6 2 6 24 V132 Q6 154 28 154 H62" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-        <path data-cycle-arrow d="M48 147.5 L66 154 L48 160.5 Z" fill="#ffffff"/>
+      <svg data-cycle-connector="left" aria-hidden="true" viewBox="0 0 44 170" preserveAspectRatio="none" fill="none" style="position: absolute; left: 0; top: 50%; width: clamp(34px, 5.5vw, 58px); height: 34%; overflow: visible;">
+        <path data-cycle-elbow d="M42.25 1.75 H13.75 Q1.75 1.75 1.75 13.75 V156.25 Q1.75 168.25 13.75 168.25 H33.25" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+        <path data-cycle-arrow d="M33.25 163.25 L42.25 168.25 L33.25 173.25 Z" fill="#ffffff"/>
       </svg>
     </div>
   </section>
@@ -547,48 +547,85 @@ class Component extends DCLogic {
     ];
     if (heads.length < 3 || connectors.some((c) => !c.svg)) return;
 
-    // fixed regardless of the connector's own height: how far the elbow
-    // rounds before running straight, and the arrowhead's two dimensions.
-    // The head points along the horizontal, so BARB — its tip-to-back
-    // reach, i.e. the triangle's own height — runs horizontally, while
-    // WING is half its vertical base
-    const CORNER = 22;
-    const WING = 6.5;
-    const BARB = 18;
+    // every value below is real CSS pixels, and the viewBox is rebuilt each
+    // pass to match the element's own px box exactly, so the scale stays
+    // 1:1 on both axes. It used to be a fixed `0 0 90 h` viewBox stretched
+    // into whatever width the CSS clamp() produced: at 34px wide on a phone
+    // that squashed x to ~0.38 while leaving y at 1, which sheared the
+    // stroke and turned the corner radius into a stretched ellipse — the
+    // "weird arrows" this fixes. Uniform scale is also why the radius can
+    // be a single number rather than one per axis
+    const STROKE = 2.5;
+    // keeps the stroke's own width inside the box instead of half-clipped
+    const PAD = STROKE / 2 + 0.5;
+    const CORNER = 12;
+    // the arrowhead points along the horizontal, so BARB — its tip-to-back
+    // reach — runs horizontally, while WING is half its vertical base
+    const BARB = 9;
+    const WING = 5;
+    // clear space between a word and the connector beside it
+    const GAP = 14;
 
     const apply = () => {
       const stackRect = stack.getBoundingClientRect();
-      const centerOf = (el) => el.getBoundingClientRect().top + el.getBoundingClientRect().height / 2 - stackRect.top;
+      const centerOf = (el) => {
+        const r = el.getBoundingClientRect();
+        return r.top + r.height / 2 - stackRect.top;
+      };
 
       connectors.forEach(({ svg, from, to, side }) => {
         const startY = centerOf(heads[from]);
         const endY = centerOf(heads[to]);
-        const h = endY - startY;
-        const corner = Math.min(CORNER, h / 2);
-        const nearX = side === 'right' ? 84 : 6;
-        const farX = side === 'right' ? 62 : 28;
-        const tipX = side === 'right' ? 24 : 66;
-        // the head's back edge, measured back from the tip along the line
-        // it points down, so BARB alone controls how long it reads
-        const wingX = side === 'right' ? tipX + BARB : tipX - BARB;
+        // the box is padded past both word centers so the horizontal arms
+        // land exactly on them rather than PAD short
+        const boxH = (endY - startY) + PAD * 2;
+        const w = parseFloat(window.getComputedStyle(svg).width);
+        if (!w || !(boxH > 0)) return;
 
-        svg.setAttribute('viewBox', '0 0 90 ' + h);
-        svg.style.top = startY + 'px';
-        svg.style.height = h + 'px';
+        // anchored to the measured edges of the two words it spans rather
+        // than to the stack's own edges, which on a wide viewport left it
+        // stranded far out in the margin. Clamped so it can never be
+        // pushed outside the stack on a narrow one
+        const fromRect = heads[from].getBoundingClientRect();
+        const toRect = heads[to].getBoundingClientRect();
+        const x = side === 'right'
+          ? Math.max(fromRect.right, toRect.right) - stackRect.left + GAP
+          : Math.min(fromRect.left, toRect.left) - stackRect.left - GAP - w;
+        svg.style.left = Math.max(0, Math.min(x, stackRect.width - w)) + 'px';
+        svg.style.right = 'auto';
+        svg.style.top = (startY - PAD) + 'px';
+        svg.style.height = boxH + 'px';
+        svg.setAttribute('viewBox', '0 0 ' + w + ' ' + boxH);
+
+        // innerX is the edge nearest the words — where the top arm starts
+        // and the arrowhead points; spineX is the far vertical run
+        const innerX = side === 'right' ? PAD : w - PAD;
+        const spineX = side === 'right' ? w - PAD : PAD;
+        const radius = Math.min(CORNER, Math.abs(spineX - innerX), (boxH - PAD * 2) / 2);
+        const bendX = side === 'right' ? spineX - radius : spineX + radius;
+        const topY = PAD;
+        const botY = boxH - PAD;
+        const wingX = side === 'right' ? innerX + BARB : innerX - BARB;
+
         // selected by their own attributes rather than by position among
         // the SVG's paths, so the two stay explicit and order-independent
         const elbowPath = svg.querySelector('[data-cycle-elbow]');
         const arrowPath = svg.querySelector('[data-cycle-arrow]');
         elbowPath.setAttribute('d',
-          'M' + (side === 'right' ? 2 : 88) + ' 2 H' + farX +
-          ' Q' + nearX + ' 2 ' + nearX + ' ' + (2 + corner) +
-          ' V' + (h - corner) +
-          ' Q' + nearX + ' ' + h + ' ' + farX + ' ' + h +
-          ' H' + (side === 'right' ? 28 : 62)
+          'M' + innerX + ' ' + topY +
+          ' H' + bendX +
+          ' Q' + spineX + ' ' + topY + ' ' + spineX + ' ' + (topY + radius) +
+          ' V' + (botY - radius) +
+          ' Q' + spineX + ' ' + botY + ' ' + bendX + ' ' + botY +
+          ' H' + wingX
         );
         // closed with Z and filled (see the static markup's fill="#ffffff")
         // rather than left as an open stroked chevron, for a solid arrowhead
-        arrowPath.setAttribute('d', 'M' + wingX + ' ' + (h - WING) + ' L' + tipX + ' ' + h + ' L' + wingX + ' ' + (h + WING) + ' Z');
+        arrowPath.setAttribute('d',
+          'M' + wingX + ' ' + (botY - WING) +
+          ' L' + innerX + ' ' + botY +
+          ' L' + wingX + ' ' + (botY + WING) + ' Z'
+        );
       });
     };
 
