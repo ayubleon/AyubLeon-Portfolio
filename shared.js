@@ -414,30 +414,4 @@
     document.addEventListener('touchstart', unlockAudio);
   }
 
-  // iOS Safari tints its status bar and bottom bar to match whatever's
-  // scrolled to the very top/bottom edge of the viewport, live, as you
-  // scroll — not a flat theme-color. Every page here that's solid black
-  // start to finish never shows this. The landing page isn't: its cream
-  // Curiosity section and blue Cycle section can each sit pinned at that
-  // edge for a long scroll stretch, which is what shows up there as a
-  // stray colored bar. These two strips pin flat black exactly over the
-  // safe-area insets so there's always solid black under Safari's chrome
-  // regardless of what's scrolled beneath. Added here (JS-appended to
-  // body) rather than as static markup in the landing page itself, since
-  // support.js's own rebuild of the page strips markup placed outside
-  // its recognized component structure — appending after the fact is
-  // the same reason the audio toggle above is built this way too. Only
-  // the landing page opts into viewport-fit=cover (needed for the insets
-  // to be non-zero at all on iOS), so on every other page — and on every
-  // non-iOS browser regardless — the insets resolve to 0px and these
-  // strips take up no space
-  var safeAreaBarCSS = 'position:fixed;left:0;right:0;height:env(safe-area-inset-top);background:#000;z-index:999999;pointer-events:none;';
-  var safeAreaTop = document.createElement('div');
-  safeAreaTop.setAttribute('aria-hidden', 'true');
-  safeAreaTop.style.cssText = safeAreaBarCSS + 'top:0;';
-  document.body.appendChild(safeAreaTop);
-  var safeAreaBottom = document.createElement('div');
-  safeAreaBottom.setAttribute('aria-hidden', 'true');
-  safeAreaBottom.style.cssText = 'position:fixed;left:0;right:0;bottom:0;height:env(safe-area-inset-bottom);background:#000;z-index:999999;pointer-events:none;';
-  document.body.appendChild(safeAreaBottom);
 })();
