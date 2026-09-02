@@ -41,6 +41,52 @@
     });
   };
 
+  // covers the page with a veil matching its own black background until
+  // the DOM actually goes quiet, instead of revealing on a fixed timer.
+  // supports.js's own boot() swap is already smoothed by the
+  // @view-transition rule in each page's <head>, but that only masks a
+  // ~250-400ms browser-controlled window — the AL.selfHeal cascade above
+  // (nav/footer/badge/signature/heading patches, each re-running on every
+  // mutation from every other one) can keep touching the DOM well past
+  // that, and when it does, the tail end becomes visible as a flash on an
+  // already-settled-looking page. This waits for QUIET_MS with no
+  // qualifying mutation before revealing, so it naturally clears fast
+  // when the page is actually done and only holds longer when there's
+  // real churn left to hide — capped at MAX_WAIT_MS so a page that never
+  // fully quiets (a stray hover-driven style tweak, say) still reveals
+  // rather than staying hidden. Lives here rather than in each page's own
+  // early inline script because it has to watch the exact same
+  // childList/subtree mutations AL.selfHeal itself reacts to, so the two
+  // are one mechanism split across two functions, not two unrelated ones.
+  // The veil element itself is static markup outside <x-dc> in each
+  // page's <body> (see its own comment there) — sitting outside <x-dc>
+  // means boot()'s dc.replaceWith swap can never touch it
+  (function installSettleVeil() {
+    var veil = document.querySelector('[data-settle-veil]');
+    if (!veil) return;
+    var QUIET_MS = 220;
+    var MAX_WAIT_MS = 1400;
+    var revealed = false;
+    var quietTimer = null;
+    var observer;
+    function reveal() {
+      if (revealed) return;
+      revealed = true;
+      clearTimeout(quietTimer);
+      observer.disconnect();
+      veil.style.opacity = '0';
+      veil.addEventListener('transitionend', function () { veil.remove(); }, { once: true });
+    }
+    function scheduleReveal() {
+      clearTimeout(quietTimer);
+      quietTimer = setTimeout(reveal, QUIET_MS);
+    }
+    observer = new MutationObserver(scheduleReveal);
+    observer.observe(document.body, { childList: true, subtree: true });
+    scheduleReveal();
+    setTimeout(reveal, MAX_WAIT_MS);
+  })();
+
   // clipboard copy with a document.execCommand fallback for contexts
   // without navigator.clipboard (older Safari, non-secure origins).
   // execCommand can fail silently (returns false) as well as throw, so

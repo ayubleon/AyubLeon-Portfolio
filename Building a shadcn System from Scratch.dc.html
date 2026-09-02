@@ -18,7 +18,8 @@
 <meta name="twitter:description" content="Case study: a component framework built on shadcn/ui, originally a personal project, later adapted to power BuzzIQ.">
 <meta name="twitter:image" content="https://ayub-leon-portfolio.vercel.app/images/work-design-system-cover.png">
 <style>html, body { background: #000000; margin: 0; }
-  @view-transition { navigation: auto; }</style><link rel="preload" as="script" href="./support.js">
+  @view-transition { navigation: auto; }
+  [data-settle-veil] { position: fixed; inset: 0; z-index: 9999; background: #000000; opacity: 1; transition: opacity .35s ease; }</style><link rel="preload" as="script" href="./support.js">
 <!-- support.js's own boot() re-fetches this exact document a second time
      right after first paint (unless window.__resources is already set —
      it's meant for a build mode that bundles resources locally, which
@@ -45,6 +46,11 @@
 <script src="case-labels.js" defer></script>
 </head>
 <body>
+<!-- sits outside <x-dc> so boot()'s dc.replaceWith swap (see the
+     __resources script's own comment in <head> above) can never touch
+     it — see installSettleVeil in shared.js for why this exists and
+     how it decides when to fade out -->
+<div data-settle-veil aria-hidden="true"></div>
 <x-dc>
 <helmet>
 <meta name="viewport" content="width=device-width, initial-scale=1">
