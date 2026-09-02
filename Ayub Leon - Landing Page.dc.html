@@ -368,27 +368,10 @@
     </div>
   </section>
 
-  <!-- min-height so the blue always reaches both edges of the screen. Its
-       natural content height is shorter than a phone viewport (611px in an
-       812px one), and the black page background showing through above and
-       below it is what read as stray black bars at the status bar and under
-       the address bar — the only non-black section on the page short enough
-       for that to happen. 100vh rather than svh/dvh deliberately: on iOS vh
-       resolves to the LARGE viewport, so the section still covers the screen
-       in both toolbar states, where svh would re-open the gap the moment the
-       toolbars hid. min-height, not height, so content taller than the
-       viewport still grows the section instead of being clipped -->
-  <section id="cycle" style="position: relative; z-index: 2; width: 100%; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; background: #0056FF; padding: clamp(96px, 16vw, 160px) 40px; overflow: hidden;">
+  <section id="cycle" style="position: relative; z-index: 2; width: 100%; background: #0056FF; padding: clamp(96px, 16vw, 160px) 40px; overflow: hidden;">
     <canvas data-cycle-shader aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block;"></canvas>
-    <p style="position: relative; z-index: 1; margin: 0 auto clamp(56px, 9vw, 96px); width: 100%; max-width: 42rem; font-family: Poppins, Helvetica, sans-serif; font-weight: 500; font-size: 1.16rem; letter-spacing: -0.015em; line-height: 2; color: #ffffff; text-align: center; text-wrap: pretty;">As the landscape shifts and AI reshapes how we build,<br>my mindset moves with it</p>
-    <!-- width:100% here and on the paragraph above is load-bearing, not
-         redundant with max-width: the section is a column flex container,
-         and a flex item with an auto cross-axis margin opts out of stretch
-         alignment — so without an explicit width both would shrink to
-         fit-content. That collapsed this stack to the width of its longest
-         word and dragged the connectors, which are positioned from the
-         words' measured edges, right over the text -->
-    <div data-cycle-stack style="width: 100%; max-width: 640px; margin: 0 auto; position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: clamp(32px, 6vw, 52px);">
+    <p style="position: relative; z-index: 1; margin: 0 auto clamp(56px, 9vw, 96px); max-width: 42rem; font-family: Poppins, Helvetica, sans-serif; font-weight: 500; font-size: 1.16rem; letter-spacing: -0.015em; line-height: 2; color: #ffffff; text-align: center; text-wrap: pretty;">As the landscape shifts and AI reshapes how we build,<br>my mindset moves with it</p>
+    <div data-cycle-stack style="max-width: 640px; margin: 0 auto; position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: clamp(32px, 6vw, 52px);">
       <div>
         <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-weight: 700; font-size: clamp(1.6rem, 4.2vw, 2.75rem); letter-spacing: -0.02em; line-height: 1; color: #ffffff;">Adapt</h2>
         <p style="margin: 14px 0 0; font-family: Poppins, Helvetica, sans-serif; font-size: 15px; color: rgba(255,255,255,0.7);">to the changes</p>
