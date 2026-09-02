@@ -345,10 +345,29 @@
   // sound (the badge, the contact card avatar) can land permanently silent
   // if a hover happens to be the very first interaction on the page. Grab
   // the first genuine gesture anywhere on the page to unlock it early.
-  AL.audioGestureSeen = false;
+  //
+  // Every internal navigation is a full page load, which throws away the
+  // AudioContext along with everything else — so this used to start at
+  // false on every single page regardless of what happened on the last
+  // one, gating makeSoundPlayer's own resume() attempt below (see its
+  // comment) closed until a fresh click/tap/key landed on THIS page.
+  // That's a real, unavoidable requirement in Safari and Firefox — each
+  // document's context needs its own gesture, no way around it — but
+  // Chrome tracks per-origin media engagement and can grant a returning
+  // visitor's page a running context without a new in-page gesture at
+  // all. Seeding this from a persisted flag instead of hardcoding false
+  // means Chrome actually gets the chance to use that leniency instead
+  // of this code refusing to even try; browsers that truly require a
+  // fresh gesture are no worse off than before, since resume() failing
+  // silently there was already the fallback
+  var AUDIO_GESTURE_SEEN_KEY = 'al-audio-gesture-seen';
+  AL.audioGestureSeen = (function () {
+    try { return localStorage.getItem(AUDIO_GESTURE_SEEN_KEY) === '1'; } catch (e) { return false; }
+  })();
   if (AL.audioCtx) {
     var unlockAudio = function () {
       AL.audioGestureSeen = true;
+      try { localStorage.setItem(AUDIO_GESTURE_SEEN_KEY, '1'); } catch (e) {}
       // the site's own optimistic default (see AL.audioMuted's own
       // comment above): turn sound on now that the user has actually
       // engaged with the page, unless they've already made an explicit
