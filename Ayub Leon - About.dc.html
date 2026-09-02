@@ -291,6 +291,32 @@ class Component extends DCLogic {
     trigger.addEventListener('mouseleave', this.onBehanceLeave);
   }
 
+  // the same hover tick the nav dock's links play, on each "People I've
+  // built with" name. Matched on the existing .friend-cell class rather
+  // than a data-* hook like the rest of this file uses: this section is
+  // under the same template-lock signature.js works around (see its
+  // fixFriendsHeading), so an attribute added to the markup here isn't
+  // guaranteed to survive a rebuild, while the class ships with it.
+  // Guarded on an instance property AND a per-cell marker for the reason
+  // spelled out on initPhotoStack below, and gated to real hover devices
+  // like initBehanceTooltip above — touch fires a synthetic mouseenter
+  // right before click, which would sound the tick on a plain tap
+  initFriendHoverSound() {
+    const cells = Array.from(document.querySelectorAll('.friend-cell'));
+    if (!cells.length) return;
+    if (this.friendSoundBound && cells.every((c) => c.__friendSoundWired)) return;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    this.friendSoundBound = true;
+    this.friendCells = cells;
+    // shared across every component file that needs it (see shared.js) —
+    // each used to build its own independent player for the same sound
+    this.onFriendEnter = () => { AL.playSwitch(); };
+    cells.forEach((cell) => {
+      cell.__friendSoundWired = true;
+      cell.addEventListener('mouseenter', this.onFriendEnter);
+    });
+  }
+
   // guarded by an instance property AND a per-card marker together (like
   // initBurnText/initReveals elsewhere in this file) so repeated calls
   // (see componentDidMount, which wraps this in AL.selfHeal) skip cards
@@ -422,6 +448,7 @@ class Component extends DCLogic {
   componentDidMount() {
     AL.selfHeal(() => this.initPhotoStack(), 5000);
     AL.selfHeal(() => this.initBehanceTooltip(), 5000);
+    AL.selfHeal(() => this.initFriendHoverSound(), 5000);
     // wrapped like initPhotoStack above (not called once): these two also
     // touch nodes inside the same rebuildable <main>, and calling them
     // once left the hero/story/photo-trio images with no scroll-reveal or
@@ -521,6 +548,11 @@ class Component extends DCLogic {
       this.behanceTrigger.removeEventListener('mouseenter', this.onBehanceEnter);
       this.behanceTrigger.removeEventListener('mousemove', this.onBehanceMove);
       this.behanceTrigger.removeEventListener('mouseleave', this.onBehanceLeave);
+    }
+    if (this.friendCells) {
+      this.friendCells.forEach((cell) => {
+        cell.removeEventListener('mouseenter', this.onFriendEnter);
+      });
     }
   }
 }
