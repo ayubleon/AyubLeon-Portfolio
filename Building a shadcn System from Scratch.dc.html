@@ -38,8 +38,15 @@
      Disabling it here, before support.js or anything else runs, makes a
      reload behave like any other fresh navigation: starting at the top -->
 <script>window.__resources = {}; history.scrollRestoration = 'manual';</script>
-<script src="./support.js" defer></script>
+<!-- shared.js before support.js, and both deferred so they run in document
+     order: support.js mounts each page's component, and every page's
+     componentDidMount opens by calling AL.selfHeal, which shared.js defines.
+     With support.js first that call threw "AL is not defined" — and since
+     support.js wraps componentDidMount in a catch that only logs, every init
+     after the throw silently never registered, leaving the page's JS-driven
+     content (headings, reveals, scroll-scrub, shaders) dead with no retry -->
 <script src="shared.js" defer></script>
+<script src="./support.js" defer></script>
 <script src="project-viewer.js" defer></script>
 <script src="footer.js" defer></script>
 <script src="nav.js" defer></script>

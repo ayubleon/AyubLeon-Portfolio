@@ -38,8 +38,15 @@
      Disabling it here, before support.js or anything else runs, makes a
      reload behave like any other fresh navigation: starting at the top -->
 <script>window.__resources = {}; history.scrollRestoration = 'manual';</script>
-<script src="./support.js" defer></script>
+<!-- shared.js before support.js, and both deferred so they run in document
+     order: support.js mounts each page's component, and every page's
+     componentDidMount opens by calling AL.selfHeal, which shared.js defines.
+     With support.js first that call threw "AL is not defined" — and since
+     support.js wraps componentDidMount in a catch that only logs, every init
+     after the throw silently never registered, leaving the page's JS-driven
+     content (headings, reveals, scroll-scrub, shaders) dead with no retry -->
 <script src="shared.js" defer></script>
+<script src="./support.js" defer></script>
 <script src="project-viewer.js" defer></script>
 <script src="footer.js" defer></script>
 <script src="nav.js" defer></script>
@@ -471,16 +478,24 @@ class Component extends DCLogic {
   // does once you solve for the multiplier). Guarded + wrapped in
   // AL.selfHeal like initBurnText below — see that method's comment for
   // why: support.js can rebuild this content after mount.
-  // Guarded on an instance property (like initCycleConnectors' own
-  // onCycleResize below), not a DOM dataset flag: support.js can also
-  // unmount and remount this whole component while reusing the same DOM
-  // nodes, and a flag left on a node from the previous instance would
-  // wrongly tell a fresh instance "already done", permanently skipping
-  // re-init with no listener left alive to ever revive it
+  // Guarded on an instance property AND a marker on the heading itself
+  // (like initBurnText below) — an instance property alone missed a
+  // rebuild wave that swaps in a fresh heading node under this same
+  // still-mounted instance (this.fitBound stays true from the first run,
+  // so the fresh, never-measured heading — the exact "Ayub Leon never
+  // appears" bug this was — sat however the browser first laid it out
+  // and was never sized at all); a node marker alone would miss
+  // support.js unmounting and remounting this whole component while
+  // reusing the same DOM nodes (a flag surviving from the previous
+  // instance would tell the fresh one "already done" and permanently
+  // skip re-init, with no listener left alive to ever revive it).
+  // Requiring both handles every combination
   initHeadingFit() {
     const heading = document.querySelector('[data-fit-heading]');
-    if (!heading || this.fitBound) return;
+    if (!heading) return;
+    if (this.fitBound && heading.__fitWired) return;
     this.fitBound = true;
+    heading.__fitWired = true;
     let measureCanvas = null;
     const measureWidth = (text, fontSizePx, fontWeight, fontFamily) => {
       if (!measureCanvas) measureCanvas = document.createElement('canvas');
@@ -592,15 +607,20 @@ class Component extends DCLogic {
   // entirely within the site's existing blue (a darker and a lighter shade
   // mixed with the section's own #0056FF) rather than introducing a new
   // color. Plays on its own, driven only by u_time — no mouse interaction.
-  // Guarded on an instance property, not a DOM dataset flag — see
-  // initHeadingFit's comment above for why: a stale flag on a reused
-  // canvas would block a remounted instance from ever starting a new
-  // draw loop, freezing the shader on whatever frame the previous
-  // instance's cancelAnimationFrame caught it on
+  // Guarded on an instance property AND a marker on the canvas itself —
+  // see initHeadingFit's comment above for why neither alone is enough:
+  // an instance property alone misses a rebuild wave swapping in a fresh,
+  // never-started canvas under this same instance (frozen/unanimated —
+  // exactly this shader's own reported bug); a canvas marker alone would
+  // block a remounted instance from ever starting a new draw loop on a
+  // reused canvas, freezing it on whatever frame the previous instance's
+  // cancelAnimationFrame caught it on
   initCycleShader() {
     const canvas = document.querySelector('[data-cycle-shader]');
-    if (!canvas || this.shaderBound) return;
+    if (!canvas) return;
+    if (this.shaderBound && canvas.__shaderWired) return;
     this.shaderBound = true;
+    canvas.__shaderWired = true;
     const gl = canvas.getContext('webgl');
     if (!gl) return;
 
@@ -1022,8 +1042,22 @@ class Component extends DCLogic {
       goTo(next);
     };
 
+    let touchStartX = null;
     let touchStartY = null;
-    this.onBurnTouchStart = (e) => { touchStartY = e.touches[0].clientY; };
+    let touchStartTime = 0;
+    // set the moment a drag crosses onBurnTouchMove's own 24px threshold
+    // below and fires a navigation from it — lets onBurnTouchEnd tell "this
+    // touch was already handled as a drag" apart from "the section merely
+    // happens to be mid-transition for some unrelated reason" (checking
+    // `animating` alone would wrongly swallow a legitimate tap that lands
+    // while a previous transition is still settling)
+    let touchDidDrag = false;
+    this.onBurnTouchStart = (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchStartTime = performance.now();
+      touchDidDrag = false;
+    };
     this.onBurnTouchMove = (e) => {
       if (!engaged()) return;
       if (touchStartY === null) return;
@@ -1039,7 +1073,9 @@ class Component extends DCLogic {
       const dy = touchStartY - e.touches[0].clientY;
       if (Math.abs(dy) < 24) return;
       const dir = dy > 0 ? 1 : -1;
+      touchStartX = null;
       touchStartY = null;
+      touchDidDrag = true;
 
       if (dir > 0) {
         if (index >= count - 1) return;
@@ -1050,6 +1086,58 @@ class Component extends DCLogic {
       if (index === 0) return;
       const next = index - 1;
       goTo(next);
+    };
+
+    // phone/tablet only: a tap (not a drag) on the left or right edge of
+    // the screen steps to the previous/next block, mirroring the
+    // left/right paging affordance from e.g. Instagram Stories. Gated to
+    // coarse-pointer/no-hover devices with the same media query shared.js
+    // already uses for its own touch-vs-desktop split, since this is a
+    // touch-only affordance that would otherwise steal clicks from a
+    // mouse user hovering the edge of the viewport
+    const isTouchNav = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    // above this, a touch has moved enough to be a drag/swipe rather than
+    // a tap — matches the 24px drag threshold onBurnTouchMove already uses
+    const TAP_MAX_MOVEMENT = 10;
+    // above this, a slow press-and-release reads as something other than
+    // a deliberate tap (e.g. a long-press or an accidental rest of a finger)
+    const TAP_MAX_DURATION_MS = 300;
+    // the middle share of the screen width left untapped for navigation,
+    // so a tap near the center of the text — not clearly aimed at either
+    // edge — does nothing rather than guessing a direction
+    const TAP_DEAD_ZONE = 0.3;
+    this.onBurnTouchEnd = (e) => {
+      if (!isTouchNav) return;
+      if (!engaged()) return;
+      if (touchStartX === null || touchStartY === null) return;
+      const dragged = touchDidDrag;
+      const startX = touchStartX;
+      const startY = touchStartY;
+      const elapsed = performance.now() - touchStartTime;
+      touchStartX = null;
+      touchStartY = null;
+      if (dragged) return;
+      if (animating) return;
+      if (performance.now() < cooldownUntil) return;
+      const touch = e.changedTouches[0];
+      const dx = touch.clientX - startX;
+      const dy = touch.clientY - startY;
+      if (Math.abs(dx) > TAP_MAX_MOVEMENT || Math.abs(dy) > TAP_MAX_MOVEMENT) return;
+      if (elapsed > TAP_MAX_DURATION_MS) return;
+      const half = window.innerWidth / 2;
+      const distanceFromCenter = Math.abs(touch.clientX - half) / half;
+      if (distanceFromCenter < TAP_DEAD_ZONE) return;
+
+      if (touch.clientX > half) {
+        if (index >= count - 1) return;
+        startCooldown();
+        goTo(index + 1);
+        return;
+      }
+
+      if (index === 0) return;
+      startCooldown();
+      goTo(index - 1);
     };
 
     // keyboard scrolling (arrow keys, Space, Page Up/Down) previously
@@ -1098,6 +1186,7 @@ class Component extends DCLogic {
     window.addEventListener('wheel', this.onBurnWheel, { passive: false });
     window.addEventListener('touchstart', this.onBurnTouchStart, { passive: true });
     window.addEventListener('touchmove', this.onBurnTouchMove, { passive: false });
+    window.addEventListener('touchend', this.onBurnTouchEnd, { passive: true });
     window.addEventListener('keydown', this.onBurnKey, { passive: false });
   }
 
@@ -1347,17 +1436,21 @@ class Component extends DCLogic {
     document.addEventListener('click', this.onDocClick);
   }
 
-  // Guarded on an instance property, not a DOM dataset flag — see
-  // initHeadingFit's comment for why: support.js can unmount and remount
-  // this whole component while reusing the same DOM nodes, and a flag
-  // left on the list from a previous instance would tell a fresh one
-  // "already done", leaving the scroll-scrub permanently dead since the
-  // previous instance's own listener was already torn down on unmount
+  // Guarded on an instance property AND a marker on each row (like
+  // initBurnText) — see initHeadingFit's comment for why neither alone is
+  // enough: an instance property alone misses a rebuild wave that swaps
+  // in fresh rows under this same instance (this.workBound stays true, so
+  // the fresh rows never get their scroll-scrub wired at all — exactly
+  // the "Featured Work scroll doesn't work" bug this was); a row marker
+  // alone would miss support.js unmounting and remounting this whole
+  // component while reusing the same DOM nodes, telling a fresh instance
+  // "already done" and leaving the scroll-scrub permanently dead since
+  // the previous instance's own listener was already torn down on unmount
   initWork() {
     const section = document.querySelector('[data-work-section]');
     const list = document.querySelector('[data-work-list]');
     const viewport = document.querySelector('[data-work-viewport]');
-    if (!section || !list || this.workBound) return;
+    if (!section || !list) return;
     const rows = Array.from(section.querySelectorAll('[data-work-row]'));
     // the wrapper section/list can exist before support.js has actually
     // rendered the rows into it — bail without setting the bound flag so
@@ -1365,7 +1458,9 @@ class Component extends DCLogic {
     // again, instead of crashing paint() on an empty rows array and
     // permanently locking this out via a flag set before that crash
     if (!rows.length) return;
+    if (this.workBound && rows.every((r) => r.__workWired)) return;
     this.workBound = true;
+    rows.forEach((r) => { r.__workWired = true; });
     // tear down the previous rebuild's window listener before replacing it
     // with a fresh closure over the current live rows/panels — same
     // teardown-before-rebind shape as footer.js's wordmark resize wiring,
@@ -1467,6 +1562,7 @@ class Component extends DCLogic {
     window.removeEventListener('wheel', this.onBurnWheel);
     window.removeEventListener('touchstart', this.onBurnTouchStart);
     window.removeEventListener('touchmove', this.onBurnTouchMove);
+    window.removeEventListener('touchend', this.onBurnTouchEnd);
     window.removeEventListener('keydown', this.onBurnKey);
   }
 }

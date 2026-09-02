@@ -41,8 +41,15 @@
      Disabling it here, before support.js or anything else runs, makes a
      reload behave like any other fresh navigation: starting at the top -->
 <script>window.__resources = {}; history.scrollRestoration = 'manual';</script>
-<script src="./support.js" defer></script>
+<!-- shared.js before support.js, and both deferred so they run in document
+     order: support.js mounts each page's component, and every page's
+     componentDidMount opens by calling AL.selfHeal, which shared.js defines.
+     With support.js first that call threw "AL is not defined" — and since
+     support.js wraps componentDidMount in a catch that only logs, every init
+     after the throw silently never registered, leaving the page's JS-driven
+     content (headings, reveals, scroll-scrub, shaders) dead with no retry -->
 <script src="shared.js" defer></script>
+<script src="./support.js" defer></script>
 <script src="project-viewer.js" defer></script>
 <script src="footer.js" defer></script>
 <script src="nav.js" defer></script>
@@ -251,18 +258,24 @@ class Component extends DCLogic {
   // guarded the same way as initPhotoStack (an instance property +
   // AL.selfHeal), since this element is also rendered inside <main> and
   // subject to the same support.js rebuild-wave quirk documented there.
-  // An instance property rather than a DOM dataset flag: support.js can
-  // also unmount and remount this whole component while reusing the same
-  // DOM nodes, and a flag left on the trigger from a previous instance
-  // would tell a fresh one "already done" — this file's own teardown
-  // already removes the previous instance's listeners on unmount, so a
-  // stale flag here would leave the tooltip permanently dead
+  // Guarded on an instance property AND a marker on the trigger itself —
+  // see initPhotoStack's comment above for why neither alone is enough:
+  // an instance property alone misses a rebuild wave swapping in a fresh
+  // trigger under this same instance (this.tipBound stays true, so the
+  // fresh trigger never gets its hover listeners at all); a trigger
+  // marker alone would miss support.js unmounting and remounting this
+  // whole component while reusing the same DOM nodes — this file's own
+  // teardown already removes the previous instance's listeners on
+  // unmount, so a stale flag here would leave the tooltip permanently
+  // dead with nothing left to revive it
   initBehanceTooltip() {
     const trigger = document.querySelector('[data-behance-trigger]');
     const tip = document.querySelector('[data-behance-tooltip]');
-    if (!trigger || !tip || this.tipBound) return;
+    if (!trigger || !tip) return;
+    if (this.tipBound && trigger.__tipWired) return;
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     this.tipBound = true;
+    trigger.__tipWired = true;
     this.behanceTrigger = trigger;
     // shared across every component file that needs it (see shared.js) —
     // each used to build its own independent player for the same sound
@@ -278,24 +291,33 @@ class Component extends DCLogic {
     trigger.addEventListener('mouseleave', this.onBehanceLeave);
   }
 
-  // guarded by an instance property so repeated calls (see
-  // componentDidMount, which wraps this in AL.selfHeal) skip elements
+  // guarded by an instance property AND a per-card marker together (like
+  // initBurnText/initReveals elsewhere in this file) so repeated calls
+  // (see componentDidMount, which wraps this in AL.selfHeal) skip cards
   // already wired up — support.js rebuilds this page's <main> from its
   // own template in more than one wave during startup (same quirk
   // signature.js works around), which was silently orphaning this
   // stack's transforms and pointer listeners on whichever wave replaced
-  // its DOM nodes last. An instance property rather than a DOM dataset
-  // flag, since support.js can also unmount and remount this whole
-  // component while reusing the same DOM nodes — a flag left on the
-  // stack from a previous instance would tell a fresh one "already
-  // done" and permanently skip re-wiring
+  // its DOM nodes last. Neither guard alone covers both ways this can go
+  // wrong: an instance property alone misses a rebuild wave that swaps
+  // in fresh cards under this same still-mounted instance (this.stackBound
+  // stays true from the first run, so the fresh, unstyled cards — all
+  // stacked flush with no peek offset, exactly this bug's symptom — never
+  // get laid out at all); a per-card flag alone misses support.js
+  // unmounting and remounting this whole component while reusing the same
+  // DOM nodes (a flag surviving from the previous instance would tell the
+  // fresh one "already done" and permanently skip wiring). Requiring both
+  // handles every combination: a genuinely redundant call skips cleanly,
+  // either scenario above still re-wires
   initPhotoStack() {
     const stack = document.querySelector('[data-photo-stack]');
-    if (!stack || this.stackBound) return;
+    if (!stack) return;
+    const cards = Array.from(stack.querySelectorAll('[data-stack-card]'));
+    if (this.stackBound && cards.every((c) => c.__stackWired)) return;
     this.stackBound = true;
+    cards.forEach((c) => { c.__stackWired = true; });
     const EASE = 'cubic-bezier(.16,1,.3,1)';
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const cards = Array.from(stack.querySelectorAll('[data-stack-card]'));
     // logical front-to-back order, kept in JS only — never reorders real DOM nodes,
     // since this template is rendered by React and direct DOM reordering fights its reconciliation
     let order = cards.map((_, i) => i);

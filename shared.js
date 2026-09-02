@@ -25,20 +25,70 @@
 
   // self-healing mount/patch runner: support.js can rebuild the page's
   // <main> content from its own internal template after first paint, in
-  // one or more waves — this re-runs `runFn` on every DOM mutation until a
-  // settle window past `load` has passed with nothing left to react to,
-  // then stops watching instead of leaving an observer running forever.
+  // one or more waves — this re-runs `runFn` on every DOM mutation until
+  // the DOM has been quiet for a settle window, then stops watching
+  // instead of leaving an observer running forever.
   // Used by every self-mounting component on the site (nav, footer,
   // badge, the About page's signature/heading patches, the case study
   // label/card patches).
   AL.selfHeal = function (runFn, settleMs) {
-    runFn();
-    var observer = new MutationObserver(runFn);
-    observer.observe(document.body, { childList: true, subtree: true });
-    window.addEventListener('load', function () {
-      runFn();
-      setTimeout(function () { observer.disconnect(); }, settleMs || 3000);
+    var SETTLE_MS = settleMs || 3000;
+    // absolute ceiling on how long an observer can stay attached, so a page
+    // whose DOM never fully quiets (an extension animating nodes, a stray
+    // hover-driven style tweak) still releases it rather than re-running
+    // runFn for the lifetime of the tab — same escape hatch, and the same
+    // reasoning, as the settle veil's own MAX_WAIT_MS below
+    var MAX_HEAL_MS = 20000;
+    var observer;
+    var idleTimer = null;
+    var stopped = false;
+    // support.js invokes componentDidMount inside a try/catch that only
+    // logs, so an unguarded throw from any one runFn used to abort every
+    // AL.selfHeal call after it in that same componentDidMount — one
+    // failing feature silently taking several unrelated ones down with it.
+    // Worse, a throw on the very first run below would skip the observer
+    // registration too, so nothing was left watching to ever retry. Both
+    // failure modes are why this is caught per-run rather than per-page
+    var safeRun = function () {
+      try { runFn(); } catch (e) { console.error(e); }
+    };
+    var stop = function () {
+      if (stopped) return;
+      stopped = true;
+      clearTimeout(idleTimer);
+      observer.disconnect();
+    };
+    // the settle window is measured from the last DOM change rather than
+    // from `load`, which is what it used to key off. support.js's rebuild
+    // waves are the whole reason this exists, and `load` says nothing about
+    // when the last of them lands — a timer anchored to it can expire while
+    // rebuilds are still arriving, disconnecting the observer just before
+    // the wave it was watching for, and whatever that wave replaced then
+    // stays permanently un-wired with nothing alive to notice. Re-arming on
+    // each mutation keeps the observer up for as long as the page is
+    // actually still churning, which is what the comment above always
+    // claimed this did but the `load`-anchored version never actually did
+    var scheduleStop = function () {
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(stop, SETTLE_MS);
+    };
+    safeRun();
+    observer = new MutationObserver(function () {
+      safeRun();
+      scheduleStop();
     });
+    observer.observe(document.body, { childList: true, subtree: true });
+    setTimeout(stop, MAX_HEAL_MS);
+    var onLoad = function () {
+      safeRun();
+      scheduleStop();
+    };
+    // `load` may already have fired by the time a component gets here (a
+    // late-evaluated <script>, a bfcache restore) — in that case the
+    // listener would never fire at all, leaving the observer with no stop
+    // scheduled but MAX_HEAL_MS
+    if (document.readyState === 'complete') onLoad();
+    else window.addEventListener('load', onLoad);
   };
 
   // covers the page with a veil matching its own black background until
