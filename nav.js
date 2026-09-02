@@ -1,7 +1,7 @@
 (function () {
   var CSS = [
     "@keyframes siteNavRise{from{opacity:0;transform:translateX(-50%) translateY(16px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}",
-    ".site-nav-dock{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:4px;padding:8px;border-radius:999px;border:1px solid var(--al-border,rgba(255,255,255,0.13));background:var(--al-card,#1C1C1E);box-shadow:inset 0 1px 0 var(--al-border-strong,rgba(255,255,255,0.16)),inset 0 -1px 0 rgba(0,0,0,0.35),0 22px 50px -28px rgba(0,0,0,0.9);}",
+    ".site-nav-dock{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:4px;padding:8px;border-radius:999px;border:1px solid var(--al-border,rgba(255,255,255,0.13));background:var(--al-card,#1C1C1E);box-shadow:inset 0 1px 0 var(--al-border-strong,rgba(255,255,255,0.16)),inset 0 -1px 0 rgba(0,0,0,0.35),0 22px 50px -28px rgba(0,0,0,0.9);}",
     // this rise plays once per browser tab, not on every single page —
     // see the sessionStorage check in navHTML() below. Split into its own
     // modifier class rather than left on .site-nav-dock unconditionally,
@@ -31,7 +31,7 @@
     // deliberate, non-hover way to reach this button
     "@media (hover:hover) and (pointer:fine){.site-nav-avatar-btn:hover .site-nav-tooltip{opacity:1;transform:translate(-50%,0);}}",
     ".site-nav-avatar-btn:focus-visible .site-nav-tooltip{opacity:1;transform:translate(-50%,0);}",
-    "@media (max-width:700px){.site-nav-dock{bottom:calc(16px + env(safe-area-inset-bottom));gap:4px;}.site-nav-link{padding:11px 16px;font-size:13px;}}",
+    "@media (max-width:700px){.site-nav-dock{bottom:16px;gap:4px;}.site-nav-link{padding:11px 16px;font-size:13px;}}",
     ".site-contact-backdrop{position:fixed;inset:0;z-index:39;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .35s ease;}",
     ".site-contact-backdrop.is-open{opacity:1;pointer-events:auto;}",
     ".site-contact-card{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) rotate(2deg) scale(0.4);width:min(300px,calc(100vw - 32px));background:var(--al-card,#1C1C1E);border:1px solid var(--al-border,rgba(255,255,255,0.13));border-radius:18px;padding:68px 24px 24px;box-shadow:inset 0 1px 0 var(--al-border-strong,rgba(255,255,255,0.16)),inset 0 -1px 0 rgba(0,0,0,0.35),0 30px 70px -26px rgba(0,0,0,0.9);z-index:41;opacity:0;pointer-events:none;transition:opacity .35s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.16,1,.3,1);" +

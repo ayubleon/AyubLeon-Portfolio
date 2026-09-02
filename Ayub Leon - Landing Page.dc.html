@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ayub Leon | Product Designer</title>
 <meta name="description" content="Portfolio of Ayub Leon, a product designer with 4+ years of experience building TikTok Shop platforms, Crash betting games, Banking apps, and Design systems">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -60,7 +60,7 @@
 <div data-settle-veil aria-hidden="true"></div>
 <x-dc>
 <helmet>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=Instrument+Serif:ital@0;1&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
@@ -252,14 +252,11 @@
         <!-- sits above the nav dock rather than centred on the viewport
              floor: the dock is fixed at bottom:22px (16px under 700px) and
              is ~64px tall, so anything below ~86px from the bottom is
-             covered by it. Both carry the same safe-area-inset-bottom term,
-             so they stay this far apart once the page renders under the
-             home indicator (see viewport-fit=cover in the head).
-             aria-hidden because it's a pointing device for sighted users
-             only — [data-burn-srtext] below already gives assistive tech
-             the whole section's copy in one pass -->
-        <span data-burn-scrollcue aria-hidden="true" style="position: absolute; bottom: calc(108px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 5; font-family: Poppins, Helvetica, sans-serif; font-size: 12.5px; font-weight: 500; letter-spacing: 0.06em; color: rgba(10,6,6,0.3); pointer-events: none; white-space: nowrap;">Scroll ↓</span>
-        <div data-burn-progress aria-hidden="true" style="position: absolute; top: calc(40px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); width: min(420px, 40vw); height: 3px; display: flex; gap: 6px; z-index: 5;">
+             covered by it. aria-hidden because it's a pointing device for
+             sighted users only — [data-burn-srtext] below already gives
+             assistive tech the whole section's copy in one pass -->
+        <span data-burn-scrollcue aria-hidden="true" style="position: absolute; bottom: 108px; left: 50%; transform: translateX(-50%); z-index: 5; font-family: Poppins, Helvetica, sans-serif; font-size: 12.5px; font-weight: 500; letter-spacing: 0.06em; color: rgba(10,6,6,0.3); pointer-events: none; white-space: nowrap;">Scroll ↓</span>
+        <div data-burn-progress aria-hidden="true" style="position: absolute; top: 40px; left: 50%; transform: translateX(-50%); width: min(420px, 40vw); height: 3px; display: flex; gap: 6px; z-index: 5;">
           <div class="burn-progress-seg" style="flex: 1; height: 100%; border-radius: 999px; overflow: hidden; background: rgba(10,6,6,0.12);"><div class="burn-progress-seg-fill" style="height: 100%; width: 0%; background: #0a0606; border-radius: inherit;"></div></div>
           <div class="burn-progress-seg" style="flex: 1; height: 100%; border-radius: 999px; overflow: hidden; background: rgba(10,6,6,0.12);"><div class="burn-progress-seg-fill" style="height: 100%; width: 0%; background: #0a0606; border-radius: inherit;"></div></div>
           <div class="burn-progress-seg" style="flex: 1; height: 100%; border-radius: 999px; overflow: hidden; background: rgba(10,6,6,0.12);"><div class="burn-progress-seg-fill" style="height: 100%; width: 0%; background: #0a0606; border-radius: inherit;"></div></div>
@@ -497,7 +494,6 @@ class Component extends DCLogic {
     AL.selfHeal(() => this.initBurnText(), 5000);
     AL.selfHeal(() => this.initCycleConnectors(), 5000);
     AL.selfHeal(() => this.initCycleShader(), 5000);
-    AL.selfHeal(() => this.initThemeColor(), 5000);
   }
 
   // sizes the "Ayub Leon" heading so its rendered width is always exactly
@@ -667,68 +663,6 @@ class Component extends DCLogic {
     if (!this.onCycleResize) {
       this.onCycleResize = apply;
       window.addEventListener('resize', this.onCycleResize);
-    }
-  }
-
-  // iOS Safari paints its status bar and bottom toolbar with theme-color,
-  // and a single static #000000 is what reads as black bars above and below
-  // the page once a cream or blue section fills the screen. The About page
-  // never shows it because that page is dark-framed throughout, so black
-  // chrome passes as part of the design — this one isn't, so the colour has
-  // to follow the section on screen. Picks whichever covers the most of the
-  // viewport rather than whichever sits at the top edge, because Safari uses
-  // this one value for BOTH its top and bottom chrome: at the very bottom of
-  // the page the top edge is still #cycle's blue while the black footer owns
-  // most of the screen, and tinting both bars blue there is the worse of the
-  // two errors. Everywhere else the two rules agree, since #curiosity and
-  // #cycle each fill the viewport on their own
-  initThemeColor() {
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (!meta) return;
-    // the hero sits above all of these and is black, so no visible section
-    // means the page's own black background is what's on screen
-    const FALLBACK = '#000000';
-
-    const apply = () => {
-      const sections = Array.from(
-        document.querySelectorAll('#philosophy, #curiosity, #work, #cycle, [data-footer-mount]')
-      );
-      const viewportHeight = window.innerHeight;
-      let color = FALLBACK;
-      let widest = 0;
-      sections.forEach((section) => {
-        const rect = section.getBoundingClientRect();
-        const visible = Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0);
-        // the bail is `< widest`, not `<= widest`, so a section tying the
-        // current best still replaces it — leaving the last such section in
-        // document order as the winner, which is the one painted on top.
-        // That's what keeps #philosophy from claiming the colour while it
-        // sits pinned underneath the sections scrolling over it
-        if (visible <= 0 || visible < widest) return;
-        const background = window.getComputedStyle(section).backgroundColor;
-        // a transparent section says nothing about what's on screen; skip it
-        // rather than let it count as the answer
-        if (!background || background === 'rgba(0, 0, 0, 0)' || background === 'transparent') return;
-        widest = visible;
-        color = background;
-      });
-      if (meta.content !== color) meta.content = color;
-    };
-
-    apply();
-    // apply() is safe to re-run on every AL.selfHeal call; the listeners
-    // are not, and would stack duplicates without this guard — same shape
-    // as initCycleConnectors' own onCycleResize above
-    if (!this.onThemeColorScroll) {
-      let frame = null;
-      // coalesced to one pass per frame: this fires on every scroll event
-      // and getBoundingClientRect forces layout each time
-      this.onThemeColorScroll = () => {
-        if (frame) return;
-        frame = requestAnimationFrame(() => { frame = null; apply(); });
-      };
-      window.addEventListener('scroll', this.onThemeColorScroll, { passive: true });
-      window.addEventListener('resize', this.onThemeColorScroll);
     }
   }
 
@@ -1718,8 +1652,6 @@ class Component extends DCLogic {
     window.removeEventListener('touchmove', this.onBurnTouchMove);
     window.removeEventListener('touchend', this.onBurnTouchEnd);
     window.removeEventListener('keydown', this.onBurnKey);
-    window.removeEventListener('scroll', this.onThemeColorScroll);
-    window.removeEventListener('resize', this.onThemeColorScroll);
   }
 }
 
