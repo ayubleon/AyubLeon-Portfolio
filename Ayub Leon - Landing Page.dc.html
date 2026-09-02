@@ -168,7 +168,9 @@
     [data-burn-runway] { height: auto !important; }
     [data-burn-viewport] { position: static !important; height: auto !important; overflow: visible !important; padding: 32px 0; }
     [data-burn-block] { position: static !important; visibility: visible !important; opacity: 1 !important; transform: none !important; display: block !important; margin-bottom: 28px; }
-    [data-burn-progress], [data-burn-grain] { display: none !important; }
+    /* the scroll cue goes with them: this fallback unpins the runway into a
+       plain stack, so there's no one-block-at-a-time scrolling left to cue */
+    [data-burn-progress], [data-burn-grain], [data-burn-scrollcue] { display: none !important; }
     /* [data-burn-icon] sits opacity:0 by default (see its inline style),
        only revealed by playProcessIcon()'s fly-in — which never runs
        here, since that method's own reduced-motion check returns before
@@ -247,6 +249,13 @@
   <section id="curiosity" style="position: relative; z-index: 2; width: 100%; background: var(--al-card-light,#FDFBF8); color: #0a0606;">
     <div data-burn-runway style="width: 100%; height: calc(170vh * 4);">
       <div data-burn-viewport style="position: sticky; top: 0; height: 100svh; width: 100%; overflow: hidden;">
+        <!-- sits above the nav dock rather than centred on the viewport
+             floor: the dock is fixed at bottom:22px (16px under 700px) and
+             is ~64px tall, so anything below ~86px from the bottom is
+             covered by it. aria-hidden because it's a pointing device for
+             sighted users only — [data-burn-srtext] below already gives
+             assistive tech the whole section's copy in one pass -->
+        <span data-burn-scrollcue aria-hidden="true" style="position: absolute; bottom: 108px; left: 50%; transform: translateX(-50%); z-index: 5; font-family: Poppins, Helvetica, sans-serif; font-size: 12.5px; font-weight: 500; letter-spacing: 0.06em; color: rgba(10,6,6,0.3); pointer-events: none; white-space: nowrap;">Scroll ↓</span>
         <div data-burn-progress aria-hidden="true" style="position: absolute; top: 40px; left: 50%; transform: translateX(-50%); width: min(420px, 40vw); height: 3px; display: flex; gap: 6px; z-index: 5;">
           <div class="burn-progress-seg" style="flex: 1; height: 100%; border-radius: 999px; overflow: hidden; background: rgba(10,6,6,0.12);"><div class="burn-progress-seg-fill" style="height: 100%; width: 0%; background: #0a0606; border-radius: inherit;"></div></div>
           <div class="burn-progress-seg" style="flex: 1; height: 100%; border-radius: 999px; overflow: hidden; background: rgba(10,6,6,0.12);"><div class="burn-progress-seg-fill" style="height: 100%; width: 0%; background: #0a0606; border-radius: inherit;"></div></div>

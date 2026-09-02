@@ -143,6 +143,13 @@
 
   var FOOTER_MODE_TOGGLE_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7"/><path d="M3 3h5.28a1 1 0 0 1 .948.684l5.544 16.632a1 1 0 0 0 .949.684H21"/></svg>';
 
+  // shared by both of the footer's cursor-following tooltips (the Figma
+  // triggers' and the layout toggle's) so the two can't drift apart —
+  // position:fixed because AL.positionCursorTooltip writes viewport
+  // coordinates, and parked off-screen until a hover moves it so it never
+  // flashes at 0,0 on first paint
+  var CURSOR_TOOLTIP_CSS = 'position:fixed;top:0;left:0;z-index:9999;padding:6px 12px;background:#0056FF;color:#ffffff;font-family:Poppins,Helvetica,sans-serif;font-size:12.5px;font-weight:500;white-space:nowrap;border-radius:0;opacity:0;pointer-events:none;transition:opacity .15s ease;transform:translate(-9999px,-9999px);';
+
   // the pale-to-color Figma icon crossfade, reused for the icon-only
   // Figma link (RESOURCES column) — same mask trick as the keyboard's
   // Figma key: a solid-color silhouette by default, the real logo faded
@@ -229,7 +236,8 @@
           '<p style="margin:40px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:var(--al-text-muted,rgba(239,232,229,0.45));">©2026<br>Designed in Figma, Built with Claude</p>' +
         '</div>' +
       '</footer>' +
-      '<span data-figma-tooltip aria-hidden="true" style="position:fixed;top:0;left:0;z-index:9999;padding:6px 12px;background:#0056FF;color:#ffffff;font-family:Poppins,Helvetica,sans-serif;font-size:12.5px;font-weight:500;white-space:nowrap;border-radius:0;opacity:0;pointer-events:none;transition:opacity .15s ease;transform:translate(-9999px,-9999px);">Website breakdown</span>'
+      '<span data-figma-tooltip aria-hidden="true" style="' + CURSOR_TOOLTIP_CSS + '">Website breakdown</span>' +
+      '<span data-mode-tooltip aria-hidden="true" style="' + CURSOR_TOOLTIP_CSS + '">Click to switch</span>'
     );
   };
 
@@ -304,22 +312,33 @@
       });
 
       // same cursor-following tooltip treatment as the About page's
-      // Behance trigger — blue tag beside the cursor, offset so it
-      // doesn't sit directly under the pointer. Wired to every Figma
-      // trigger on the page (the keyboard's Figma key and the RESOURCES
-      // icon link both carry data-figma-key), not just one
-      var figmaTip = el.querySelector('[data-figma-tooltip]');
-      if (figmaTip) {
-        var moveFigmaTip = function (e) { AL.positionCursorTooltip(figmaTip, e, 18, 20, 'left'); };
-        el.querySelectorAll('[data-figma-key]').forEach(function (figmaKey) {
-          figmaKey.addEventListener('mouseenter', function (e) {
-            figmaTip.style.opacity = '1';
-            moveFigmaTip(e);
+      // Behance trigger — blue tag beside the cursor, offset so it doesn't
+      // sit directly under the pointer. Takes a list of triggers rather
+      // than one, since the Figma tag answers to both of its triggers (the
+      // keyboard's Figma key and the RESOURCES icon link each carry
+      // data-figma-key)
+      var bindCursorTooltip = function (tip, triggers) {
+        if (!tip || !triggers.length) return;
+        var move = function (e) { AL.positionCursorTooltip(tip, e, 18, 20, 'left'); };
+        triggers.forEach(function (trigger) {
+          trigger.addEventListener('mouseenter', function (e) {
+            tip.style.opacity = '1';
+            move(e);
           });
-          figmaKey.addEventListener('mousemove', moveFigmaTip);
-          figmaKey.addEventListener('mouseleave', function () { figmaTip.style.opacity = '0'; });
+          trigger.addEventListener('mousemove', move);
+          trigger.addEventListener('mouseleave', function () { tip.style.opacity = '0'; });
         });
-      }
+      };
+      bindCursorTooltip(
+        el.querySelector('[data-figma-tooltip]'),
+        Array.from(el.querySelectorAll('[data-figma-key]'))
+      );
+      // the layout toggle gives no hint what it does — the icon alone
+      // doesn't read as "swap the footer between keyboard and links"
+      bindCursorTooltip(
+        el.querySelector('[data-mode-tooltip]'),
+        modeToggle ? [modeToggle] : []
+      );
     }
   }
 
