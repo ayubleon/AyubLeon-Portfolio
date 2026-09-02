@@ -170,7 +170,10 @@
     [data-burn-block] { position: static !important; visibility: visible !important; opacity: 1 !important; transform: none !important; display: block !important; margin-bottom: 28px; }
     /* the scroll cue goes with them: this fallback unpins the runway into a
        plain stack, so there's no one-block-at-a-time scrolling left to cue */
-    [data-burn-progress], [data-burn-grain], [data-burn-scrollcue] { display: none !important; }
+    /* the pitch cursor goes too: it's parked by JS from the measured
+       position of the phrase it points at, and that never runs here, so
+       it would otherwise sit at the paragraph's top-left over the text */
+    [data-burn-progress], [data-burn-grain], [data-burn-scrollcue], [data-pitch-cursor] { display: none !important; }
     /* [data-burn-icon] sits opacity:0 by default (see its inline style),
        only revealed by playProcessIcon()'s fly-in — which never runs
        here, since that method's own reduced-motion check returns before
@@ -270,7 +273,7 @@
           </div>
         </div>
         <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; visibility: hidden;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">I don't just execute a brief. <span class="hl">I've pitched features the team hadn't considered,</span> presented directly to customers, and <span class="hl">weighed in on hiring,</span> the kind of input most designers never get pulled into.</p>
+          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">I don't just execute a brief. <span class="hl" data-pitch-anchor>I've pitched features the team hadn't considered,</span> presented directly to customers, and <span class="hl">weighed in on hiring,</span> the kind of input most designers never get pulled into.<span data-pitch-cursor aria-hidden="true" style="position: absolute; left: 0; top: 0; z-index: 2; display: block; opacity: 0; pointer-events: none; transform-origin: 0 0; will-change: transform, opacity;"><svg width="17" height="18" viewBox="0 0 17 18" fill="none" style="display: block; flex: 0 0 auto; filter: drop-shadow(0 2px 5px rgba(10,6,6,0.28));"><path d="M1.4 1.1 L1.4 13.9 L4.8 10.7 L7.1 15.9 L9.6 14.7 L7.3 9.6 L12 9.4 Z" fill="#0056FF" stroke="#FDFBF8" stroke-width="1.1" stroke-linejoin="round"/></svg></span></p>
         </div>
         <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; visibility: hidden;">
           <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">That <span data-process-icon-origin>curiosity</span> is also why I've spent the last year learning to <span class="hl">bring AI into my process <img data-burn-icon src="images/claude-ai-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block; opacity: 0; margin-right: 0.15em;"><img data-figma-icon src="images/figma-logo.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block;"></span>, not as a shortcut, but to <span class="hl">dig deeper into problems before</span> <span data-figma-frame>designing,<span class="figma-frame-label" aria-hidden="true">Frame 1403</span><span class="figma-frame-handle" data-corner="tl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tr" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="bl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="br" aria-hidden="true"></span></span> and move faster to working code. It's changed how I research, prototype, and build on my own.</p>
@@ -901,10 +904,15 @@ class Component extends DCLogic {
     let index = 0; // 0 = block 1 ... count-1 = the last block
     let animating = false;
     let settleTimer = null;
-    // block 3 (0-indexed) — the one whose text carries the inline AI icon
-    // right after "process". Landing on it, from either direction, is what
-    // cues that icon's own little flip-and-settle (see playProcessIcon)
-    const PROCESS_ICON_BLOCK_INDEX = 2;
+    // the blocks that carry their own arrival animation, by 0-based index:
+    // block 2's multiplayer cursor and block 3's inline AI icon. Landing on
+    // one of these, from either direction, is what cues it — kept as a map
+    // rather than a flag per animation so adding one to another block is
+    // just another entry here
+    const ARRIVAL_ANIMATIONS = {
+      1: () => this.playPitchCursor(),
+      2: () => this.playProcessIcon()
+    };
 
     const engaged = () => {
       const rect = runway.getBoundingClientRect();
@@ -916,27 +924,28 @@ class Component extends DCLogic {
       const scrollable = rect.height - window.innerHeight;
       return runwayTop + (i / (count - 1)) * scrollable;
     };
-    // whether the transition currently settling is the one that landed on
-    // the process-icon block — checked once, here, rather than firing the
-    // icon straight from goTo(): mid-transition the block is still
-    // scaling/fading in (see the depth-lens transform in update()), so
-    // measuring its layout that early would fly the icon in from the
-    // wrong spot. Waiting for settle() means the block is already at its
-    // resting size and position before playProcessIcon measures anything
-    let pendingProcessIcon = false;
+    // the arrival animation the transition currently settling should play,
+    // held here rather than fired straight from goTo(): mid-transition the
+    // block is still scaling/fading in (see the depth-lens transform in
+    // update()), so measuring its layout that early would start the
+    // animation from the wrong spot. Waiting for settle() means the block
+    // is already at its resting size and position before either
+    // playPitchCursor or playProcessIcon measures anything
+    let pendingArrival = null;
     const settle = () => {
       animating = false;
       window.removeEventListener('scrollend', settle);
       clearTimeout(settleTimer);
-      if (pendingProcessIcon) {
-        pendingProcessIcon = false;
-        this.playProcessIcon();
+      if (pendingArrival) {
+        const play = pendingArrival;
+        pendingArrival = null;
+        play();
       }
     };
     const goTo = (i) => {
       const nextIndex = Math.max(0, Math.min(count - 1, i));
-      if (nextIndex === PROCESS_ICON_BLOCK_INDEX && index !== PROCESS_ICON_BLOCK_INDEX) {
-        pendingProcessIcon = true;
+      if (ARRIVAL_ANIMATIONS[nextIndex] && nextIndex !== index) {
+        pendingArrival = ARRIVAL_ANIMATIONS[nextIndex];
       }
       index = nextIndex;
       animating = true;
@@ -1410,6 +1419,93 @@ class Component extends DCLogic {
       { transform: 'translate(0,0) scale(1.04) rotate(360deg)', offset: 0.95, easing: land },
       { transform: 'translate(0,0) scale(1) rotate(360deg)', offset: 1 }
     ], { duration: 1000, fill: 'forwards' });
+  }
+
+  // a Figma-style multiplayer cursor that glides in and clicks on the
+  // highlighted "I've pitched..." phrase. Same arrival treatment as
+  // playProcessIcon above — replayed from scratch every time the section
+  // lands on that block, from either direction — and the same reason for
+  // the Figma vocabulary as the frame handles two blocks later: the point
+  // of the sentence is being in the file with the team rather than handing
+  // one over, so a collaborator's cursor showing up in the copy is the
+  // claim itself rather than decoration
+  playPitchCursor() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const cursor = document.querySelector('[data-pitch-cursor]');
+    const anchor = document.querySelector('[data-pitch-anchor]');
+    if (!cursor || !anchor) return;
+    const paragraph = cursor.parentElement;
+    if (!paragraph) return;
+    cursor.getAnimations().forEach((animation) => animation.cancel());
+
+    // the anchor is an inline span wrapping across two or three lines, and
+    // getBoundingClientRect() on a wrapped inline returns the union of all
+    // of them — one tall rectangle matching no actual line. getClientRects()
+    // gives the per-line fragments, which is what the cursor walks
+    const lines = Array.from(anchor.getClientRects());
+    if (!lines.length) return;
+    const paragraphRect = paragraph.getBoundingClientRect();
+    const lastLine = lines[lines.length - 1];
+
+    // rides in the leading under each line rather than over the words:
+    // line-height 2 leaves about a font-size of empty space between the
+    // glyph rows, so centring the cursor's own box on a line's bottom edge
+    // drops it into the middle of that gap. Measured rather than a fixed
+    // offset because the gap scales with the block's clamp() font-size
+    const lineY = (line) => line.bottom - cursor.offsetHeight / 2;
+
+    // parked at the end of the phrase's last line, since the path below
+    // walks the whole phrase to get here. Clamped to the viewport rather
+    // than the paragraph: the cursor is absolutely positioned and free to
+    // sit outside the paragraph's own width, so the paragraph's bounds are
+    // not what keeps it on screen
+    const EDGE_GAP = 8;
+    const maxLeft = window.innerWidth - EDGE_GAP - cursor.offsetWidth - paragraphRect.left;
+    const minLeft = EDGE_GAP - paragraphRect.left;
+    const restX = Math.max(minLeft, Math.min(lastLine.right - paragraphRect.left - 3, maxLeft));
+    const restY = lineY(lastLine) - paragraphRect.top;
+    cursor.style.left = restX + 'px';
+    cursor.style.top = restY + 'px';
+
+    // every keyframe is an offset back from that resting point, so the path
+    // is written in the same viewport coordinates the rects are measured in
+    const restViewportX = paragraphRect.left + restX;
+    const restViewportY = paragraphRect.top + restY;
+    const at = (x, y) => 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
+    const to = (x, y) => at(x - restViewportX, y - restViewportY);
+    const glide = 'cubic-bezier(.22,1,.36,1)';
+    // near-linear, so each pass reads as a steady deliberate run across the
+    // words rather than easing out halfway along them
+    const sweep = 'cubic-bezier(.4,0,.25,1)';
+    // transform-origin is the arrow's own tip (0 0), so the click below
+    // pivots on the point rather than the middle of the shape
+    const click = 'cubic-bezier(.34,1.56,.64,1)';
+
+    // one pass per line, with a carriage-return drop between them, then the
+    // click. Built from the rects rather than hand-written keyframes so it
+    // still reads correctly whether the phrase wraps onto two lines or
+    // three, which it does between phone and desktop widths
+    const ENTRY_END = 0.18;
+    const SWEEP_END = 0.78;
+    const share = (SWEEP_END - ENTRY_END) / lines.length;
+    const frames = [{
+      transform: to(lines[0].left - 46, lineY(lines[0]) + 78) + ' scale(0.62)',
+      opacity: 0, offset: 0, easing: glide
+    }];
+    lines.forEach((line, i) => {
+      const arriveAt = ENTRY_END + share * i;
+      // the last line gets its full share; earlier ones give up the tail of
+      // theirs to the drop down onto the next line
+      const leaveAt = arriveAt + share * (i === lines.length - 1 ? 1 : 0.82);
+      frames.push({ transform: to(line.left, lineY(line)) + ' scale(1)', opacity: 1, offset: Number(arriveAt.toFixed(3)), easing: sweep });
+      frames.push({ transform: to(line.right, lineY(line)) + ' scale(1)', opacity: 1, offset: Number(leaveAt.toFixed(3)), easing: sweep });
+    });
+    frames.push({ transform: 'translate(0,0) scale(1)', opacity: 1, offset: 0.8, easing: click });
+    frames.push({ transform: 'translate(0,0) scale(0.82)', opacity: 1, offset: 0.88, easing: click });
+    frames.push({ transform: 'translate(0,0) scale(1.05)', opacity: 1, offset: 0.95, easing: click });
+    frames.push({ transform: 'translate(0,0) scale(1)', opacity: 1, offset: 1 });
+
+    cursor.animate(frames, { duration: 1800, fill: 'forwards' });
   }
 
   // the desk photo's "cover" crop pushes the monitor higher up the screen
