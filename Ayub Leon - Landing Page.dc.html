@@ -1052,25 +1052,41 @@ class Component extends DCLogic {
     // `animating` alone would wrongly swallow a legitimate tap that lands
     // while a previous transition is still settling)
     let touchDidDrag = false;
+    // null until the first touchmove of a gesture resolves a direction,
+    // then true if this is a gesture the section has to let go of
+    let touchExiting = null;
     this.onBurnTouchStart = (e) => {
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
       touchStartTime = performance.now();
       touchDidDrag = false;
+      touchExiting = null;
     };
     this.onBurnTouchMove = (e) => {
       if (!engaged()) return;
       if (touchStartY === null) return;
-      // prevented unconditionally, before the drag-distance check below —
-      // iOS Safari only honors preventDefault() called on a touchmove
-      // before native scrolling has started for that gesture; waiting
-      // until the 24px threshold is crossed calls it one tick too late; by
-      // then the page has already started its own native scroll, which
-      // then fights the programmatic scrollTo() in goTo() below, landing
-      // short of the target block and needing a second swipe to finish
+      const dy = touchStartY - e.touches[0].clientY;
+      // at either end of the sequence, a gesture heading out of the section
+      // has to be left to native scroll or the user is simply trapped —
+      // reaching the last block and then swiping down went nowhere, because
+      // the preventDefault below used to run unconditionally. Resolved on
+      // the first touchmove that carries any movement at all, rather than
+      // at the 24px step threshold: iOS Safari only ever starts native
+      // scrolling for a gesture whose *first* touchmove went un-prevented,
+      // so deciding this any later is already too late to release it
+      if (touchExiting === null && dy !== 0) {
+        touchExiting = (dy > 0 && index >= count - 1) || (dy < 0 && index === 0);
+      }
+      if (touchExiting) return;
+      // prevented before the drag-distance check below — iOS Safari only
+      // honors preventDefault() called on a touchmove before native
+      // scrolling has started for that gesture; waiting until the 24px
+      // threshold is crossed calls it one tick too late; by then the page
+      // has already started its own native scroll, which then fights the
+      // programmatic scrollTo() in goTo() below, landing short of the
+      // target block and needing a second swipe to finish
       e.preventDefault();
       if (animating) return;
-      const dy = touchStartY - e.touches[0].clientY;
       if (Math.abs(dy) < 24) return;
       const dir = dy > 0 ? 1 : -1;
       touchStartX = null;
