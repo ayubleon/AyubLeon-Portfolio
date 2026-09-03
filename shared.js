@@ -2,7 +2,7 @@
   window.AL = window.AL || {};
 
   // design tokens used across nav.js/footer.js/badge.js/signature.js/
-  // case-labels.js/project-viewer.js — one definition instead of the same
+  // more-work-cards.js/project-viewer.js — one definition instead of the same
   // literals hand-repeated in every file's own CSS string
   var tokenStyle = document.createElement('style');
   tokenStyle.textContent = [
@@ -22,6 +22,38 @@
     "}"
   ].join('');
   document.head.appendChild(tokenStyle);
+
+  // "eyebrow" — the site's one small uppercase label style. Used by the
+  // case-study section titles (Overview, Challenges, Impact, More work,
+  // ...) and meta-grid labels (Role, Client, Timeline, ...), the footer's
+  // PAGES/CONTACTS/RESOURCES columns, and the About page's "People I've
+  // built with". Defined once here so the size,
+  // tracking or colour of all of them moves together: this label type
+  // previously shipped three different ways, and a case-study title even
+  // rendered differently on the page (16px Schibsted) than in the
+  // project-viewer popup (11px Poppins), since the popup styled its own
+  // copy separately.
+  //
+  // The case-study classes are matched alongside .al-eyebrow rather than
+  // having the class added by script, so the labels are correct on first
+  // paint and inside the popup's fetched markup — neither of which can
+  // rely on a DOM patch having run. .case-field-label (Role, Client,
+  // Timeline, Platforms, Project contributors, Previous/Next) is in here
+  // too: it does an eyebrow's job — a small label naming the value under
+  // it — and shipped larger than the value it labelled, which read as the
+  // hierarchy being inverted.
+  var labelStyle = document.createElement('style');
+  labelStyle.textContent = [
+    ".al-eyebrow,.case-section-label,.case-field-label{",
+    "font-family:Poppins,Helvetica,sans-serif;",
+    "font-size:11px;",
+    "font-weight:400;",
+    "letter-spacing:0.18em;",
+    "text-transform:uppercase;",
+    "color:var(--al-section-title);",
+    "}"
+  ].join('');
+  document.head.appendChild(labelStyle);
 
   // self-healing mount/patch runner: support.js can rebuild the page's
   // <main> content from its own internal template after first paint, in

@@ -1,25 +1,11 @@
 (function () {
   // case study pages are rebuilt by support.js from its own internal
-  // template on load (same as the About page), discarding raw style edits
-  // — so patch the section-title labels (Overview, My role, Challenges,
-  // More work, etc.) and the sentence-case meta-labels (Role, Client,
-  // Timeline, etc.) via live DOM manipulation instead, matching them by
-  // the .case-field-label/.case-section-label classes now shared across
-  // all four case-study pages rather than by sniffing their raw inline
-  // styles. Those classes' own CSS is defined in project-viewer.js, not
-  // here — every page that loads this file also loads that one first (see
-  // its own comment on that rule), including the popup card project-
-  // viewer.js renders elsewhere, which needs the exact same base
-  // appearance for content it fetches from these pages' raw HTML. Keep
+  // template on load, discarding raw style edits — so patch the "More
+  // work" nav cards via live DOM manipulation instead, and keep
   // re-patching through the settle window since support.js can rebuild in
-  // more than one wave.
-
-  // applied to every 0.18em-tracked label — section titles (Overview,
-  // Challenges, etc.) and meta-labels (Role, Client, Timeline, etc.) alike
-  // — matches shared.js's --al-section-title, kept as a literal here since
-  // this file predates that variable and nothing forces the two to move
-  // together
-  var SECTION_TITLE = 'rgba(239, 232, 229, 0.66)';
+  // more than one wave. The section/meta labels this file used to restyle
+  // here are now handled by the .al-eyebrow rule in shared.js, which needs
+  // no patching at all.
 
   // border-only glow that tracks the cursor: a real span (not a ::before —
   // this exact card element inexplicably wouldn't pick up class- or
@@ -51,24 +37,6 @@
     "@media (prefers-reduced-motion: reduce){.al-glass-glow{display:none;}}"
   ].join('');
   document.head.appendChild(shimmerStyle);
-
-  function patch() {
-    document.querySelectorAll('.case-field-label, .case-section-label').forEach(function (p) {
-      // classify each element exactly once — patch() reruns on every
-      // MutationObserver tick through the settle window
-      if (p.dataset.alLabelPatched) return;
-      p.dataset.alLabelPatched = '1';
-      p.style.color = SECTION_TITLE;
-      // sentence-case labels (Role, Client/Type, Timeline, Platforms,
-      // Project contributors, Previous/Next) keep Poppins and their
-      // sentence case, just lose the wide tracking back to the font's own
-      // default spacing. Everything else gets the full section-title
-      // treatment: uppercase, wide tracking kept as shipped
-      p.style.letterSpacing = 'normal';
-      if (p.classList.contains('case-field-label')) return;
-      p.style.textTransform = 'uppercase';
-    });
-  }
 
   // the "More work" nav cards (next/previous project) currently have no
   // fill at all — just a hairline border — so give them the site's
@@ -103,29 +71,23 @@
     });
   }
 
-  function patchAll() {
-    patch();
-    glassifyMoreWorkCards();
-  }
+  AL.selfHeal(glassifyMoreWorkCards, 5000);
 
-  AL.selfHeal(patchAll, 5000);
-
-  // both patch() and glassifyMoreWorkCards() key off exact framework-
-  // generated inline-style substrings rather than a class, since support.js
-  // gives none of this content its own hook — if it ever changes how it
-  // serializes those styles, or the underlying source values shift, either
-  // selector can stop matching anything with nothing to notice the
-  // regression: the labels/cards just silently keep their unpatched
-  // styling. A one-time check 5s after load (matching AL.selfHeal's own
-  // settle window above) is a cheap tripwire for exactly that — every
-  // case-study page that loads this script has at least one of each, so
-  // finding neither by the time everything should have settled means the
-  // selectors are out of sync with the current markup, not that this page
-  // legitimately has nothing to patch
+  // glassifyMoreWorkCards() keys off an exact framework-generated inline-
+  // style substring rather than a class, since support.js gives that
+  // content no hook of its own — if it ever changes how it serializes
+  // those styles, or the underlying source values shift, the selector can
+  // stop matching anything with nothing to notice the regression: the
+  // cards just silently keep their unpatched styling. A one-time check 5s
+  // after load (matching AL.selfHeal's own settle window above) is a cheap
+  // tripwire for exactly that — every case-study page that loads this
+  // script has at least one card, so finding none by the time everything
+  // should have settled means the selector is out of sync with the current
+  // markup, not that this page legitimately has nothing to patch
   window.addEventListener('load', function () {
     setTimeout(function () {
-      if (!document.querySelector('[data-al-label-patched]') && !document.querySelector('[data-glass-card]')) {
-        console.warn('case-labels.js: found nothing to patch on this page — its inline-style selectors may be out of sync with the current markup');
+      if (!document.querySelector('[data-glass-card]')) {
+        console.warn('more-work-cards.js: found no More-work cards to patch on this page — its inline-style selector may be out of sync with the current markup');
       }
     }, 5000);
   });

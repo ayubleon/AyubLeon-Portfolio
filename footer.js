@@ -189,7 +189,7 @@
       return '<' + tag + ' class="footer-kb-key"' + attrs + ' style="position:absolute;left:' + k.l + '%;top:' + k.t + '%;width:' + k.w + '%;height:' + k.h + '%;display:block;color:inherit;text-decoration:none;background-image:url(images/footer-keyboard-hover.svg);background-repeat:no-repeat;background-size:' + k.bsx + '% ' + k.bsy + '%;background-position:' + k.bx + '% ' + k.by + '%;"></' + tag + '>';
     }).join('');
     var titles = FOOTER_KB_COLS.map(function (c) {
-      return '<p style="position:absolute;left:' + c.l + '%;top:0;width:' + c.w + '%;margin:0;text-align:center;font-family:Poppins;font-size:11px;color:var(--al-section-title,rgba(239,232,229,0.66))">' + c.label + '</p>';
+      return '<p class="al-eyebrow" style="position:absolute;left:' + c.l + '%;top:0;width:' + c.w + '%;margin:0;text-align:center">' + c.label + '</p>';
     }).join('');
     return (
       '<div class="footer-kb-col" style="flex-direction:column;gap:14px;">' +
@@ -219,18 +219,18 @@
               '<button type="button" class="footer-mode-toggle" data-footer-mode-toggle aria-label="Switch footer layout">' + FOOTER_MODE_TOGGLE_ICON + '</button>' +
               '<div class="footer-nav-cols" style="flex:0 1 auto;min-width:0;">' +
                 '<div style="display:flex;flex-direction:column;gap:14px;">' +
-                  '<p style="margin:0;font-family:Poppins;font-size:11px;color:var(--al-section-title,rgba(239,232,229,0.66))">PAGES</p>' +
+                  '<p class="al-eyebrow" style="margin:0">PAGES</p>' +
                   '<a class="site-footer-link" href="' + links.home + '">Home</a>' +
                   '<a class="site-footer-link" href="' + links.work + '">Work</a>' +
                   '<a class="site-footer-link" href="' + links.about + '">About</a>' +
                 '</div>' +
                 '<div style="display:flex;flex-direction:column;gap:14px;">' +
-                  '<p style="margin:0;font-family:Poppins;font-size:11px;color:var(--al-section-title,rgba(239,232,229,0.66))">CONTACTS</p>' +
+                  '<p class="al-eyebrow" style="margin:0">CONTACTS</p>' +
                   '<a class="site-footer-link" href="mailto:ayubleon.pd@gmail.com" data-copy-email>Copy Email</a>' +
                   '<a class="site-footer-link" href="https://www.linkedin.com/in/ayubleon" target="_blank" rel="noopener noreferrer">Linked In</a>' +
                 '</div>' +
                 '<div style="display:flex;flex-direction:column;gap:14px;">' +
-                  '<p style="margin:0;font-family:Poppins;font-size:11px;color:var(--al-section-title,rgba(239,232,229,0.66))">RESOURCES</p>' +
+                  '<p class="al-eyebrow" style="margin:0">RESOURCES</p>' +
                   '<a class="site-footer-link" href="/resume" target="_blank" rel="noopener noreferrer">Download Resume</a>' +
                   '<a class="site-footer-link" href="' + FIGMA_URL + '" target="_blank" rel="noopener noreferrer" aria-label="Figma" data-figma-key>' + figmaIconHTML(14) + '</a>' +
                 '</div>' +

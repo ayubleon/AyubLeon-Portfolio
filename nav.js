@@ -9,7 +9,7 @@
     // instead of replaying the same pop-in it just did a moment ago
     ".site-nav-dock.site-nav-dock-enter{animation:siteNavRise .8s cubic-bezier(.22,1,.36,1) .1s both;}",
     // same border-only cursor-tracked glow as the case-study "More work"
-    // cards: a real sibling span (not ::before — see case-labels.js for
+    // cards: a real sibling span (not ::before — see more-work-cards.js for
     // why), masked to just the border ring, lit by a radial-gradient
     // following --mx/--my, fixed to a tight 70px radius so the highlight
     // stays a localized point on this wide pill rather than spreading

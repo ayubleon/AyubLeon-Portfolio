@@ -55,18 +55,21 @@
   }
 
   // same template-lock, same fix — "People I've built with" ships with the
-  // page's serif heading font; match it to the footer's PAGES/CONTACTS/
-  // RESOURCES eyebrow-label style instead
+  // page's serif heading font; give it the site's shared .al-eyebrow label
+  // style (defined in shared.js) instead
   function fixFriendsHeading() {
-    var heading = Array.from(document.querySelectorAll('p')).find(function (p) {
+    // p, h1-h6: this label is an <h2> now, but the selector stays broad so
+    // it keeps matching if the tag changes again — losing it silently
+    // leaves the label at its inline clamp() size instead of the eyebrow
+    var heading = Array.from(document.querySelectorAll('p, h1, h2, h3, h4, h5, h6')).find(function (p) {
       return p.textContent.trim() === "People I've built with";
     });
     if (!heading) return;
-    heading.style.fontFamily = 'Poppins, Helvetica, sans-serif';
-    heading.style.fontSize = '11px';
-    heading.style.letterSpacing = '0.18em';
-    heading.style.color = 'var(--al-section-title,rgba(239,232,229,0.66))';
-    heading.style.textTransform = 'uppercase';
+    // the class carries the type; the template's own inline styles would
+    // otherwise outrank it, so drop exactly the properties it defines
+    heading.classList.add('al-eyebrow');
+    ['font-family', 'font-size', 'font-weight', 'letter-spacing', 'text-transform', 'color']
+      .forEach(function (property) { heading.style.removeProperty(property); });
   }
 
   function patch() {

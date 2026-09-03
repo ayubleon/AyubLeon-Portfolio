@@ -65,17 +65,6 @@
     });
   }
 
-  // the section-title/meta-grid labels ("Role", "Client", "Overview", …)
-  // already set font-family: Poppins inline, but also carry the wide
-  // 0.18em tracking tuned for their all-caps treatment on the original
-  // dark page — reads as oddly spaced at this card's smaller scale, so
-  // it's normalized here. This exact "font-size: 11px; letter-spacing:
-  // 0.18em;" pairing is unique to that one label style across the
-  // source markup, so it's safe to target as a plain string replace
-  function normalizeLabelSpacing(html) {
-    return html.replace(/font-size:\s*11px;\s*letter-spacing:\s*0\.18em;/gi, 'font-size: 11px; letter-spacing: normal;');
-  }
-
   // the section headings (h2, e.g. "The advantage that made it work"),
   // the bold intro statement under "Overview", and the in-body
   // subheadings (e.g. "Protecting system integrity") all run oversized
@@ -169,16 +158,12 @@
         // serialized to a string. Every one of these classes was always
         // the muted 239,232,229 tier on its source page (never the bright
         // 244,238,235 one), so they all take the same #636262 darkenText
-        // Colors would have given them anyway. Letter-spacing gets the
-        // same normalize-at-card-scale treatment normalizeLabelSpacing
-        // gives every other 0.18em-tracked label, for the same reason
+        // Colors would have given them anyway. Only the colour is
+        // adjusted — the tracking is the shared .al-eyebrow standard and
+        // must read the same here as it does on the page
         var sharedLabels = main.querySelectorAll('.case-field-label, .case-section-label, .case-body-text, .case-figcaption');
         for (var i = 0; i < sharedLabels.length; i++) {
           sharedLabels[i].style.color = '#636262';
-        }
-        var sharedTrackedLabels = main.querySelectorAll('.case-field-label, .case-section-label');
-        for (var j = 0; j < sharedTrackedLabels.length; j++) {
-          sharedTrackedLabels[j].style.letterSpacing = 'normal';
         }
       }
 
@@ -187,8 +172,7 @@
         descHTML: descHTML,
         // the center card is white, so its embedded content needs its
         // text recolored dark — see darkenTextColors above — and its
-        // label tracking normalized — see normalizeLabelSpacing above
-        bodyHTML: main ? thickenAccentBorders(shrinkCardHeadings(normalizeLabelSpacing(darkenTextColors(main.innerHTML)))) : ''
+        bodyHTML: main ? thickenAccentBorders(shrinkCardHeadings(darkenTextColors(main.innerHTML))) : ''
       };
     }).catch(function () {
       // a failed fetch shouldn't poison this href forever — deleting the
@@ -438,8 +422,12 @@
     // their SOURCE-page appearance: darkenTextColors() below still does the
     // actual light-on-dark -> dark-on-white recolor for this card, the same
     // way it always has for every other muted-tier element on the page
-    ".al-pv-card .case-field-label{margin:0;font-family:Poppins;font-size:11px;letter-spacing:0.18em;text-transform:none;color:rgba(239,232,229,0.45);}",
-    ".al-pv-card .case-section-label{margin:0;font-family:Poppins;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(239,232,229,0.66);}",
+    // the label type itself comes from shared.js's .al-eyebrow rule, which
+    // also matches both case-study label classes, so the markup this card
+    // fetches from those pages is styled without needing a copy of it here.
+    // Only the popup-specific bit stays: these sit in a grid that supplies
+    // its own spacing, so they carry no margin of their own
+    ".al-pv-card .case-field-label,.al-pv-card .case-section-label{margin:0;}",
     ".al-pv-card .case-body-text{margin:0;font-size:15.5px;line-height:1.78;color:rgba(239,232,229,0.86);text-wrap:pretty;}",
     ".al-pv-card .case-figcaption{margin:0;font-family:Poppins,Helvetica,Arial,sans-serif;font-size:11px;line-height:1.6;letter-spacing:0.02em;color:rgba(239,232,229,0.5);}",
     // phones get the opposite treatment from desktop: screen space is
