@@ -16,7 +16,7 @@
     // edge-to-edge like the farthest-corner sizing used on the cards
     ".site-nav-glow{position:absolute;inset:0;border-radius:inherit;padding:1px;background:radial-gradient(70px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,0.95) 0%,transparent 65%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:0;transition:opacity .3s ease;}",
     "@media (prefers-reduced-motion: reduce){.site-nav-glow{display:none;}}",
-    ".site-nav-link{padding:12px 22px;border-radius:999px;font-size: 0.9375rem;font-weight:500;color:rgba(244,238,235,0.7);transition:background .25s ease,color .25s ease;}",
+    ".site-nav-link{padding:12px 22px;border-radius:999px;font-family:Poppins,Helvetica,sans-serif;font-size: 0.9375rem;font-weight:500;color:rgba(244,238,235,0.7);transition:background .25s ease,color .25s ease;}",
     ".site-nav-link:hover{color:#fff;background:var(--al-card-hover,#2A2A2C);}",
     ".site-nav-link.is-active{color:#fff;background:var(--al-card-hover,#2A2A2C);font-weight:600;}",
     ".site-nav-divider{width:1px;align-self:stretch;margin:8px 6px;background:rgba(255,255,255,0.14);}",
@@ -74,7 +74,7 @@
     ".site-contact-avatar-flip.is-hint .site-contact-avatar-face-back{animation:siteContactBackHint .6s cubic-bezier(.22,1,.36,1);}",
     ".site-contact-avatar{width:76px;height:76px;border-radius:50%;background:#fff;display:block;object-fit:cover;}",
     ".site-contact-name{margin:0;font-family:Poppins,Helvetica,sans-serif;font-weight:600;font-size: 1.35rem;color:#fff;}",
-    ".site-contact-role{margin:2px 0 0;font-family:'Schibsted Grotesk',Helvetica,Arial,sans-serif;font-size: 0.7812rem;font-weight:500;color:#0A84FF;}",
+    ".site-contact-role{margin:2px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;font-weight:500;color:#0A84FF;}",
     ".site-contact-blurb{margin:18px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;line-height:1.55;color:rgba(244,238,235,0.82);}",
     ".site-contact-link{display:block;color:#0A84FF;text-decoration:none;}",
     ".site-contact-link:hover{color:#54A9FF;}",

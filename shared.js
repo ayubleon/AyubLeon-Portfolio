@@ -23,6 +23,15 @@
   ].join('');
   document.head.appendChild(tokenStyle);
 
+  // inheritance floor. No page sets font-family on <body> except the
+  // homepage, so unstyled text fell through to the browser default —
+  // Times, a serif, on five of six pages. Set on <html> so a page that
+  // does set its own body font still overrides this; it only replaces
+  // the serif fallback with the site's reading face.
+  var baseFontStyle = document.createElement('style');
+  baseFontStyle.textContent = "html{font-family:'Schibsted Grotesk',Helvetica,Arial,sans-serif;}";
+  document.head.appendChild(baseFontStyle);
+
   // "eyebrow" — the site's one small uppercase label style. Used by the
   // case-study section titles (Overview, Challenges, Impact, More work,
   // ...) and meta-grid labels (Role, Client, Timeline, ...), the footer's

@@ -11,7 +11,7 @@
     // links column instead, reachable via the layout toggle
     ".footer-kb-figma-color{opacity:0;transition:opacity .12s ease;}",
     ".footer-kb:has(.footer-kb-key:last-child:hover) .footer-kb-figma-color{opacity:1;}",
-    ".site-footer-link{display:inline-flex;align-items:center;gap:8px;font-size: 0.9375rem;font-weight:400;color:rgba(244,238,235,0.88);text-decoration:none;transition:color .3s cubic-bezier(.22,1,.36,1),font-weight .3s cubic-bezier(.22,1,.36,1);}",
+    ".site-footer-link{display:inline-flex;align-items:center;gap:8px;font-family:Poppins,Helvetica,sans-serif;font-size: 0.9375rem;font-weight:400;color:rgba(244,238,235,0.88);text-decoration:none;transition:color .3s cubic-bezier(.22,1,.36,1),font-weight .3s cubic-bezier(.22,1,.36,1);}",
     ".site-footer-link:hover{color:#fff;}",
     ".footer-figma-mask,.footer-figma-color{position:absolute;inset:0;transition:opacity .2s ease;}",
     ".footer-figma-color{opacity:0;}",
