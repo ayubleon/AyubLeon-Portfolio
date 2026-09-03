@@ -238,7 +238,7 @@
               footerKeyboardHTML(links) +
             '</div>' +
           '</div>' +
-          '<p data-wordmark style="margin:56px 0 0;text-align:center;opacity:0;white-space:nowrap;font-family:Poppins,Helvetica,sans-serif;font-weight:600;line-height:1;color:rgba(239,232,229,0.12);">ayubleon</p>' +
+          '<p data-wordmark style="margin:56px 0 0;text-align:center;opacity:0;white-space:nowrap;font-family:Poppins,Helvetica,sans-serif;font-weight:700;line-height:1;color:rgba(239,232,229,0.12);">ayubleon</p>' +
           '<p style="margin:40px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;line-height:1.6;color:var(--al-text-muted,rgba(239,232,229,0.45));">©2026<br>Designed in Figma, Built with Claude</p>' +
         '</div>' +
       '</footer>' +

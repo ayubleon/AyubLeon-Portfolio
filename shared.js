@@ -363,7 +363,7 @@
     // the label/state/icon compositing together as one group first, so
     // they blend against the page as a single unit rather than each
     // possibly double-blending against each other where they'd overlap
-    ".al-audio-toggle{position:fixed;top:28px;right:28px;z-index:46;display:inline-flex;align-items:center;gap:7px;border:0;background:none;padding:0;color:#fff;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;font-weight:600;letter-spacing:-0.005em;cursor:pointer;-webkit-tap-highlight-color:transparent;mix-blend-mode:difference;isolation:isolate;opacity:0;transform:scale(0.85);animation:alAudioEnter .5s cubic-bezier(.22,1,.36,1) .15s forwards;}",
+    ".al-audio-toggle{position:fixed;top:28px;right:28px;z-index:46;display:inline-flex;align-items:center;gap:7px;border:0;background:none;padding:0;color:#fff;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;font-weight:500;letter-spacing:-0.005em;cursor:pointer;-webkit-tap-highlight-color:transparent;mix-blend-mode:difference;isolation:isolate;opacity:0;transform:scale(0.85);animation:alAudioEnter .5s cubic-bezier(.22,1,.36,1) .15s forwards;}",
     ".al-audio-toggle:hover{opacity:0.7;}",
     "@keyframes alAudioEnter{to{opacity:1;transform:scale(1);}}",
     "@media (prefers-reduced-motion: reduce){.al-audio-toggle{animation:none;opacity:1;transform:none;}}",
