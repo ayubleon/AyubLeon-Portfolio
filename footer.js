@@ -2,14 +2,13 @@
   var CSS = [
     ".footer-kb-key{opacity:0;transition:opacity .12s ease;}",
     ".footer-kb-key:hover{opacity:1;}",
-    // hover alone reveals these (opacity:0 at rest) but never covered
-    // keyboard focus — a tabbing user got no visible feedback at all on
-    // this whole keyboard-style nav. Same outline treatment used
-    // everywhere else on the site (nav.js's tooltip trigger, the project
-    // popup's cards), plus the same opacity reveal :hover already gets,
-    // since an outline drawn around a fully transparent key would look
-    // like a floating, unexplained box
-    ".footer-kb-key:focus-visible{opacity:1;outline:2px solid var(--al-green,#EF4418);outline-offset:2px;border-radius:4px;}",
+    // no :focus-visible rule for these: the keys are tabindex="-1" (see
+    // footerKeyboardHTML), so they never take focus. An earlier version gave
+    // them a focus ring because tabbing through them showed nothing — but a
+    // ring does not fix the real problem, which is that they sit inside an
+    // aria-hidden widget with no accessible name, so a screen reader still
+    // announced nothing. Keyboard and assistive-tech users get the plain
+    // links column instead, reachable via the layout toggle
     ".footer-kb-figma-color{opacity:0;transition:opacity .12s ease;}",
     ".footer-kb:has(.footer-kb-key:last-child:hover) .footer-kb-figma-color{opacity:1;}",
     ".site-footer-link{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:400;color:rgba(244,238,235,0.88);text-decoration:none;transition:color .3s cubic-bezier(.22,1,.36,1),font-weight .3s cubic-bezier(.22,1,.36,1);}",
@@ -180,6 +179,13 @@
     var keys = FOOTER_KB_KEYS.filter(function (k) { return !k.inactive; }).map(function (k) {
       var attrs = footerKeyboardKeyAttrs(k, links);
       var tag = attrs ? 'a' : 'div';
+      // tabindex="-1" because the whole widget is aria-hidden below: without
+      // it these anchors stayed in the tab order while being invisible to a
+      // screen reader and carrying no accessible name, so a keyboard user
+      // hit seven dead stops that announced nothing. Every destination here
+      // is also in the plain-links column, which is what assistive tech and
+      // keyboard users get instead
+      if (attrs) attrs += ' tabindex="-1"';
       return '<' + tag + ' class="footer-kb-key"' + attrs + ' style="position:absolute;left:' + k.l + '%;top:' + k.t + '%;width:' + k.w + '%;height:' + k.h + '%;display:block;color:inherit;text-decoration:none;background-image:url(images/footer-keyboard-hover.svg);background-repeat:no-repeat;background-size:' + k.bsx + '% ' + k.bsy + '%;background-position:' + k.bx + '% ' + k.by + '%;"></' + tag + '>';
     }).join('');
     var titles = FOOTER_KB_COLS.map(function (c) {

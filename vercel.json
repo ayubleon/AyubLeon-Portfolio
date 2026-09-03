@@ -31,12 +31,12 @@
   ],
   "redirects": [
     {
-      "source": "/Ayub Leon - Landing Page.dc.html",
+      "source": "/Ayub%20Leon%20-%20Landing%20Page.dc.html",
       "destination": "/",
       "permanent": true
     },
     {
-      "source": "/Ayub Leon - About.dc.html",
+      "source": "/Ayub%20Leon%20-%20About.dc.html",
       "destination": "/about",
       "permanent": true
     },
@@ -51,12 +51,12 @@
       "permanent": true
     },
     {
-      "source": "/Building a shadcn System from Scratch.dc.html",
+      "source": "/Building%20a%20shadcn%20System%20from%20Scratch.dc.html",
       "destination": "/building-a-shadcn-system-from-scratch",
       "permanent": true
     },
     {
-      "source": "/Kenyan Banking Redesign.dc.html",
+      "source": "/Kenyan%20Banking%20Redesign.dc.html",
       "destination": "/kenyan-banking-redesign",
       "permanent": true
     }
