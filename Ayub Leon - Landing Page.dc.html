@@ -154,6 +154,10 @@
   .figma-frame-handle[data-corner="tr"] { top: -2px; right: -6px; transform: translate(50%, -50%); }
   .figma-frame-handle[data-corner="bl"] { bottom: -2px; left: -6px; transform: translate(-50%, 50%); }
   .figma-frame-handle[data-corner="br"] { bottom: -2px; right: -6px; transform: translate(50%, 50%); }
+  /* the name is set here rather than as a text node: it is chrome for the
+     frame, and in the markup it was read by text extractors as part of the
+     sentence — "before anyone starts buildingFrame 1404" */
+  .figma-frame-label::before { content: "Frame 1404"; }
   .figma-frame-label {
     position: absolute; left: -6px; bottom: 100%; margin-bottom: 6px;
     font-size: 11px; font-weight: 500; color: #0D99FF; white-space: nowrap; line-height: 1;
@@ -295,8 +299,7 @@
              floor: the dock is fixed at bottom:22px (16px under 700px) and
              is ~64px tall, so anything below ~86px from the bottom is
              covered by it. aria-hidden because it's a pointing device for
-             sighted users only — [data-burn-srtext] below already gives
-             assistive tech the whole section's copy in one pass -->
+             sighted users only: the blocks themselves carry the copy -->
         <span data-burn-scrollcue aria-hidden="true" style="position: absolute; bottom: 108px; left: 50%; transform: translateX(-50%); z-index: 5; font-family: Poppins, Helvetica, sans-serif; font-size: 12.5px; font-weight: 500; letter-spacing: 0.06em; color: rgba(10,6,6,0.3); pointer-events: none; white-space: nowrap;">Scroll ↓</span>
         <div data-burn-progress aria-hidden="true" style="position: absolute; top: 40px; left: 50%; transform: translateX(-50%); width: min(420px, 40vw); height: 3px; display: flex; gap: 6px; z-index: 5;">
           <div class="burn-progress-seg" style="flex: 1; height: 100%; border-radius: 999px; overflow: hidden; background: rgba(10,6,6,0.12);"><div class="burn-progress-seg-fill" style="height: 100%; width: 0%; background: #0a0606; border-radius: inherit;"></div></div>
@@ -304,25 +307,24 @@
           <div class="burn-progress-seg" style="flex: 1; height: 100%; border-radius: 999px; overflow: hidden; background: rgba(10,6,6,0.12);"><div class="burn-progress-seg-fill" style="height: 100%; width: 0%; background: #0a0606; border-radius: inherit;"></div></div>
           <div class="burn-progress-seg" style="flex: 1; height: 100%; border-radius: 999px; overflow: hidden; background: rgba(10,6,6,0.12);"><div class="burn-progress-seg-fill" style="height: 100%; width: 0%; background: #0a0606; border-radius: inherit;"></div></div>
         </div>
-        <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
+        <div data-burn-block style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
           <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">Curiosity is what <span data-curiosity-flash>drives</span> how I work.</p>
           <div data-curiosity-icon aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 0; height: 0; opacity: 0; pointer-events: none; z-index: 6;">
             <img data-curiosity-bulb src="images/curiosity-bulb.svg" alt="" style="position: absolute; left: 0; top: 0; height: 42px; width: auto; transform: translate(-50%, -50%); filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));">
             <img data-curiosity-car src="images/curiosity-car.png" alt="" style="position: absolute; left: 0; top: 0; height: 22px; width: auto; opacity: 0; transform: translate(-50%, -50%); filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));">
           </div>
         </div>
-        <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">It shows up early. I ask why a flow works the way it does, or <span class="hl hl-seam-a">whether a feature is </span><span data-pitch-anchor><span class="hl hl-seam-b">solving the right problem, before anyone starts</span> <span data-figma-frame>building<span class="figma-frame-label" aria-hidden="true">Frame 1404</span><span class="figma-frame-handle" data-corner="tl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tr" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="bl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="br" aria-hidden="true"></span></span></span>. That&#39;s often where I can make the biggest difference.<span data-pitch-cursor aria-hidden="true" style="position: absolute; left: 0; top: 0; z-index: 2; display: block; opacity: 0; pointer-events: none; transform-origin: 0 0; will-change: transform, opacity;"><svg width="17" height="18" viewBox="0 0 17 18" fill="none" style="display: block; flex: 0 0 auto; filter: drop-shadow(0 2px 5px rgba(10,6,6,0.28));"><path d="M1.4 1.1 L1.4 13.9 L4.8 10.7 L7.1 15.9 L9.6 14.7 L7.3 9.6 L12 9.4 Z" fill="#0056FF" stroke="#FDFBF8" stroke-width="1.1" stroke-linejoin="round"/></svg></span></p>
+        <div data-burn-block style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
+          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">It shows up early. I ask why a flow works the way it does, or <span class="hl hl-seam-a">whether a feature is </span><span data-pitch-anchor><span class="hl hl-seam-b">solving the right problem, before anyone starts</span> <span data-figma-frame>building<span class="figma-frame-label" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tr" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="bl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="br" aria-hidden="true"></span></span></span>. That&#39;s where the real problems are still cheap to fix.<span data-pitch-cursor aria-hidden="true" style="position: absolute; left: 0; top: 0; z-index: 2; display: block; opacity: 0; pointer-events: none; transform-origin: 0 0; will-change: transform, opacity;"><svg width="17" height="18" viewBox="0 0 17 18" fill="none" style="display: block; flex: 0 0 auto; filter: drop-shadow(0 2px 5px rgba(10,6,6,0.28));"><path d="M1.4 1.1 L1.4 13.9 L4.8 10.7 L7.1 15.9 L9.6 14.7 L7.3 9.6 L12 9.4 Z" fill="#0056FF" stroke="#FDFBF8" stroke-width="1.1" stroke-linejoin="round"/></svg></span></p>
         </div>
-        <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
+        <div data-burn-block style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
           <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;"><span data-process-icon-origin>That&#39;s</span> also why I&#39;ve spent the last year bringing AI into my process<img data-search-icon src="images/search-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block; margin-left: 0.34em; margin-right: 0.22em;"><img data-burn-icon src="images/claude-ai-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block; opacity: 0; margin-right: 0.22em;"><img data-figma-icon src="images/figma-logo.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block;"> <span class="hl">not as a shortcut</span>, but as another way to <span class="hl">dig deeper into problems, explore more possibilities</span>, and get from an idea to something tangible <span class="hl">faster.</span></p>
         </div>
-        <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
+        <div data-burn-block style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
           <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">Because good ideas only matter when they work, I collaborate closely with developers and stakeholders to turn them into products people can actually use.<span class="curiosity-cat" aria-hidden="true" style="position: relative; display: block; height: 1.9em; width: 2.4em; margin: 22px auto 0;"><img src="images/cat-frame-1.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-1"><img src="images/cat-frame-2.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-2"><img src="images/cat-frame-3.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-3"></span></p>
         </div>
         <div data-burn-grain aria-hidden="true" style="position: absolute; inset: 0; z-index: 4; opacity: 0.4; pointer-events: none;"></div>
       </div>
-      <p data-burn-srtext style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;">Curiosity is what drives how I work. It shows up early. I ask why a flow works the way it does, or whether a feature is solving the right problem, before anyone starts buildingFrame 1404. That's often where I can make the biggest difference. That's also why I've spent the last year bringing AI into my process not as a shortcut, but as another way to dig deeper into problems, explore more possibilities, and get from an idea to something tangible faster. Because good ideas only matter when they work, I collaborate closely with developers and stakeholders to turn them into products people can actually use.</p>
     </div>
   </section>
 
@@ -824,9 +826,6 @@ class Component extends DCLogic {
     if (this.burnResizeObserver) this.burnResizeObserver.disconnect();
 
     const progressFills = Array.from(runway.querySelectorAll('.burn-progress-seg-fill'));
-    const srText = runway.querySelector('[data-burn-srtext]');
-
-    srText.textContent = blockEls.map((el) => el.querySelector('[data-burn-text]').textContent).join(' ');
 
     // reduced motion: the pin/fade is scroll-position math, not a CSS
     // animation, so the site's usual `* { animation-duration: .01ms }`
