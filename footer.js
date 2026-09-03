@@ -31,7 +31,7 @@
     "@media (min-width:701px){.footer-mode-toggle{display:inline-flex;}" +
       ".footer-right-group.footer-mode-keyboard .footer-nav-cols{display:none;}" +
       ".footer-right-group.footer-mode-keyboard .footer-kb-col{display:flex;}}",
-    ".footer-mode-toggle{width:32px;height:32px;padding:0;border:1px solid var(--al-border,rgba(255,255,255,0.13));border-radius:999px;background:var(--al-card,#1C1C1E);color:rgba(239,232,229,0.66);align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;transition:color .25s ease,background .25s ease,border-color .25s ease;}",
+    ".footer-mode-toggle{width:32px;height:32px;padding:0;border:1px solid var(--al-border,rgba(255,255,255,0.13));border-radius:999px;background:var(--al-card,#1C1C1E);color:rgba(244,238,235,0.66);align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;transition:color .25s ease,background .25s ease,border-color .25s ease;}",
     ".footer-mode-toggle svg{stroke:currentColor;stroke-width:2;}",
     ".footer-mode-toggle:hover{color:#fff;background:var(--al-card-hover,#2A2A2C);border-color:var(--al-border-strong,rgba(255,255,255,0.16));}",
     // below 701px links mode is the only option (no toggle to keyboard),
@@ -238,8 +238,8 @@
               footerKeyboardHTML(links) +
             '</div>' +
           '</div>' +
-          '<p data-wordmark style="margin:56px 0 0;text-align:center;opacity:0;white-space:nowrap;font-family:Poppins,Helvetica,sans-serif;font-weight:700;line-height:1;color:rgba(239,232,229,0.12);">ayubleon</p>' +
-          '<p style="margin:40px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size: 0.651rem;line-height:1.6;color:var(--al-text-muted,rgba(239,232,229,0.45));">©2026<br>Designed in Figma, Built with Claude</p>' +
+          '<p data-wordmark style="margin:56px 0 0;text-align:center;opacity:0;white-space:nowrap;font-family:Poppins,Helvetica,sans-serif;font-weight:700;line-height:1;color:rgba(244,238,235,0.12);">ayubleon</p>' +
+          '<p style="margin:40px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size: 0.651rem;line-height:1.6;color:var(--al-text-muted,rgba(244,238,235,0.45));">©2026<br>Designed in Figma, Built with Claude</p>' +
         '</div>' +
       '</footer>' +
       '<span data-figma-tooltip aria-hidden="true" style="' + CURSOR_TOOLTIP_CSS + '">Website breakdown</span>' +

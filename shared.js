@@ -15,8 +15,8 @@
     "--al-card-light:#FDFBF8;",
     "--al-green:#EF4418;",
     "--al-green-hover:#F37352;",
-    "--al-text-muted:rgba(239,232,229,0.45);",
-    "--al-section-title:rgba(239,232,229,0.66);",
+    "--al-text-muted:rgba(244,238,235,0.45);",
+    "--al-section-title:rgba(244,238,235,0.66);",
     "--al-border:rgba(255,255,255,0.13);",
     "--al-border-strong:rgba(255,255,255,0.16);",
     "}"
@@ -78,7 +78,7 @@
     ".case-body-text{",
     "font-size: 0.9375rem;",
     "line-height:1.78;",
-    "color:rgba(239,232,229,0.86);",
+    "color:rgba(244,238,235,0.86);",
     "text-wrap:pretty;",
     "}",
     ".case-figcaption{",
@@ -86,7 +86,31 @@
     "font-size: 0.7812rem;",
     "line-height:1.6;",
     "letter-spacing:0.02em;",
-    "color:rgba(239,232,229,0.5);",
+    "color:rgba(244,238,235,0.5);",
+    "}",
+    // the "More work" teaser line, the stat-block captions ("550+ /
+    // screens across mobile..."), and the bulleted highlight list were the
+    // last inline-styled case-study text still on the old muted base hue
+    // (239,232,229) instead of this file's 244,238,235 — carried as
+    // classes now for the same reason .case-body-text/.case-figcaption
+    // are: project-viewer.js's popup card forces these to #636262 by class
+    // (see its sharedLabels list), not by reading the inline colour, so
+    // moving the colour here is safe and keeps page and popup in sync
+    ".case-more-work-teaser{",
+    "font-size: 0.9375rem;",
+    "line-height:1.78;",
+    "color:rgba(244,238,235,0.66);",
+    "}",
+    ".case-stat-caption{",
+    "font-size: 0.9375rem;",
+    "line-height:1.78;",
+    "color:rgba(244,238,235,0.82);",
+    "}",
+    ".case-bullet-item{",
+    "font-size: 0.9375rem;",
+    "line-height:1.75;",
+    "color:rgba(244,238,235,0.86);",
+    "text-wrap:pretty;",
     "}"
   ].join('');
   document.head.appendChild(proseStyle);

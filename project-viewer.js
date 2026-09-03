@@ -169,8 +169,13 @@
         // 244,238,235 one), so they all take the same #636262 darkenText
         // Colors would have given them anyway. Only the colour is
         // adjusted — the tracking is the shared .al-eyebrow standard and
-        // must read the same here as it does on the page
-        var sharedLabels = main.querySelectorAll('.case-field-label, .case-section-label, .case-body-text, .case-figcaption');
+        // must read the same here as it does on the page. The More-work
+        // teaser, stat captions and bullet/closing-note text join this
+        // list for the same reason: they moved off inline colour onto
+        // these classes so their source could share the page's one base
+        // hue (244,238,235) without darkenTextColors misreading them as
+        // the bright tier — so they need their own forced colour here too
+        var sharedLabels = main.querySelectorAll('.case-field-label, .case-section-label, .case-body-text, .case-figcaption, .case-more-work-teaser, .case-stat-caption, .case-bullet-item');
         for (var i = 0; i < sharedLabels.length; i++) {
           sharedLabels[i].style.color = '#636262';
         }
