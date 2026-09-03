@@ -138,6 +138,13 @@
     content: ''; position: absolute; inset: -2px -6px;
     border: 1.5px solid #0D99FF; pointer-events: none;
   }
+  /* block 2's highlight is split in two so the cursor's phrase can overlap
+     it (see playPitchCursor). The halves meet mid-sentence, where .hl's 6px
+     of side padding lands twice — pushing "is" and "solving" ~19px apart,
+     about triple a word space. Dropping it at the seam only; the outer
+     edges keep their padding */
+  .hl-seam-a { padding-right: 0; }
+  .hl-seam-b { padding-left: 0; }
   .hl [data-figma-frame] { background: transparent; }
   .figma-frame-handle {
     position: absolute; width: 6px; height: 6px; box-sizing: border-box;
@@ -305,7 +312,7 @@
           </div>
         </div>
         <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">It shows up early. I ask why a flow works the way it does, or <span class="hl">whether a feature is </span><span data-pitch-anchor><span class="hl">solving the right problem, before anyone starts</span> <span data-figma-frame>building<span class="figma-frame-label" aria-hidden="true">Frame 1404</span><span class="figma-frame-handle" data-corner="tl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tr" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="bl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="br" aria-hidden="true"></span></span></span>. That&#39;s often where I can make the biggest difference.<span data-pitch-cursor aria-hidden="true" style="position: absolute; left: 0; top: 0; z-index: 2; display: block; opacity: 0; pointer-events: none; transform-origin: 0 0; will-change: transform, opacity;"><svg width="17" height="18" viewBox="0 0 17 18" fill="none" style="display: block; flex: 0 0 auto; filter: drop-shadow(0 2px 5px rgba(10,6,6,0.28));"><path d="M1.4 1.1 L1.4 13.9 L4.8 10.7 L7.1 15.9 L9.6 14.7 L7.3 9.6 L12 9.4 Z" fill="#0056FF" stroke="#FDFBF8" stroke-width="1.1" stroke-linejoin="round"/></svg></span></p>
+          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">It shows up early. I ask why a flow works the way it does, or <span class="hl hl-seam-a">whether a feature is </span><span data-pitch-anchor><span class="hl hl-seam-b">solving the right problem, before anyone starts</span> <span data-figma-frame>building<span class="figma-frame-label" aria-hidden="true">Frame 1404</span><span class="figma-frame-handle" data-corner="tl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tr" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="bl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="br" aria-hidden="true"></span></span></span>. That&#39;s often where I can make the biggest difference.<span data-pitch-cursor aria-hidden="true" style="position: absolute; left: 0; top: 0; z-index: 2; display: block; opacity: 0; pointer-events: none; transform-origin: 0 0; will-change: transform, opacity;"><svg width="17" height="18" viewBox="0 0 17 18" fill="none" style="display: block; flex: 0 0 auto; filter: drop-shadow(0 2px 5px rgba(10,6,6,0.28));"><path d="M1.4 1.1 L1.4 13.9 L4.8 10.7 L7.1 15.9 L9.6 14.7 L7.3 9.6 L12 9.4 Z" fill="#0056FF" stroke="#FDFBF8" stroke-width="1.1" stroke-linejoin="round"/></svg></span></p>
         </div>
         <div data-burn-block aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
           <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;"><span data-process-icon-origin>That&#39;s</span> also why I&#39;ve spent the last year bringing AI into my process<img data-search-icon src="images/search-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block; margin-left: 0.34em; margin-right: 0.22em;"><img data-burn-icon src="images/claude-ai-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block; opacity: 0; margin-right: 0.22em;"><img data-figma-icon src="images/figma-logo.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block;"> <span class="hl">not as a shortcut</span>, but as another way to <span class="hl">dig deeper into problems, explore more possibilities</span>, and get from an idea to something tangible <span class="hl">faster.</span></p>
@@ -1517,8 +1524,13 @@ class Component extends DCLogic {
     // click. Built from the rects rather than hand-written keyframes so it
     // still reads correctly whether the phrase wraps onto two lines or
     // three, which it does between phone and desktop widths
-    const ENTRY_END = 0.18;
-    const SWEEP_END = 0.78;
+    // the sweep is the part that reads as reading, so it gets most of the
+    // timeline: entry and click stay around their old absolute lengths
+    // (~325ms and ~400ms) while the pass itself runs 1680ms rather than
+    // 1080ms, which is what made it feel hurried
+    const DURATION_MS = 2400;
+    const ENTRY_END = 0.135;
+    const SWEEP_END = 0.835;
     const share = (SWEEP_END - ENTRY_END) / lines.length;
     const frames = [{
       transform: to(lines[0].left - 46, lineY(lines[0]) + 78) + ' scale(0.62)',
@@ -1532,12 +1544,18 @@ class Component extends DCLogic {
       frames.push({ transform: to(line.left, lineY(line)) + ' scale(1)', opacity: 1, offset: Number(arriveAt.toFixed(3)), easing: sweep });
       frames.push({ transform: to(line.right, lineY(line)) + ' scale(1)', opacity: 1, offset: Number(leaveAt.toFixed(3)), easing: sweep });
     });
-    frames.push({ transform: 'translate(0,0) scale(1)', opacity: 1, offset: 0.8, easing: click });
-    frames.push({ transform: 'translate(0,0) scale(0.82)', opacity: 1, offset: 0.88, easing: click });
-    frames.push({ transform: 'translate(0,0) scale(1.05)', opacity: 1, offset: 0.95, easing: click });
+    // derived from SWEEP_END rather than written as fixed offsets: hard
+    // numbers here silently fall before the last sweep frame the moment the
+    // sweep is given more of the timeline, and keyframe offsets that stop
+    // ascending throw rather than degrade
+    const tail = 1 - SWEEP_END;
+    const clickAt = (fraction) => Number((SWEEP_END + tail * fraction).toFixed(3));
+    frames.push({ transform: 'translate(0,0) scale(1)', opacity: 1, offset: clickAt(0.12), easing: click });
+    frames.push({ transform: 'translate(0,0) scale(0.82)', opacity: 1, offset: clickAt(0.45), easing: click });
+    frames.push({ transform: 'translate(0,0) scale(1.05)', opacity: 1, offset: clickAt(0.73), easing: click });
     frames.push({ transform: 'translate(0,0) scale(1)', opacity: 1, offset: 1 });
 
-    cursor.animate(frames, { duration: 1800, fill: 'forwards' });
+    cursor.animate(frames, { duration: DURATION_MS, fill: 'forwards' });
   }
 
   // the desk photo's "cover" crop pushes the monitor higher up the screen
