@@ -192,7 +192,7 @@
       return '<p class="al-eyebrow" style="position:absolute;left:' + c.l + '%;top:0;width:' + c.w + '%;margin:0;text-align:center">' + c.label + '</p>';
     }).join('');
     return (
-      '<div class="footer-kb-col" style="flex-direction:column;gap:14px;">' +
+      '<div class="footer-kb-col" style="flex-direction:column;gap:16px;">' +
         '<div style="position:relative;width:400px;max-width:90vw;height:11px;">' + titles + '</div>' +
         '<div class="footer-kb" aria-hidden="true" style="position:relative;width:400px;max-width:90vw;aspect-ratio:444/138;flex:0 0 auto;">' +
           '<img src="images/footer-keyboard-default.svg" alt="" style="position:absolute;inset:0;width:100%;height:100%;display:block;">' +
@@ -218,18 +218,18 @@
             '<div class="footer-right-group" style="display:flex;align-items:flex-start;gap:20px;">' +
               '<button type="button" class="footer-mode-toggle" data-footer-mode-toggle aria-label="Switch footer layout">' + FOOTER_MODE_TOGGLE_ICON + '</button>' +
               '<div class="footer-nav-cols" style="flex:0 1 auto;min-width:0;">' +
-                '<div style="display:flex;flex-direction:column;gap:14px;">' +
+                '<div style="display:flex;flex-direction:column;gap:16px;">' +
                   '<p class="al-eyebrow" style="margin:0">PAGES</p>' +
                   '<a class="site-footer-link" href="' + links.home + '">Home</a>' +
                   '<a class="site-footer-link" href="' + links.work + '">Work</a>' +
                   '<a class="site-footer-link" href="' + links.about + '">About</a>' +
                 '</div>' +
-                '<div style="display:flex;flex-direction:column;gap:14px;">' +
+                '<div style="display:flex;flex-direction:column;gap:16px;">' +
                   '<p class="al-eyebrow" style="margin:0">CONTACTS</p>' +
                   '<a class="site-footer-link" href="mailto:ayubleon.pd@gmail.com" data-copy-email>Copy Email</a>' +
                   '<a class="site-footer-link" href="https://www.linkedin.com/in/ayubleon" target="_blank" rel="noopener noreferrer">Linked In</a>' +
                 '</div>' +
-                '<div style="display:flex;flex-direction:column;gap:14px;">' +
+                '<div style="display:flex;flex-direction:column;gap:16px;">' +
                   '<p class="al-eyebrow" style="margin:0">RESOURCES</p>' +
                   '<a class="site-footer-link" href="/resume" target="_blank" rel="noopener noreferrer">Download Resume</a>' +
                   '<a class="site-footer-link" href="' + FIGMA_URL + '" target="_blank" rel="noopener noreferrer" aria-label="Figma" data-figma-key>' + figmaIconHTML(14) + '</a>' +
