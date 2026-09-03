@@ -88,7 +88,7 @@
   function shrinkCardHeadings(html) {
     var HEADING_PLACEHOLDER = '\u0000AL_HEADING\u0000';
     return html
-      .replace(/font-size:\s*clamp\(1\.125rem,\s*1\.9vw,\s*1\.62rem\);(\s*font-weight:\s*500;\s*line-height:\s*1\.4;\s*)letter-spacing:\s*-0\.022em/gi, 'font-size: ' + HEADING_PLACEHOLDER + ';$1letter-spacing: -0.015em')
+      .replace(/font-size:\s*clamp\(1\.125rem,\s*1\.9vw,\s*1\.62rem\);(\s*font-weight:\s*500;\s*line-height:\s*1\.65;\s*)letter-spacing:\s*-0\.022em/gi, 'font-size: ' + HEADING_PLACEHOLDER + ';$1letter-spacing: -0.015em')
       .replace(/font-size:\s*1\.125rem(;\s*font-weight:\s*500;\s*letter-spacing:\s*-0\.015em;)/gi, 'font-size: 0.9375rem$1')
       .replace(new RegExp(HEADING_PLACEHOLDER, 'g'), '1.125rem');
   }
