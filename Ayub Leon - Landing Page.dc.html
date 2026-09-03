@@ -160,7 +160,7 @@
   .figma-frame-label::before { content: "Frame 1404"; }
   .figma-frame-label {
     position: absolute; left: -6px; bottom: 100%; margin-bottom: 6px;
-    font-size: 11px; font-weight: 500; color: #0D99FF; white-space: nowrap; line-height: 1;
+    font-size: 0.651rem; font-weight: 500; color: #0D99FF; white-space: nowrap; line-height: 1;
   }
   /* on narrow viewports the paragraph wraps such that "designing," can
      land right under the previous line, leaving less gap above the frame
@@ -175,7 +175,7 @@
        size it down further — combined with the tighter line-height, this
        is what keeps the copy from reading oversized and overly
        spaced-out on a phone screen */
-    [data-burn-text] { font-size: 1.15rem !important; line-height: 1.65 !important; }
+    [data-burn-text] { font-size: 1.125rem !important; line-height: 1.65 !important; }
   }
   [data-burn-grain] { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='gamma' exponent='4'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"); background-size: 180px; }
   /* the block-4 curiosity cat: three drawn poses (looking up, arm low →
@@ -286,8 +286,8 @@
     <div class="mobile-gutter" style="max-width: 1400px; margin: 0 auto; padding: 96px 40px;">
       <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; margin: 0 auto;">
         <h1 data-fit-heading style="margin: 0; white-space: nowrap; font-family: Poppins, Helvetica, sans-serif; font-weight: 700; font-size: 6.5rem; letter-spacing: -0.04em; line-height: 1; color: #f4eeeb;">Ayub Leon</h1>
-        <span style="display: inline-block; margin-top: 20px; padding: 6px 12px; background: #0056FF; color: #ffffff; font-family: Poppins, Helvetica, sans-serif; font-size: 12.5px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 0;">Product Designer</span>
-        <p style="margin: 14px 0 0; max-width: 46ch; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.2rem, 1.9vw, 1.5rem); font-weight: 600; line-height: 1.5; letter-spacing: -0.015em; color: #f4eeeb; text-wrap: pretty;">Four years designing products,<br>most of them as the only designer on the project.</p><p style="margin: 12px 0 0; max-width: 68ch; font-size: 14.5px; line-height: 1.65; color: rgba(239,232,229,0.72); text-wrap: pretty;">TikTok Shop analytics, betting platforms, and the systems underneath them.</p>
+        <span style="display: inline-block; margin-top: 20px; padding: 6px 12px; background: #0056FF; color: #ffffff; font-family: Poppins, Helvetica, sans-serif; font-size: 0.7812rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 0;">Product Designer</span>
+        <p style="margin: 14px 0 0; max-width: 46ch; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.125rem, 1.9vw, 1.62rem); font-weight: 600; line-height: 1.5; letter-spacing: -0.015em; color: #f4eeeb; text-wrap: pretty;">Four years designing products,<br>most of them as the only designer on the project.</p><p style="margin: 12px 0 0; max-width: 68ch; font-size: 0.9375rem; line-height: 1.65; color: rgba(239,232,229,0.72); text-wrap: pretty;">TikTok Shop analytics, betting platforms, and the systems underneath them.</p>
       </div>
     </div>
   </section>
@@ -300,7 +300,7 @@
              is ~64px tall, so anything below ~86px from the bottom is
              covered by it. aria-hidden because it's a pointing device for
              sighted users only: the blocks themselves carry the copy -->
-        <span data-burn-scrollcue aria-hidden="true" style="position: absolute; bottom: 108px; left: 50%; transform: translateX(-50%); z-index: 5; font-family: Poppins, Helvetica, sans-serif; font-size: 12.5px; font-weight: 500; letter-spacing: 0.06em; color: rgba(10,6,6,0.3); pointer-events: none; white-space: nowrap;">Scroll ↓</span>
+        <span data-burn-scrollcue aria-hidden="true" style="position: absolute; bottom: 108px; left: 50%; transform: translateX(-50%); z-index: 5; font-family: Poppins, Helvetica, sans-serif; font-size: 0.7812rem; font-weight: 500; letter-spacing: 0.06em; color: rgba(10,6,6,0.3); pointer-events: none; white-space: nowrap;">Scroll ↓</span>
         <div data-burn-progress aria-hidden="true" style="position: absolute; top: 40px; left: 50%; transform: translateX(-50%); width: min(420px, 40vw); height: 3px; display: flex; gap: 6px; z-index: 5;">
           <div class="burn-progress-seg" style="flex: 1; height: 100%; border-radius: 999px; overflow: hidden; background: rgba(10,6,6,0.12);"><div class="burn-progress-seg-fill" style="height: 100%; width: 0%; background: #0a0606; border-radius: inherit;"></div></div>
           <div class="burn-progress-seg" style="flex: 1; height: 100%; border-radius: 999px; overflow: hidden; background: rgba(10,6,6,0.12);"><div class="burn-progress-seg-fill" style="height: 100%; width: 0%; background: #0a0606; border-radius: inherit;"></div></div>
@@ -308,20 +308,20 @@
           <div class="burn-progress-seg" style="flex: 1; height: 100%; border-radius: 999px; overflow: hidden; background: rgba(10,6,6,0.12);"><div class="burn-progress-seg-fill" style="height: 100%; width: 0%; background: #0a0606; border-radius: inherit;"></div></div>
         </div>
         <div data-burn-block style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">Curiosity is what <span data-curiosity-flash>drives</span> how I work.</p>
+          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.944rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">Curiosity is what <span data-curiosity-flash>drives</span> how I work.</p>
           <div data-curiosity-icon aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 0; height: 0; opacity: 0; pointer-events: none; z-index: 6;">
             <img data-curiosity-bulb src="images/curiosity-bulb.svg" alt="" style="position: absolute; left: 0; top: 0; height: 42px; width: auto; transform: translate(-50%, -50%); filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));">
             <img data-curiosity-car src="images/curiosity-car.png" alt="" style="position: absolute; left: 0; top: 0; height: 22px; width: auto; opacity: 0; transform: translate(-50%, -50%); filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));">
           </div>
         </div>
         <div data-burn-block style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">It shows up early. I ask why a flow works the way it does, or <span class="hl hl-seam-a">whether a feature is </span><span data-pitch-anchor><span class="hl hl-seam-b">solving the right problem, before anyone starts</span> <span data-figma-frame>building<span class="figma-frame-label" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tr" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="bl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="br" aria-hidden="true"></span></span></span>. That&#39;s where the real problems are still cheap to fix.<span data-pitch-cursor aria-hidden="true" style="position: absolute; left: 0; top: 0; z-index: 2; display: block; opacity: 0; pointer-events: none; transform-origin: 0 0; will-change: transform, opacity;"><svg width="17" height="18" viewBox="0 0 17 18" fill="none" style="display: block; flex: 0 0 auto; filter: drop-shadow(0 2px 5px rgba(10,6,6,0.28));"><path d="M1.4 1.1 L1.4 13.9 L4.8 10.7 L7.1 15.9 L9.6 14.7 L7.3 9.6 L12 9.4 Z" fill="#0056FF" stroke="#FDFBF8" stroke-width="1.1" stroke-linejoin="round"/></svg></span></p>
+          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.944rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">It shows up early. I ask why a flow works the way it does, or <span class="hl hl-seam-a">whether a feature is </span><span data-pitch-anchor><span class="hl hl-seam-b">solving the right problem, before anyone starts</span> <span data-figma-frame>building<span class="figma-frame-label" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tr" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="bl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="br" aria-hidden="true"></span></span></span>. That&#39;s where the real problems are still cheap to fix.<span data-pitch-cursor aria-hidden="true" style="position: absolute; left: 0; top: 0; z-index: 2; display: block; opacity: 0; pointer-events: none; transform-origin: 0 0; will-change: transform, opacity;"><svg width="17" height="18" viewBox="0 0 17 18" fill="none" style="display: block; flex: 0 0 auto; filter: drop-shadow(0 2px 5px rgba(10,6,6,0.28));"><path d="M1.4 1.1 L1.4 13.9 L4.8 10.7 L7.1 15.9 L9.6 14.7 L7.3 9.6 L12 9.4 Z" fill="#0056FF" stroke="#FDFBF8" stroke-width="1.1" stroke-linejoin="round"/></svg></span></p>
         </div>
         <div data-burn-block style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;"><span data-process-icon-origin>That&#39;s</span> also why I&#39;ve spent the last year bringing AI into my process<img data-search-icon src="images/search-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block; margin-left: 0.34em; margin-right: 0.22em;"><img data-burn-icon src="images/claude-ai-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block; opacity: 0; margin-right: 0.22em;"><img data-figma-icon src="images/figma-logo.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block;"> <span class="hl">not as a shortcut</span>, but as another way to <span class="hl">dig deeper into problems, explore more possibilities</span>, and get from an idea to something tangible <span class="hl">faster.</span></p>
+          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.944rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;"><span data-process-icon-origin>That&#39;s</span> also why I&#39;ve spent the last year bringing AI into my process<img data-search-icon src="images/search-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block; margin-left: 0.34em; margin-right: 0.22em;"><img data-burn-icon src="images/claude-ai-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block; opacity: 0; margin-right: 0.22em;"><img data-figma-icon src="images/figma-logo.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block;"> <span class="hl">not as a shortcut</span>, but as another way to <span class="hl">dig deeper into problems, explore more possibilities</span>, and get from an idea to something tangible <span class="hl">faster.</span></p>
         </div>
         <div data-burn-block style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.9rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">Because good ideas only matter when they work, I collaborate closely with developers and stakeholders to turn them into products people can actually use.<span class="curiosity-cat" aria-hidden="true" style="position: relative; display: block; height: 1.9em; width: 2.4em; margin: 22px auto 0;"><img src="images/cat-frame-1.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-1"><img src="images/cat-frame-2.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-2"><img src="images/cat-frame-3.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-3"></span></p>
+          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.6vw, 1.944rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">Because good ideas only matter when they work, I collaborate closely with developers and stakeholders to turn them into products people can actually use.<span class="curiosity-cat" aria-hidden="true" style="position: relative; display: block; height: 1.9em; width: 2.4em; margin: 22px auto 0;"><img src="images/cat-frame-1.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-1"><img src="images/cat-frame-2.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-2"><img src="images/cat-frame-3.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-3"></span></p>
         </div>
         <div data-burn-grain aria-hidden="true" style="position: absolute; inset: 0; z-index: 4; opacity: 0.4; pointer-events: none;"></div>
       </div>
@@ -331,7 +331,7 @@
   <section id="work" data-work-section="1" style="position: relative; z-index: 10; height: 280svh; background: #000000;">
     <div class="mobile-gutter" data-work-pin="1" style="position: sticky; top: 0; height: 100svh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 40px; max-width: 1400px; margin: 0 auto; padding: 96px 40px 56px;">
       <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;">
-        <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.7rem, 3.2vw, 2.6rem); font-weight: 700; letter-spacing: -0.04em; color: #f4eeeb;">Featured work</h2>
+        <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.944rem, 3.4vw, 2.7994rem); font-weight: 700; letter-spacing: -0.04em; color: #f4eeeb;">Featured work</h2>
 
       </div>
 
@@ -347,9 +347,9 @@
           <div data-work-list="1" style="position: absolute; top: 50%; left: 0; right: 0; display: flex; flex-direction: column; will-change: transform;">
           <a data-work-row="0" href="/buzziq" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 7px; align-items: center; padding: 30px 0; color: inherit; text-decoration: none;">
             <span style="display: flex; flex-direction: column; gap: 10px;">
-              <span data-row-title="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.5rem, 2.4vw, 2.1rem); font-weight: 600; letter-spacing: -0.032em; color: rgba(255,255,255,0.24); transition: color .55s cubic-bezier(.22,1,.36,1);">BuzzIQ</span>
-              <span data-row-desc="1" style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 15.5px; line-height: 1.5; color: rgba(255,255,255,0.2); transition: color .55s cubic-bezier(.22,1,.36,1); text-wrap: pretty;">TikTok Shop intelligence platform built for IGNITEAMZ, a US-based creator commerce company</span>
-              <span data-row-meta="1" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 13.5px; color: rgba(255,255,255,0.16); transition: color .55s cubic-bezier(.22,1,.36,1);"><span>Sole Product Designer</span><span>2025 – 2026</span></span>
+              <span data-row-title="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.62rem, 2.4vw, 1.944rem); font-weight: 600; letter-spacing: -0.032em; color: rgba(255,255,255,0.24); transition: color .55s cubic-bezier(.22,1,.36,1);">BuzzIQ</span>
+              <span data-row-desc="1" style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; line-height: 1.5; color: rgba(255,255,255,0.2); transition: color .55s cubic-bezier(.22,1,.36,1); text-wrap: pretty;">TikTok Shop intelligence platform built for IGNITEAMZ, a US-based creator commerce company</span>
+              <span data-row-meta="1" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.7812rem; color: rgba(255,255,255,0.16); transition: color .55s cubic-bezier(.22,1,.36,1);"><span>Sole Product Designer</span><span>2025 – 2026</span></span>
             </span>
             <div class="work-row-thumb" style="grid-column: 1 / -1; display: none; margin-top: 6px; border-radius: 16px; overflow: hidden; aspect-ratio: 16 / 10.4; background: #f4f2f0;">
               <img src="images/work-buzziq.png" alt="BuzzIQ dashboard and creator detail screens" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
@@ -357,9 +357,9 @@
           </a>
           <a data-work-row="1" href="/danadana" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 7px; align-items: center; padding: 30px 0; color: inherit; text-decoration: none;">
             <span style="display: flex; flex-direction: column; gap: 10px;">
-              <span data-row-title="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.5rem, 2.4vw, 2.1rem); font-weight: 600; letter-spacing: -0.032em; color: rgba(255,255,255,0.24); transition: color .55s cubic-bezier(.22,1,.36,1);">Danadana</span>
-              <span data-row-desc="1" style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 15.5px; line-height: 1.5; color: rgba(255,255,255,0.2); transition: color .55s cubic-bezier(.22,1,.36,1); text-wrap: pretty;">A crash betting game licensed to gambling operators, built with player-protection safeguards from the start.</span>
-              <span data-row-meta="1" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 13.5px; color: rgba(255,255,255,0.16); transition: color .55s cubic-bezier(.22,1,.36,1);"><span>Product Designer</span><span>2024 – 2025</span></span>
+              <span data-row-title="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.62rem, 2.4vw, 1.944rem); font-weight: 600; letter-spacing: -0.032em; color: rgba(255,255,255,0.24); transition: color .55s cubic-bezier(.22,1,.36,1);">Danadana</span>
+              <span data-row-desc="1" style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; line-height: 1.5; color: rgba(255,255,255,0.2); transition: color .55s cubic-bezier(.22,1,.36,1); text-wrap: pretty;">A crash betting game licensed to gambling operators, built with player-protection safeguards from the start.</span>
+              <span data-row-meta="1" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.7812rem; color: rgba(255,255,255,0.16); transition: color .55s cubic-bezier(.22,1,.36,1);"><span>Product Designer</span><span>2024 – 2025</span></span>
             </span>
             <div class="work-row-thumb" style="grid-column: 1 / -1; display: none; margin-top: 6px; border-radius: 16px; overflow: hidden; aspect-ratio: 16 / 10.4; background: #f4f2f0;">
               <img src="images/work-danadana.png" alt="Danadana brand key visual" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
@@ -367,9 +367,9 @@
           </a>
           <a data-work-row="2" href="/building-a-shadcn-system-from-scratch" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 7px; align-items: center; padding: 30px 0; color: inherit; text-decoration: none;">
             <span style="display: flex; flex-direction: column; gap: 10px;">
-              <span data-row-title="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.5rem, 2.4vw, 2.1rem); font-weight: 600; letter-spacing: -0.032em; color: rgba(255,255,255,0.24); transition: color .55s cubic-bezier(.22,1,.36,1);">Building a shadcn System from Scratch</span>
-              <span data-row-desc="1" style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 15.5px; line-height: 1.5; color: rgba(255,255,255,0.2); transition: color .55s cubic-bezier(.22,1,.36,1); text-wrap: pretty;">A shadcn component system built from scratch as a personal project, later adapted to power BuzzIQ</span>
-              <span data-row-meta="1" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 13.5px; color: rgba(255,255,255,0.16); transition: color .55s cubic-bezier(.22,1,.36,1);"><span>Systems Product Designer</span><span>2024 – Present</span></span>
+              <span data-row-title="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.62rem, 2.4vw, 1.944rem); font-weight: 600; letter-spacing: -0.032em; color: rgba(255,255,255,0.24); transition: color .55s cubic-bezier(.22,1,.36,1);">Building a shadcn System from Scratch</span>
+              <span data-row-desc="1" style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; line-height: 1.5; color: rgba(255,255,255,0.2); transition: color .55s cubic-bezier(.22,1,.36,1); text-wrap: pretty;">A shadcn component system built from scratch as a personal project, later adapted to power BuzzIQ</span>
+              <span data-row-meta="1" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.7812rem; color: rgba(255,255,255,0.16); transition: color .55s cubic-bezier(.22,1,.36,1);"><span>Systems Product Designer</span><span>2024 – Present</span></span>
             </span>
             <div class="work-row-thumb" style="grid-column: 1 / -1; display: none; margin-top: 6px; border-radius: 16px; overflow: hidden; aspect-ratio: 16 / 10.4; background: #f4f2f0;">
               <img src="images/work-design-system.png" alt="Component documentation pages in light and dark" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
@@ -377,9 +377,9 @@
           </a>
           <a data-work-row="3" href="/kenyan-banking-redesign" style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 7px; align-items: center; padding: 30px 0; color: inherit; text-decoration: none;">
             <span style="display: flex; flex-direction: column; gap: 10px;">
-              <span data-row-title="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.5rem, 2.4vw, 2.1rem); font-weight: 600; letter-spacing: -0.032em; color: rgba(255,255,255,0.24); transition: color .55s cubic-bezier(.22,1,.36,1);">Kenyan Banking Redesign</span>
-              <span data-row-desc="1" style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 15.5px; line-height: 1.5; color: rgba(255,255,255,0.2); transition: color .55s cubic-bezier(.22,1,.36,1); text-wrap: pretty;">Overhauling digital banking friction across four major regional apps</span>
-              <span data-row-meta="1" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 13.5px; color: rgba(255,255,255,0.16); transition: color .55s cubic-bezier(.22,1,.36,1);"><span>UX Designer, UI Designer</span><span>2025</span></span>
+              <span data-row-title="1" style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.62rem, 2.4vw, 1.944rem); font-weight: 600; letter-spacing: -0.032em; color: rgba(255,255,255,0.24); transition: color .55s cubic-bezier(.22,1,.36,1);">Kenyan Banking Redesign</span>
+              <span data-row-desc="1" style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; line-height: 1.5; color: rgba(255,255,255,0.2); transition: color .55s cubic-bezier(.22,1,.36,1); text-wrap: pretty;">Overhauling digital banking friction across four major regional apps</span>
+              <span data-row-meta="1" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.7812rem; color: rgba(255,255,255,0.16); transition: color .55s cubic-bezier(.22,1,.36,1);"><span>UX Designer, UI Designer</span><span>2025</span></span>
             </span>
             <div class="work-row-thumb" style="grid-column: 1 / -1; display: none; margin-top: 6px; border-radius: 16px; overflow: hidden; aspect-ratio: 16 / 10.4; background: #f4f2f0;">
               <img src="images/work-banking.png" alt="Banking app home and card management screens" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
@@ -412,7 +412,7 @@
           <span data-work-dot="2" style="width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.28); transition: all .45s cubic-bezier(.22,1,.36,1);"></span>
           <span data-work-dot="3" style="width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.28); transition: all .45s cubic-bezier(.22,1,.36,1);"></span>
             </div>
-            <p data-work-counter="1" style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 14px; letter-spacing: -0.005em; color: rgba(255,255,255,0.9);">Project 1/4</p>
+            <p data-work-counter="1" style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; letter-spacing: -0.005em; color: rgba(255,255,255,0.9);">Project 1/4</p>
           </div>
         </div>
       </div>
@@ -421,19 +421,19 @@
 
   <section id="cycle" style="position: relative; z-index: 2; width: 100%; background: #0056FF; padding: clamp(96px, 16vw, 160px) 40px; overflow: hidden;">
     <canvas data-cycle-shader aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block;"></canvas>
-    <p style="position: relative; z-index: 1; margin: 0 auto clamp(56px, 9vw, 96px); max-width: 42rem; font-family: Poppins, Helvetica, sans-serif; font-weight: 500; font-size: 1.16rem; letter-spacing: -0.015em; line-height: 2; color: #ffffff; text-align: center; text-wrap: pretty;">As the landscape shifts and AI reshapes how we build,<br>my mindset moves with it</p>
+    <p style="position: relative; z-index: 1; margin: 0 auto clamp(56px, 9vw, 96px); max-width: 42rem; font-family: Poppins, Helvetica, sans-serif; font-weight: 500; font-size: 1.125rem; letter-spacing: -0.015em; line-height: 2; color: #ffffff; text-align: center; text-wrap: pretty;">As the landscape shifts and AI reshapes how we build,<br>my mindset moves with it</p>
     <div data-cycle-stack style="max-width: 640px; margin: 0 auto; position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: clamp(32px, 6vw, 52px);">
       <div>
-        <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-weight: 700; font-size: clamp(1.6rem, 4.2vw, 2.75rem); letter-spacing: -0.02em; line-height: 1; color: #ffffff;">Adapt</h2>
-        <p style="margin: 14px 0 0; font-family: Poppins, Helvetica, sans-serif; font-size: 15px; color: rgba(255,255,255,0.7);">to the changes</p>
+        <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-weight: 700; font-size: clamp(1.62rem, 4.2vw, 2.7994rem); letter-spacing: -0.02em; line-height: 1; color: #ffffff;">Adapt</h2>
+        <p style="margin: 14px 0 0; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; color: rgba(255,255,255,0.7);">to the changes</p>
       </div>
       <div>
-        <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-weight: 700; font-size: clamp(1.6rem, 4.2vw, 2.75rem); letter-spacing: -0.02em; line-height: 1; color: #ffffff;">Reinvent</h2>
-        <p style="margin: 14px 0 0; font-family: Poppins, Helvetica, sans-serif; font-size: 15px; color: rgba(255,255,255,0.7);">yourself</p>
+        <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-weight: 700; font-size: clamp(1.62rem, 4.2vw, 2.7994rem); letter-spacing: -0.02em; line-height: 1; color: #ffffff;">Reinvent</h2>
+        <p style="margin: 14px 0 0; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; color: rgba(255,255,255,0.7);">yourself</p>
       </div>
       <div>
-        <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-weight: 700; font-size: clamp(1.6rem, 4.2vw, 2.75rem); letter-spacing: -0.02em; line-height: 1; color: #ffffff;">Explore</h2>
-        <p style="margin: 14px 0 0; font-family: Poppins, Helvetica, sans-serif; font-size: 15px; color: rgba(255,255,255,0.7);">and make it work!</p>
+        <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-weight: 700; font-size: clamp(1.62rem, 4.2vw, 2.7994rem); letter-spacing: -0.02em; line-height: 1; color: #ffffff;">Explore</h2>
+        <p style="margin: 14px 0 0; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; color: rgba(255,255,255,0.7);">and make it work!</p>
       </div>
 
       <!-- Adapt -> Reinvent connector, right side. Position, size, viewBox

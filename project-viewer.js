@@ -69,19 +69,18 @@
   // the bold intro statement under "Overview", and the in-body
   // subheadings (e.g. "Protecting system integrity") all run oversized
   // for this card — sized (with the h2/statement pair fluid up to
-  // 1.55rem/1.62rem via vw) for the source pages' own wide desktop
+  // 1.62rem via vw) for the source pages' own wide desktop
   // columns, not this narrower card. Fixed, smaller sizes here instead
   // of just capping the clamp(), consistent with how the rest of this
   // card's typography (body copy, meta-grid values) is already fixed
   // rather than fluid. Headings match the About page's own numbered
-  // story titles exactly — 1.16rem at -0.015em tracking — kept
-  // deliberately above the 0.95rem subheadings so the two tiers stay
-  // visually distinct
+  // story titles exactly — 1.125rem at -0.015em tracking — kept
+  // deliberately above the 0.9375rem subheadings so the two tiers stay
+  // visually distinct (both are steps on the shared type scale)
   function shrinkCardHeadings(html) {
     return html
-      .replace(/font-size:\s*clamp\(1\.2rem,\s*1\.9vw,\s*1\.55rem\);(\s*font-weight:\s*500;\s*line-height:\s*1\.4;\s*)letter-spacing:\s*-0\.022em/gi, 'font-size: 1.16rem;$1letter-spacing: -0.015em')
-      .replace(/font-size:\s*clamp\(1\.2rem,\s*1\.9vw,\s*1\.62rem\);(\s*font-weight:\s*500;\s*line-height:\s*1\.4;\s*)letter-spacing:\s*-0\.022em/gi, 'font-size: 1.16rem;$1letter-spacing: -0.015em')
-      .replace(/font-size:\s*1\.08rem(;\s*font-weight:\s*500;\s*letter-spacing:\s*-0\.015em;)/gi, 'font-size: 0.95rem$1');
+      .replace(/font-size:\s*clamp\(1\.125rem,\s*1\.9vw,\s*1\.62rem\);(\s*font-weight:\s*500;\s*line-height:\s*1\.4;\s*)letter-spacing:\s*-0\.022em/gi, 'font-size: 1.125rem;$1letter-spacing: -0.015em')
+      .replace(/font-size:\s*1\.125rem(;\s*font-weight:\s*500;\s*letter-spacing:\s*-0\.015em;)/gi, 'font-size: 0.9375rem$1');
   }
 
   // the source's 1px, 55%-opacity accent left-border (the callout list in
@@ -314,17 +313,13 @@
     // instead of this site's own focus treatment
     ".al-pv-card:focus-visible{outline:2px solid var(--al-green,#EF4418);outline-offset:-3px;border-radius:24px;}",
     ".al-pv-card ::selection{background:#54A9FF;color:#0a0606;}",
-    // the case-study pages' body copy runs a size or two larger than the
-    // About page's own — 17.5px/15.5px/15px against About's consistent
-    // 14.5px body-paragraph size. Matched here at every width, not just
-    // mobile, by targeting the exact inline font-size values the source
-    // markup uses (attribute substring selectors on raw, unnormalized
-    // inline styles — reliable here since these pages don't vary that
-    // value) rather than by role/selector, since the same size shows up
-    // across differently-purposed elements (hero subhead, body
-    // paragraphs, meta-grid values) that don't share a class
-    ".al-pv-card [data-pv-inner] [style*=\"font-size: 17.5px\"],.al-pv-card [data-pv-inner] [style*=\"font-size: 15px\"]{font-size:14.5px !important;}",
-    ".al-pv-card [data-pv-inner] [style*=\"font-size: 15.5px\"]{font-size:14.5px !important;line-height:1.72 !important;}",
+    // the lead tier (1.125rem) is sized for the source pages' wide desktop
+    // columns and runs large in this narrower card, so it drops one step of
+    // the shared scale to 0.9375rem. Matched on the inline value rather than
+    // by role, since that size appears on differently-purposed elements
+    // (hero subhead, intro statement) that share no class. Body copy needs
+    // no rule: it is already 0.9375rem on both surfaces
+    ".al-pv-card [data-pv-inner] [style*=\"font-size: 1.125rem\"]{font-size: 0.9375rem !important;line-height:1.72 !important;}",
     // the "More work" section is rebuilt into a plain list of all four
     // projects (see rebuildMoreWork below) rather than the source's own
     // prev/next card pair, so it needs its own row styling instead of the
@@ -397,7 +392,7 @@
     // instead of cleanly disappearing with it — turning the filter off
     // outright while hidden, not just fading it, avoids that lingering trace
     ".al-pv-header.al-pv-header-hidden{opacity:0;backdrop-filter:none;-webkit-backdrop-filter:none;}",
-    ".al-pv-counter{position:absolute;top:20px;left:0;right:0;margin:0;text-align:center;font-family:Poppins,Helvetica,sans-serif;font-size:11px;letter-spacing:0.06em;color:#636262;}",
+    ".al-pv-counter{position:absolute;top:20px;left:0;right:0;margin:0;text-align:center;font-family:Poppins,Helvetica,sans-serif;font-size: 0.651rem;letter-spacing:0.06em;color:#636262;}",
     // hidden until scrolling actually starts (see the scroll handler in
     // build()) — a bar reading 0% at rest just looks like an unexplained
     // decoration; it only earns its place once there's real progress on it
@@ -428,8 +423,7 @@
     // Only the popup-specific bit stays: these sit in a grid that supplies
     // its own spacing, so they carry no margin of their own
     ".al-pv-card .case-field-label,.al-pv-card .case-section-label{margin:0;}",
-    ".al-pv-card .case-body-text{margin:0;font-size:15.5px;line-height:1.78;color:rgba(239,232,229,0.86);text-wrap:pretty;}",
-    ".al-pv-card .case-figcaption{margin:0;font-family:Poppins,Helvetica,Arial,sans-serif;font-size:11px;line-height:1.6;letter-spacing:0.02em;color:rgba(239,232,229,0.5);}",
+    ".al-pv-card .case-body-text,.al-pv-card .case-figcaption{margin:0;}",
     // phones get the opposite treatment from desktop: screen space is
     // scarce, so the center card claims as much of it as possible (a
     // slim 12px margin per side instead of desktop's 40px) and the gap
@@ -644,10 +638,10 @@
       row.className = 'al-pv-more-row' + (isCurrent ? ' al-pv-more-row-current' : '');
       if (isCurrent) row.setAttribute('aria-current', 'true');
       row.innerHTML =
-        '<span style="flex:0 0 auto;width:28px;font-family:Poppins,Helvetica,sans-serif;font-size:13px;color:#636262;">' + String(i + 1).padStart(2, '0') + '</span>' +
-        '<span data-pv-more-title style="flex:1 1 auto;font-family:Poppins,Helvetica,sans-serif;font-size:1rem;font-weight:500;color:' + (isCurrent ? '#007AFF' : '#000') + ';"></span>' +
+        '<span style="flex:0 0 auto;width:28px;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;color:#636262;">' + String(i + 1).padStart(2, '0') + '</span>' +
+        '<span data-pv-more-title style="flex:1 1 auto;font-family:Poppins,Helvetica,sans-serif;font-size: 0.9375rem;font-weight:500;color:' + (isCurrent ? '#007AFF' : '#000') + ';"></span>' +
         (isCurrent ?
-          '<span aria-hidden="true" style="flex:0 0 auto;font-family:Poppins,Helvetica,sans-serif;font-size:12px;color:#007AFF;">Currently viewing</span>' :
+          '<span aria-hidden="true" style="flex:0 0 auto;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;color:#007AFF;">Currently viewing</span>' :
           '<span aria-hidden="true" style="flex:0 0 auto;color:#636262;">&rarr;</span>');
       if (supportsHover) row.addEventListener('mouseenter', playSwitchOnRealHover);
       grid.appendChild(row);
