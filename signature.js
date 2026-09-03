@@ -20,16 +20,15 @@
 
   function place() {
     if (document.querySelector('[data-signature]')) return;
-    var heading = Array.from(document.querySelectorAll('h3')).find(function (h) {
-      return h.textContent.trim() === 'Thanks for Stopping By';
-    });
-    if (!heading) return;
-    // sign off below the whole two-column row (Off the Clock + Thanks for
-    // Stopping By), not just the column this heading happens to live in —
-    // reads as one shared closing flourish for the story section, the way
-    // a signature closes a letter, rather than an appendage to a single
-    // paragraph
-    var row = heading.closest('.story-grid-2') || heading.parentElement;
+    // sign off below the whole two-column closing row, not inside either
+    // column — it reads as one shared flourish for the story section, the
+    // way a signature closes a letter, rather than an appendage to a single
+    // paragraph. Matched on the row's own class rather than by finding a
+    // heading by its exact text: that text is copy, and renaming the
+    // heading (it was "Thanks for Stopping By") silently dropped the
+    // signature from the page with nothing to indicate why
+    var row = document.querySelector('.story-grid-2');
+    if (!row) return;
 
     // flanking fade-out lines, same gradient recipe as the "I am Ayub Leon"
     // byline on the homepage hero, just stretched to fill the row instead

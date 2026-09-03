@@ -84,6 +84,14 @@
   html { scroll-behavior: smooth; }
   a { color: rgba(244,238,235,0.72); text-decoration: none; transition: color .35s cubic-bezier(.22,1,.36,1), opacity .35s ease; }
   a:hover { color: #fff8f4; }
+  /* the Behance link sits mid-sentence, so it should read as body copy
+     rather than a link: the global rule above renders anchors at 0.72 alpha,
+     visibly greyer than the text either side of it. inherit rather than a
+     literal, so it tracks the paragraph's own colour instead of drifting
+     from it the next time that changes. Scoped to the trigger, so every
+     other link on the page keeps the muted treatment */
+  [data-behance-trigger] a { color: inherit; }
+  [data-behance-trigger] a:hover { color: #fff8f4; }
   a:focus-visible, button:focus-visible { outline: 2px solid #EF4418; outline-offset: 3px; border-radius: 4px; }
   a:active, button:active { opacity: 0.7; }
   ::selection { background: #54A9FF; color: #0a0606; }
@@ -176,7 +184,7 @@
       <div data-reveal="2">
         <div>
           <h3 style="margin: 0 0 8px; font-family: Poppins, Helvetica, sans-serif; font-size: 1.16rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">The Accidental Beginning</h3>
-          <p style="margin: 0; max-width: 58ch; font-size: 14.5px; line-height: 1.72; color: rgba(239,232,229,0.9); text-wrap: pretty;">I got into design by accident. In high school, I built a database interface for my final-year project, and that was the first time I realized I liked figuring out how things should work, not just that they worked. I had more tech ideas than I could explain to people, so I picked up Adobe XD from YouTube to prototype them instead, then taught myself Figma the same way, hours of videos and trial and error until it stuck. That's how it all began, an accidental project that turned into a habit I never stopped chasing.</p>
+          <p style="margin: 0; max-width: 58ch; font-size: 14.5px; line-height: 1.72; color: rgba(239,232,229,0.9); text-wrap: pretty;">I got into design by accident. In high school, I built a database interface for my final-year project, and that was the first time I realized I liked figuring out how things should work, not just that they worked.</p><p style="margin: 16px 0 0; max-width: 58ch; font-size: 14.5px; line-height: 1.72; color: rgba(239,232,229,0.9); text-wrap: pretty;">I had more tech ideas than I could explain to people, so I picked up Adobe XD from YouTube to prototype them instead, then moved to Figma and kept learning the same way, hours of videos and trial and error until it stuck.</p><p style="margin: 16px 0 0; max-width: 58ch; font-size: 14.5px; line-height: 1.72; color: rgba(239,232,229,0.9); text-wrap: pretty;">What started as an accidental project became something I never stopped exploring.</p>
         </div>
       </div>
 
@@ -185,12 +193,12 @@
     <div class="story-grid-2" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px 72px; margin-top: 84px; align-items: start;">
       <div data-reveal="1">
         <h3 style="margin: 0 0 8px; font-family: Poppins, Helvetica, sans-serif; font-size: 1.16rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Off the Clock or When I Close Figma</h3>
-        <p style="margin: 0; max-width: 58ch; font-size: 14.5px; line-height: 1.72; color: rgba(239,232,229,0.9); text-wrap: pretty;">Outside of work I'm usually messing around with some other form of <span data-behance-trigger style="cursor: pointer;"><a href="https://www.behance.net/ayubleon" target="_blank" rel="noopener noreferrer" aria-label="Ayub Leon on Behance">design</a><a href="https://www.behance.net/ayubleon" target="_blank" rel="noopener noreferrer" aria-label="Ayub Leon on Behance" style="display: inline-block; vertical-align: -4px; margin: 0 6px;"><img src="images/behance-logo.svg" alt="Behance" style="width: 20px; height: 20px; border-radius: 5px; display: block;"></a></span>. Most nights I'm deep in a YouTube rabbit hole, science stuff, tech reviews, car builds, DIY home projects, whatever pulls me in that week. I take photos of whatever's around me, I game, and I like working with my hands, building things with wood, playing pool. Speaking of pool, if you're not too serious about work sometime, hit me up on iMessage and let's play a round.</p>
+        <p style="margin: 0; max-width: 58ch; font-size: 14.5px; line-height: 1.72; color: rgba(239,232,229,0.9); text-wrap: pretty;">Outside of work, I&#39;m usually messing around with some other form of <span data-behance-trigger style="cursor: pointer;"><a href="https://www.behance.net/ayubleon" target="_blank" rel="noopener noreferrer" aria-label="Ayub Leon on Behance">design</a><a href="https://www.behance.net/ayubleon" target="_blank" rel="noopener noreferrer" aria-label="Ayub Leon on Behance" style="display: inline-block; vertical-align: -4px; margin: 0 6px;"><img src="images/behance-logo.svg" alt="Behance" style="width: 20px; height: 20px; border-radius: 5px; display: block;"></a></span>.</p><p style="margin: 16px 0 0; max-width: 58ch; font-size: 14.5px; line-height: 1.72; color: rgba(239,232,229,0.9); text-wrap: pretty;">I also tend to fall down rabbit holes. A YouTube video about a car build can turn into an evening of tech reviews, science, DIY projects, or whatever else catches my attention. Gaming and pool have stuck around too. If you&#39;re not too serious about work, hit me up and let&#39;s play a round sometime.</p><p style="margin: 16px 0 0; max-width: 58ch; font-size: 14.5px; line-height: 1.72; color: rgba(239,232,229,0.9); text-wrap: pretty;">I&#39;ve always liked making things, taking them apart, and figuring out how they work. Design is just what ended up becoming my work.</p>
         <span data-behance-tooltip aria-hidden="true" style="position: fixed; top: 0; left: 0; z-index: 9999; padding: 6px 12px; background: #0056FF; color: #ffffff; font-family: Poppins, Helvetica, sans-serif; font-size: 12.5px; font-weight: 500; white-space: nowrap; border-radius: 0; opacity: 0; pointer-events: none; transition: opacity .15s ease; transform: translate(-9999px, -9999px);">Let's have a look</span>
       </div>
       <div data-reveal="2">
-        <h3 style="margin: 0 0 8px; font-family: Poppins, Helvetica, sans-serif; font-size: 1.16rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Thanks for Stopping By</h3>
-        <p style="margin: 0; max-width: 58ch; font-size: 14.5px; line-height: 1.72; color: rgba(239,232,229,0.9); text-wrap: pretty;">There's more to the story than fits here, and if you just want the fuller story, reach out, I like these conversations.</p>
+        <h3 style="margin: 0 0 8px; font-family: Poppins, Helvetica, sans-serif; font-size: 1.16rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Still Here?</h3>
+        <p style="margin: 0; max-width: 58ch; font-size: 14.5px; line-height: 1.72; color: rgba(239,232,229,0.9); text-wrap: pretty;">If you want to talk design, products, or whatever rabbit hole you&#39;re currently stuck in, I&#39;m always up for a conversation.<button type="button" data-contact-send aria-label="Open the contact card" style="display: inline-block; vertical-align: -4px; margin-left: 8px; padding: 0; border: 0; background: none; line-height: 0; color: #f4eeeb; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform .35s cubic-bezier(.22,1,.36,1), opacity .25s ease;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" style="display: block;"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></svg></button></p><span data-contact-tooltip aria-hidden="true" style="position: fixed; top: 0; left: 0; z-index: 9999; padding: 6px 12px; background: #0056FF; color: #ffffff; font-family: Poppins, Helvetica, sans-serif; font-size: 12.5px; font-weight: 500; white-space: nowrap; border-radius: 0; opacity: 0; pointer-events: none; transition: opacity .15s ease; transform: translate(-9999px, -9999px);">Hit me up...</span>
       </div>
     </div>
 
@@ -326,6 +334,51 @@ class Component extends DCLogic {
     });
   }
 
+  // the send icon closing the "Still Here?" line raises the same contact
+  // card the nav dock's avatar opens, through AL.openContactCard (nav.js)
+  // rather than by clicking that button for it — the dock's own handler
+  // toggles, so driving it from here would dismiss an already-open card.
+  // Guarded on an instance property AND a marker on the button, for the
+  // reason spelled out on initPhotoStack below
+  initContactSend() {
+    const trigger = document.querySelector('[data-contact-send]');
+    if (!trigger) return;
+    if (this.contactSendBound && trigger.__contactSendWired) return;
+    this.contactSendBound = true;
+    trigger.__contactSendWired = true;
+    this.contactSendTrigger = trigger;
+    this.onContactSendClick = () => {
+      // nav.js mounts on its own schedule, so the helper can genuinely not
+      // exist yet on a very early click — better to do nothing than throw
+      if (typeof AL.openContactCard === 'function') AL.openContactCard();
+    };
+    trigger.addEventListener('click', this.onContactSendClick);
+    // the hover tick and the tooltip are both real-hover only: touch fires a
+    // synthetic mouseenter right before click, which would double the sound
+    // against the card's own whoosh and flash a tag nobody asked for on a tap
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    this.onContactSendEnter = () => { AL.playSwitch(); };
+    trigger.addEventListener('mouseenter', this.onContactSendEnter);
+
+    // same cursor-following tag as the Behance trigger above, sharing its
+    // markup and offsets so the two read as one treatment
+    const tip = document.querySelector('[data-contact-tooltip]');
+    if (!tip) return;
+    this.contactTip = tip;
+    this.onContactTipMove = (e) => { AL.positionCursorTooltip(tip, e, 18, 20); };
+    this.onContactTipEnter = (e) => {
+      tip.style.opacity = '1';
+      this.onContactTipMove(e);
+    };
+    this.onContactTipLeave = () => { tip.style.opacity = '0'; };
+    trigger.addEventListener('mouseenter', this.onContactTipEnter);
+    trigger.addEventListener('mousemove', this.onContactTipMove);
+    trigger.addEventListener('mouseleave', this.onContactTipLeave);
+    // the card covers the page on open, so a tag left hanging over its
+    // backdrop would sit there until the pointer happened to move again
+    trigger.addEventListener('click', this.onContactTipLeave);
+  }
+
   // guarded by an instance property AND a per-card marker together (like
   // initBurnText/initReveals elsewhere in this file) so repeated calls
   // (see componentDidMount, which wraps this in AL.selfHeal) skip cards
@@ -458,6 +511,7 @@ class Component extends DCLogic {
     AL.selfHeal(() => this.initPhotoStack(), 5000);
     AL.selfHeal(() => this.initBehanceTooltip(), 5000);
     AL.selfHeal(() => this.initFriendHoverSound(), 5000);
+    AL.selfHeal(() => this.initContactSend(), 5000);
     // wrapped like initPhotoStack above (not called once): these two also
     // touch nodes inside the same rebuildable <main>, and calling them
     // once left the hero/story/photo-trio images with no scroll-reveal or
@@ -562,6 +616,14 @@ class Component extends DCLogic {
       this.friendCells.forEach((cell) => {
         cell.removeEventListener('mouseenter', this.onFriendEnter);
       });
+    }
+    if (this.contactSendTrigger) {
+      this.contactSendTrigger.removeEventListener('click', this.onContactSendClick);
+      this.contactSendTrigger.removeEventListener('mouseenter', this.onContactSendEnter);
+      this.contactSendTrigger.removeEventListener('mouseenter', this.onContactTipEnter);
+      this.contactSendTrigger.removeEventListener('mousemove', this.onContactTipMove);
+      this.contactSendTrigger.removeEventListener('mouseleave', this.onContactTipLeave);
+      this.contactSendTrigger.removeEventListener('click', this.onContactTipLeave);
     }
   }
 }

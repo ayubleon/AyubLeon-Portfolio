@@ -309,6 +309,18 @@
       toggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
     };
 
+    // lets anything outside the dock raise the contact card — the About
+    // page's closing line ends in a send icon that opens it. Reassigned on
+    // every fill() rather than defined once, so it always closes over the
+    // card currently in the DOM after a support.js rebuild swaps it out.
+    // Opening only, and a no-op when already open: a caller asking to show
+    // the card should never end up dismissing it, which is what routing
+    // this through the dock's own toggle would do
+    AL.openContactCard = function () {
+      if (card.classList.contains('is-open')) return;
+      setOpen(true);
+    };
+
     el.querySelectorAll('.site-nav-link').forEach(function (link) {
       if (supportsHover) link.addEventListener('mouseenter', playSwitchOnRealHover);
       link.addEventListener('click', function (e) {
