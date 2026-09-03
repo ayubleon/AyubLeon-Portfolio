@@ -11,7 +11,7 @@
     // links column instead, reachable via the layout toggle
     ".footer-kb-figma-color{opacity:0;transition:opacity .12s ease;}",
     ".footer-kb:has(.footer-kb-key:last-child:hover) .footer-kb-figma-color{opacity:1;}",
-    ".site-footer-link{display:inline-flex;align-items:center;gap:8px;font-family:Poppins,Helvetica,sans-serif;font-size: 0.9375rem;font-weight:400;color:rgba(244,238,235,0.88);text-decoration:none;transition:color .3s cubic-bezier(.22,1,.36,1),font-weight .3s cubic-bezier(.22,1,.36,1);}",
+    ".site-footer-link{display:inline-flex;align-items:center;gap:8px;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;font-weight:400;color:rgba(244,238,235,0.88);text-decoration:none;transition:color .3s cubic-bezier(.22,1,.36,1),font-weight .3s cubic-bezier(.22,1,.36,1);}",
     ".site-footer-link:hover{color:#fff;}",
     ".footer-figma-mask,.footer-figma-color{position:absolute;inset:0;transition:opacity .2s ease;}",
     ".footer-figma-color{opacity:0;}",
@@ -212,7 +212,7 @@
               '<img src="images/badge-name.svg" alt="Ayub Leon" style="width:16px;height:48px;display:block;flex:0 0 auto;">' +
               '<div style="display:flex;flex-direction:column;gap:3px;">' +
                 '<p style="margin:0;font-family:Poppins,Helvetica,sans-serif;font-size: 0.9375rem;font-weight:600;color:#f4eeeb;">Ayub Leon</p>' +
-                '<p style="margin:0;font-family:\'Schibsted Grotesk\',Helvetica,Arial,sans-serif;font-size: 0.9375rem;font-weight:400;color:#0A84FF;">Product Designer</p>' +
+                '<p style="margin:0;font-family:\'Schibsted Grotesk\',Helvetica,Arial,sans-serif;font-size: 0.7812rem;font-weight:400;color:#0A84FF;">Product Designer</p>' +
               '</div>' +
             '</div>' +
             '<div class="footer-right-group" style="display:flex;align-items:flex-start;gap:20px;">' +
@@ -239,7 +239,7 @@
             '</div>' +
           '</div>' +
           '<p data-wordmark style="margin:56px 0 0;text-align:center;opacity:0;white-space:nowrap;font-family:Poppins,Helvetica,sans-serif;font-weight:700;line-height:1;color:rgba(239,232,229,0.12);">ayubleon</p>' +
-          '<p style="margin:40px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;line-height:1.6;color:var(--al-text-muted,rgba(239,232,229,0.45));">©2026<br>Designed in Figma, Built with Claude</p>' +
+          '<p style="margin:40px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size: 0.651rem;line-height:1.6;color:var(--al-text-muted,rgba(239,232,229,0.45));">©2026<br>Designed in Figma, Built with Claude</p>' +
         '</div>' +
       '</footer>' +
       '<span data-figma-tooltip aria-hidden="true" style="' + CURSOR_TOOLTIP_CSS + '">Website breakdown</span>' +

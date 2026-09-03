@@ -76,11 +76,21 @@
   // rather than fluid. Headings match the About page's own numbered
   // story titles exactly — 1.125rem at -0.015em tracking — kept
   // deliberately above the 0.9375rem subheadings so the two tiers stay
-  // visually distinct (both are steps on the shared type scale)
+  // visually distinct (both are steps on the shared type scale). The first
+  // replace's own output — font-size: 1.125rem; font-weight: 500;
+  // letter-spacing: -0.015em — is byte-for-byte what the second replace's
+  // pattern matches, since that is also the subheadings' native source
+  // style. Chained as plain .replace() calls, the second pass re-caught
+  // what the first had just produced, so headings and subheadings both
+  // ended up at 0.9375rem — indistinguishable from each other and from
+  // body copy. A placeholder holds the first pass's result out of the
+  // second pass's reach until both have run.
   function shrinkCardHeadings(html) {
+    var HEADING_PLACEHOLDER = '\u0000AL_HEADING\u0000';
     return html
-      .replace(/font-size:\s*clamp\(1\.125rem,\s*1\.9vw,\s*1\.62rem\);(\s*font-weight:\s*500;\s*line-height:\s*1\.4;\s*)letter-spacing:\s*-0\.022em/gi, 'font-size: 1.125rem;$1letter-spacing: -0.015em')
-      .replace(/font-size:\s*1\.125rem(;\s*font-weight:\s*500;\s*letter-spacing:\s*-0\.015em;)/gi, 'font-size: 0.9375rem$1');
+      .replace(/font-size:\s*clamp\(1\.125rem,\s*1\.9vw,\s*1\.62rem\);(\s*font-weight:\s*500;\s*line-height:\s*1\.4;\s*)letter-spacing:\s*-0\.022em/gi, 'font-size: ' + HEADING_PLACEHOLDER + ';$1letter-spacing: -0.015em')
+      .replace(/font-size:\s*1\.125rem(;\s*font-weight:\s*500;\s*letter-spacing:\s*-0\.015em;)/gi, 'font-size: 0.9375rem$1')
+      .replace(new RegExp(HEADING_PLACEHOLDER, 'g'), '1.125rem');
   }
 
   // the source's 1px, 55%-opacity accent left-border (the callout list in
@@ -313,13 +323,12 @@
     // instead of this site's own focus treatment
     ".al-pv-card:focus-visible{outline:2px solid var(--al-green,#EF4418);outline-offset:-3px;border-radius:24px;}",
     ".al-pv-card ::selection{background:#54A9FF;color:#0a0606;}",
-    // the lead tier (1.125rem) is sized for the source pages' wide desktop
-    // columns and runs large in this narrower card, so it drops one step of
-    // the shared scale to 0.9375rem. Matched on the inline value rather than
-    // by role, since that size appears on differently-purposed elements
-    // (hero subhead, intro statement) that share no class. Body copy needs
-    // no rule: it is already 0.9375rem on both surfaces
-    ".al-pv-card [data-pv-inner] [style*=\"font-size: 1.125rem\"]{font-size: 0.9375rem !important;line-height:1.72 !important;}",
+    // card-scoped font-size stepping happens in shrinkCardHeadings, on the
+    // HTML string, before it ever reaches the DOM — not here. A CSS rule
+    // used to duplicate that step by matching the same inline substring
+    // shrinkCardHeadings produces, which meant every heading and lead this
+    // card renders got shrunk a second time, collapsing them to the same
+    // size as the subheadings and body copy beneath them
     // the "More work" section is rebuilt into a plain list of all four
     // projects (see rebuildMoreWork below) rather than the source's own
     // prev/next card pair, so it needs its own row styling instead of the
