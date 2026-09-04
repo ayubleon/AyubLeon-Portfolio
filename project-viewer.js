@@ -103,6 +103,27 @@
     return html.replace(/border-left:\s*1px solid rgba\(10,\s*132,\s*255,\s*0\.55\)/gi, 'border-left: 4px solid #0A84FF');
   }
 
+  // same problem, same fix, different border: the source's hairline
+  // section dividers (stat-block rules) are rgba(255,255,255,0.1) — a
+  // white line tuned for the dark page, which all but disappears against
+  // this card's near-white background. Recolor to black at the same
+  // opacity, matching the popup's own hand-authored dividers
+  // (.al-pv-more-row uses this exact rgba(0,0,0,0.1) already)
+  function recolorHairlineDividers(html) {
+    return html.replace(/border(-top|-bottom|-left|-right)?:\s*1px solid rgba\(255,\s*255,\s*255,\s*0\.1\)/gi, 'border$1: 1px solid rgba(0,0,0,0.1)');
+  }
+
+  // the wrapper around the whole "More work" section carries its own
+  // top divider on the source page. Recoloring it the same way as the
+  // others (see above) made it visible here for the first time — and
+  // right below it, .al-pv-more-row:first-child already draws its own
+  // divider immediately above "01". Two rules that close together read
+  // as clutter, not structure, so this one is dropped rather than
+  // recolored; the list's own rule is enough
+  function dropMoreWorkSectionRule(html) {
+    return html.replace(/padding-top:\s*40px;\s*border-top:\s*1px solid rgba\(255,\s*255,\s*255,\s*0\.1\);/gi, 'padding-top: 40px;');
+  }
+
   // each project's own page is the single source of truth for its title,
   // description, and full case-study body — fetched and cached here
   // instead of duplicating any of that copy into a second, driftable copy
@@ -186,7 +207,7 @@
         descHTML: descHTML,
         // the center card is white, so its embedded content needs its
         // text recolored dark — see darkenTextColors above — and its
-        bodyHTML: main ? thickenAccentBorders(shrinkCardHeadings(darkenTextColors(main.innerHTML))) : ''
+        bodyHTML: main ? recolorHairlineDividers(dropMoreWorkSectionRule(thickenAccentBorders(shrinkCardHeadings(darkenTextColors(main.innerHTML))))) : ''
       };
     }).catch(function () {
       // a failed fetch shouldn't poison this href forever — deleting the
