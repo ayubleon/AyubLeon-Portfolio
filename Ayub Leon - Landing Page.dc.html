@@ -181,31 +181,83 @@
     [data-burn-text] { font-size: 1.125rem !important; line-height: 1.65 !important; }
   }
   [data-burn-grain] { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='gamma' exponent='4'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"); background-size: 180px; }
-  /* the block-4 curiosity cat: three drawn poses (looking up, arm low →
-     looking down, arm raised → arm lowered, still looking down) held in a
-     fixed-size box and continuously cross-faded into one another rather
-     than tweened — the three drawings don't share point counts, so
-     there's no path to interpolate between; an opacity crossfade with
-     equal hold/transition timing is what reads as smooth motion instead.
-     The three keyframes are the same 4.5s cycle viewed from each frame's
-     own opacity, offset by a third each, so the last crossfade (frame 3
-     back to frame 1) lands exactly on the loop point for a seamless
-     repeat rather than a visible jump-cut */
-  .curiosity-cat-frame { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: left bottom; animation: 3s cubic-bezier(.22,1,.36,1) infinite; }
+  /* the block-4 curiosity cat: five drawn poses (looking up, arm low →
+     looking down, arm raised → arm lowered) held in a fixed-size box and
+     played as a frame animation — see the keyframes' own comment below
+     for why they cut rather than cross-fade */
+  .curiosity-cat-frame { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: right bottom; animation: 1.2s steps(1, end) infinite alternate; }
   .curiosity-cat-frame-1 { animation-name: curiosityCatFrame1; }
   .curiosity-cat-frame-2 { animation-name: curiosityCatFrame2; }
   .curiosity-cat-frame-3 { animation-name: curiosityCatFrame3; }
-  /* holds each frame at full opacity, cross-fading briefly into the next —
-     a continuous 3-way blend (all three always partially visible) was
-     tried here and looked blurry/ghosted, since these are three distinct
-     drawings rather than one shape tweened, and two of them overlapping
-     at once reads as a double exposure rather than motion. Keeping only
-     one frame fully opaque at a time, with a short crossfade between,
-     stays crisp while the site's own signature easing (used for every
-     other motion on this page) keeps the transition itself soft */
-  @keyframes curiosityCatFrame1 { 0%, 22.22% { opacity: 1; } 33.33%, 88.89% { opacity: 0; } 100% { opacity: 1; } }
-  @keyframes curiosityCatFrame2 { 0%, 22.22% { opacity: 0; } 33.33%, 55.55% { opacity: 1; } 66.67%, 100% { opacity: 0; } }
-  @keyframes curiosityCatFrame3 { 0%, 55.55% { opacity: 0; } 66.67%, 88.89% { opacity: 1; } 100% { opacity: 0; } }
+  .curiosity-cat-frame-4 { animation-name: curiosityCatFrame4; }
+  .curiosity-cat-frame-5 { animation-name: curiosityCatFrame5; }
+  /* five drawings cut one to the next, no crossfade — the way frame
+     animation actually works. Dissolving between them was tried and read
+     as a flash: these are distinct poses, not one shape tweened, so any
+     overlap shows both at once as a double exposure. The site's signature
+     ease made it worse, since on opacity it slams most of the way over
+     immediately and then crawls. Hence steps(1, end): each frame simply
+     holds its slot and swaps.
+
+     `alternate` runs the cycle forwards then backwards, so the cat sits up
+     and settles back down. Looping forward-only meant snapping from fully
+     upright to crouched every pass, which was the biggest source of the
+     jaggedness. It also doubles the effective frame count for free, and
+     lets each extreme hold a beat at the turnaround.
+
+     1.2s over five frames is ~4fps — still short of the 8-12fps that reads
+     as true motion, but close enough to feel like movement rather than a
+     slideshow. More frames would be the real fix if this ever needs to be
+     smoother; the keyframes below just partition 100% evenly, so any
+     count works by re-splitting the slots */
+  @keyframes curiosityCatFrame1 { 0%, 19.99% { opacity: 1; } 20%, 100% { opacity: 0; } }
+  @keyframes curiosityCatFrame2 { 0%, 19.99% { opacity: 0; } 20%, 39.99% { opacity: 1; } 40%, 100% { opacity: 0; } }
+  @keyframes curiosityCatFrame3 { 0%, 39.99% { opacity: 0; } 40%, 59.99% { opacity: 1; } 60%, 100% { opacity: 0; } }
+  @keyframes curiosityCatFrame4 { 0%, 59.99% { opacity: 0; } 60%, 79.99% { opacity: 1; } 80%, 100% { opacity: 0; } }
+  @keyframes curiosityCatFrame5 { 0%, 79.99% { opacity: 0; } 80%, 100% { opacity: 1; } }
+  /* the #cycle section's fill-in-the-blank line. Every phrase the blank
+     can hold — including the "something" it rests on — is stacked in the
+     slot's single grid cell, so the slot is always as wide as the longest
+     of them and swapping the fill can't re-wrap or re-centre the line
+     around it. Only the filled phrase sits at opacity 1; the rest wait in
+     the same cell */
+  /* the blank sits on its own line, separated by the line's own leading —
+     the same way "Kenyan Banking Redesign" separates its two lines */
+  .cycle-blank-line { display: block; }
+  .cycle-slot { display: inline-grid; padding-bottom: 8px; border-bottom: 2px solid rgba(244, 238, 235, 0.35); }
+  .cycle-slot-phrase { grid-area: 1 / 1; opacity: 0; transition: opacity .28s cubic-bezier(.22, 1, .36, 1); }
+  .cycle-slot-phrase.is-filled { opacity: 1; }
+  /* dim enough that the filled one clearly stands out, but still readable
+     on its own — the row has to carry the whole idea for anyone whose
+     pointer never reaches it */
+  .cycle-word {
+    font-family: Poppins, Helvetica, sans-serif; font-weight: 500;
+    font-size: clamp(1.125rem, 1.9vw, 1.62rem); letter-spacing: -0.022em; line-height: 1.65;
+    color: rgba(244, 238, 235, 0.45);
+    transition: color .28s cubic-bezier(.22, 1, .36, 1), transform .28s cubic-bezier(.22, 1, .36, 1);
+  }
+  .cycle-word.is-picked { color: #f4eeeb; transform: translateY(-2px); }
+  /* the closing pill. Shape, radius and type are the nav dock's own, so
+     this reads as the site's existing button rather than a second one */
+  .cycle-cta {
+    padding: 12px 22px; border: 0; border-radius: 999px; background: rgba(244, 238, 235, 0.9);
+    font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; font-weight: 500;
+    color: #0056FF; cursor: pointer;
+    transition: background .28s ease;
+  }
+  .cycle-cta:active { background: #ffffff; }
+  /* gated on real hover: on a touch screen :hover latches after a tap and
+     would leave the pill sitting in its hovered state with nothing to
+     undo it */
+  @media (hover: hover) and (pointer: fine) {
+    .cycle-cta:hover { background: #f4eeeb; }
+  }
+  /* the blanket rule further down neutralises animations, not transitions,
+     so these two need their own opt-out */
+  @media (prefers-reduced-motion: reduce) {
+    .cycle-slot-phrase, .cycle-word { transition: none; }
+    .cycle-word.is-picked { transform: none; }
+  }
   /* the crossfade is a scroll-position effect, not a CSS animation, so the
      generic `* { animation-duration: .01ms }` rule below can't neutralize
      it — this collapses the pinned runway back into a plain static stack
@@ -290,7 +342,7 @@
       <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; margin: 0 auto;">
         <h1 data-fit-heading style="margin: 0; white-space: nowrap; font-family: Poppins, Helvetica, sans-serif; font-weight: 700; font-size: 6.5rem; letter-spacing: -0.04em; line-height: 1; color: #f4eeeb;">Ayub Leon</h1>
         <span style="display: inline-block; margin-top: 20px; padding: 6px 12px; background: #0056FF; color: #ffffff; font-family: Poppins, Helvetica, sans-serif; font-size: 0.7812rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 0;">Product Designer</span>
-        <p style="margin: 14px 0 0; max-width: 46ch; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.125rem, 1.9vw, 1.62rem); font-weight: 500; line-height: 1.5; letter-spacing: -0.015em; color: #f4eeeb; text-wrap: pretty;">Four years designing products,<br>most of them as the only designer on the project.</p><p style="margin: 12px 0 0; max-width: 68ch; font-size: 0.9375rem; line-height: 1.65; color: rgba(244,238,235,0.72); text-wrap: pretty;">TikTok Shop analytics, betting platforms, and the systems underneath them.</p>
+        <p style="margin: 14px 0 0; max-width: 46ch; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.125rem, 1.9vw, 1.62rem); font-weight: 500; line-height: 1.65; letter-spacing: -0.022em; color: #f4eeeb; text-wrap: pretty;">Four years designing products,<br>most of them as the only designer on the project.</p><p style="margin: 12px 0 0; max-width: 68ch; font-size: 0.9375rem; line-height: 1.65; color: rgba(244,238,235,0.72); text-wrap: pretty;">TikTok Shop analytics, betting platforms, and the systems underneath them.</p>
       </div>
     </div>
   </section>
@@ -324,7 +376,7 @@
           <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.62rem, 2.4vw, 1.944rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;"><span data-process-icon-origin>That&#39;s</span> also why I&#39;ve spent the last year bringing AI into my process<img data-search-icon src="images/search-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block; margin-left: 0.34em; margin-right: 0.22em;"><img data-burn-icon src="images/claude-ai-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block; opacity: 0; margin-right: 0.22em;"><img data-figma-icon src="images/figma-logo.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block;"> <span class="hl">not as a shortcut</span>, but as another way to <span class="hl">dig deeper into problems, explore more possibilities</span>, and get from an idea to something tangible <span class="hl">faster.</span></p>
         </div>
         <div data-burn-block style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.62rem, 2.4vw, 1.944rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">Because good ideas only matter when they work, I collaborate closely with developers and stakeholders to turn them into products people can actually use.<span class="curiosity-cat" aria-hidden="true" style="position: relative; display: block; height: 1.9em; width: 2.4em; margin: 22px auto 0;"><img src="images/cat-frame-1.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-1"><img src="images/cat-frame-2.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-2"><img src="images/cat-frame-3.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-3"></span></p>
+          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.62rem, 2.4vw, 1.944rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">Because good ideas only matter when they work, I collaborate closely with developers and stakeholders to turn them into products people can actually use.<span class="curiosity-cat" aria-hidden="true" style="position: relative; display: block; height: 1.9em; width: 2.4em; margin: 22px auto 0;"><img src="images/cat-frame-1.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-1"><img src="images/cat-frame-1b.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-2"><img src="images/cat-frame-2.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-3"><img src="images/cat-frame-2b.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-4"><img src="images/cat-frame-3.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-5"></span></p>
         </div>
         <div data-burn-grain aria-hidden="true" style="position: absolute; inset: 0; z-index: 4; opacity: 0.4; pointer-events: none;"></div>
       </div>
@@ -334,7 +386,7 @@
   <section id="work" data-work-section="1" style="position: relative; z-index: 10; height: 280svh; background: #000000;">
     <div class="mobile-gutter" data-work-pin="1" style="position: sticky; top: 0; height: 100svh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 40px; max-width: 1400px; margin: 0 auto; padding: 96px 40px 56px;">
       <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;">
-        <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.944rem, 3.4vw, 2.7994rem); font-weight: 700; letter-spacing: -0.04em; color: #f4eeeb;">Featured work</h2>
+        <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.944rem, 3.4vw, 2.7994rem); font-weight: 700; letter-spacing: -0.04em; line-height: 1; color: #f4eeeb;">Featured work</h2>
 
       </div>
 
@@ -422,42 +474,28 @@
     </div>
   </section>
 
-  <section id="cycle" style="position: relative; z-index: 2; width: 100%; background: #0056FF; padding: clamp(96px, 16vw, 160px) 40px; overflow: hidden;">
+  <section id="cycle" style="position: relative; z-index: 2; width: 100%; background: #0056FF; padding: clamp(160px, 24vw, 240px) 40px; overflow: hidden;">
     <canvas data-cycle-shader aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block;"></canvas>
-    <p style="position: relative; z-index: 1; margin: 0 auto clamp(56px, 9vw, 96px); max-width: 42rem; font-family: Poppins, Helvetica, sans-serif; font-weight: 500; font-size: 1.125rem; letter-spacing: -0.015em; line-height: 2; color: #ffffff; text-align: center; text-wrap: pretty;">As the landscape shifts and AI reshapes how we build,<br>my mindset moves with it</p>
-    <div data-cycle-stack style="max-width: 640px; margin: 0 auto; position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: clamp(32px, 6vw, 52px);">
-      <div>
-        <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-weight: 700; font-size: clamp(1.944rem, 3.4vw, 2.7994rem); letter-spacing: -0.02em; line-height: 1; color: #ffffff;">Adapt</h2>
-        <p style="margin: 14px 0 0; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; color: rgba(255,255,255,0.7);">to the changes</p>
+    <div data-cycle-prompt style="position: relative; z-index: 1; max-width: 720px; margin: 0 auto; text-align: center;">
+      <!-- the blank starting its own line is deliberate rather than left to
+           wrapping: the phrases it holds are different lengths, and on any
+           width where the sentence sets on two lines a longer one would
+           push the break, making the whole block jump a line's height as
+           the reader moves between words -->
+      <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.62rem, 2.4vw, 1.944rem); font-weight: 600; letter-spacing: -0.032em; color: #f4eeeb;">I'm usually figuring out<span class="cycle-blank-line"><span class="cycle-slot" data-cycle-slot><span class="cycle-slot-phrase is-filled">something</span></span></span></p>
+      <div style="margin: clamp(40px, 6vw, 64px) 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 24px;">
+        <span class="cycle-word" data-cycle-word>a product</span>
+        <span class="cycle-word" data-cycle-word>a prototype</span>
+        <span class="cycle-word" data-cycle-word>a camera</span>
+        <span class="cycle-word" data-cycle-word>a piece of wood</span>
+        <span class="cycle-word" data-cycle-word>a new tool</span>
+        <span class="cycle-word" data-cycle-word>a weird idea</span>
+        <span class="cycle-word" data-cycle-word>a game</span>
+        <span class="cycle-word" data-cycle-word>a problem</span>
       </div>
-      <div>
-        <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-weight: 700; font-size: clamp(1.944rem, 3.4vw, 2.7994rem); letter-spacing: -0.02em; line-height: 1; color: #ffffff;">Reinvent</h2>
-        <p style="margin: 14px 0 0; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; color: rgba(255,255,255,0.7);">yourself</p>
-      </div>
-      <div>
-        <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-weight: 700; font-size: clamp(1.944rem, 3.4vw, 2.7994rem); letter-spacing: -0.02em; line-height: 1; color: #ffffff;">Explore</h2>
-        <p style="margin: 14px 0 0; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; color: rgba(255,255,255,0.7);">and make it work!</p>
-      </div>
-
-      <!-- Adapt -> Reinvent connector, right side. Position, size, viewBox
-           and both paths are all rewritten by initCycleConnectors() from
-           the words' own measured boxes — see that method for why this
-           can't just be hand-tuned percentages. What ships here is only a
-           first-paint placeholder, kept visually close to the resolved
-           result so there's no jump when the measured pass lands.
-           preserveAspectRatio="none" is deliberate: that pass sets a
-           viewBox matching the element's px box exactly, so the mapping is
-           already 1:1 and "none" simply keeps it that way rather than
-           re-introducing letterboxing on a subpixel rounding difference -->
-      <svg data-cycle-connector="right" aria-hidden="true" viewBox="0 0 44 170" preserveAspectRatio="none" fill="none" style="position: absolute; right: 0; top: 8%; width: clamp(34px, 5.5vw, 58px); height: 34%; overflow: visible;">
-        <path data-cycle-elbow d="M1.75 1.75 H30.25 Q42.25 1.75 42.25 13.75 V156.25 Q42.25 168.25 30.25 168.25 H10.75" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-        <path data-cycle-arrow d="M10.75 163.25 L1.75 168.25 L10.75 173.25 Z" fill="#ffffff"/>
-      </svg>
-      <!-- Reinvent -> Explore connector, left side -->
-      <svg data-cycle-connector="left" aria-hidden="true" viewBox="0 0 44 170" preserveAspectRatio="none" fill="none" style="position: absolute; left: 0; top: 50%; width: clamp(34px, 5.5vw, 58px); height: 34%; overflow: visible;">
-        <path data-cycle-elbow d="M42.25 1.75 H13.75 Q1.75 1.75 1.75 13.75 V156.25 Q1.75 168.25 13.75 168.25 H33.25" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-        <path data-cycle-arrow d="M33.25 163.25 L42.25 168.25 L33.25 173.25 Z" fill="#ffffff"/>
-      </svg>
+      <!-- a button rather than a link: it raises the same contact card the
+           nav dock's avatar opens, so there is no href to navigate to -->
+      <button type="button" class="cycle-cta" data-cycle-cta aria-haspopup="dialog" style="margin: clamp(40px, 6vw, 64px) 0 0;">Let's figure out yours</button>
     </div>
   </section>
   </main>
@@ -529,7 +567,8 @@ class Component extends DCLogic {
     // recalculates
     AL.selfHeal(() => this.initHeadingFit(), 5000);
     AL.selfHeal(() => this.initBurnText(), 5000);
-    AL.selfHeal(() => this.initCycleConnectors(), 5000);
+    AL.selfHeal(() => this.initCyclePrompt(), 5000);
+    AL.selfHeal(() => this.initCycleCta(), 5000);
     AL.selfHeal(() => this.initCycleShader(), 5000);
   }
 
@@ -593,114 +632,98 @@ class Component extends DCLogic {
     window.addEventListener('resize', this.onHeadingFitResize);
   }
 
-  // draws the two curved "Adapt -> Reinvent -> Explore" connectors in the
-  // #cycle section from each word's own measured vertical center, rather
-  // than hand-tuned top/height percentages against the stack. Percentages
-  // can't actually hit "the center of the word" reliably here: the gap
-  // between rows is a clamp() that scales differently from the heading's
-  // own clamp() font-size as the viewport changes, so any fixed percentage
-  // is only ever correct at one specific viewport width
-  initCycleConnectors() {
-    const stack = document.querySelector('[data-cycle-stack]');
-    if (!stack) return;
-    const heads = Array.from(stack.querySelectorAll('h2'));
-    const connectors = [
-      { svg: stack.querySelector('[data-cycle-connector="right"]'), from: 0, to: 1, side: 'right' },
-      { svg: stack.querySelector('[data-cycle-connector="left"]'), from: 1, to: 2, side: 'left' }
-    ];
-    if (heads.length < 3 || connectors.some((c) => !c.svg)) return;
+  // fills the blank in the #cycle section's "I'm usually figuring out
+  // ______" line with whichever thing the reader is pointing at, and dims
+  // the rest of the row back out of the way while they do.
+  //
+  // The phrases that go in the blank are cloned from the row itself rather
+  // than authored a second time in the markup: they are the same eight
+  // strings, and keeping one copy is what stops the line and the row from
+  // drifting apart the next time the list is edited.
+  //
+  // Guarded on a marker on the section itself rather than an instance
+  // property — see initHeadingFit above for why: support.js can rebuild
+  // this content, and a fresh, unbound prompt can arrive under this same
+  // still-mounted instance
+  initCyclePrompt() {
+    const prompt = document.querySelector('[data-cycle-prompt]');
+    if (!prompt || prompt.dataset.cyclePromptBound === '1') return;
+    const slot = prompt.querySelector('[data-cycle-slot]');
+    const words = Array.from(prompt.querySelectorAll('[data-cycle-word]'));
+    const restingPhrase = slot && slot.querySelector('.cycle-slot-phrase');
+    if (!slot || !restingPhrase || !words.length) return;
+    prompt.dataset.cyclePromptBound = '1';
 
-    // every value below is real CSS pixels, and the viewBox is rebuilt each
-    // pass to match the element's own px box exactly, so the scale stays
-    // 1:1 on both axes. It used to be a fixed `0 0 90 h` viewBox stretched
-    // into whatever width the CSS clamp() produced: at 34px wide on a phone
-    // that squashed x to ~0.38 while leaving y at 1, which sheared the
-    // stroke and turned the corner radius into a stretched ellipse — the
-    // "weird arrows" this fixes. Uniform scale is also why the radius can
-    // be a single number rather than one per axis
-    const STROKE = 2.5;
-    // keeps the stroke's own width inside the box instead of half-clipped
-    const PAD = STROKE / 2 + 0.5;
-    const CORNER = 12;
-    // the arrowhead points along the horizontal, so BARB — its tip-to-back
-    // reach — runs horizontally, while WING is half its vertical base
-    const BARB = 9;
-    const WING = 5;
-    // clear space between a word and the connector beside it
-    const GAP = 14;
+    const phrases = words.map((word) => {
+      const phrase = document.createElement('span');
+      phrase.className = 'cycle-slot-phrase';
+      phrase.textContent = word.textContent;
+      // the row right below says all of this already: a screen reader
+      // reading the line as "figuring out something" and then the list is
+      // the whole content, with no eight stacked duplicates in between
+      phrase.setAttribute('aria-hidden', 'true');
+      slot.appendChild(phrase);
+      return phrase;
+    });
 
-    const apply = () => {
-      const stackRect = stack.getBoundingClientRect();
-      const centerOf = (el) => {
-        const r = el.getBoundingClientRect();
-        return r.top + r.height / 2 - stackRect.top;
-      };
-
-      connectors.forEach(({ svg, from, to, side }) => {
-        const startY = centerOf(heads[from]);
-        const endY = centerOf(heads[to]);
-        // the box is padded past both word centers so the horizontal arms
-        // land exactly on them rather than PAD short
-        const boxH = (endY - startY) + PAD * 2;
-        const w = parseFloat(window.getComputedStyle(svg).width);
-        if (!w || !(boxH > 0)) return;
-
-        // anchored to the measured edges of the two words it spans rather
-        // than to the stack's own edges, which on a wide viewport left it
-        // stranded far out in the margin. Clamped so it can never be
-        // pushed outside the stack on a narrow one
-        const fromRect = heads[from].getBoundingClientRect();
-        const toRect = heads[to].getBoundingClientRect();
-        const x = side === 'right'
-          ? Math.max(fromRect.right, toRect.right) - stackRect.left + GAP
-          : Math.min(fromRect.left, toRect.left) - stackRect.left - GAP - w;
-        svg.style.left = Math.max(0, Math.min(x, stackRect.width - w)) + 'px';
-        svg.style.right = 'auto';
-        svg.style.top = (startY - PAD) + 'px';
-        svg.style.height = boxH + 'px';
-        svg.setAttribute('viewBox', '0 0 ' + w + ' ' + boxH);
-
-        // innerX is the edge nearest the words — where the top arm starts
-        // and the arrowhead points; spineX is the far vertical run
-        const innerX = side === 'right' ? PAD : w - PAD;
-        const spineX = side === 'right' ? w - PAD : PAD;
-        const radius = Math.min(CORNER, Math.abs(spineX - innerX), (boxH - PAD * 2) / 2);
-        const bendX = side === 'right' ? spineX - radius : spineX + radius;
-        const topY = PAD;
-        const botY = boxH - PAD;
-        const wingX = side === 'right' ? innerX + BARB : innerX - BARB;
-
-        // selected by their own attributes rather than by position among
-        // the SVG's paths, so the two stay explicit and order-independent
-        const elbowPath = svg.querySelector('[data-cycle-elbow]');
-        const arrowPath = svg.querySelector('[data-cycle-arrow]');
-        elbowPath.setAttribute('d',
-          'M' + innerX + ' ' + topY +
-          ' H' + bendX +
-          ' Q' + spineX + ' ' + topY + ' ' + spineX + ' ' + (topY + radius) +
-          ' V' + (botY - radius) +
-          ' Q' + spineX + ' ' + botY + ' ' + bendX + ' ' + botY +
-          ' H' + wingX
-        );
-        // closed with Z and filled (see the static markup's fill="#ffffff")
-        // rather than left as an open stroked chevron, for a solid arrowhead
-        arrowPath.setAttribute('d',
-          'M' + wingX + ' ' + (botY - WING) +
-          ' L' + innerX + ' ' + botY +
-          ' L' + wingX + ' ' + (botY + WING) + ' Z'
-        );
-      });
+    // -1 is the resting state: "something" in the blank, no word picked
+    const RESTING = -1;
+    const fill = (index) => {
+      restingPhrase.classList.toggle('is-filled', index === RESTING);
+      phrases.forEach((phrase, i) => phrase.classList.toggle('is-filled', i === index));
+      words.forEach((word, i) => word.classList.toggle('is-picked', i === index));
     };
 
-    // apply() itself is safe to re-run every time AL.selfHeal calls this
-    // method — the resize listener is not, and would stack a duplicate on
-    // every one of those re-invocations without this guard
-    apply();
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(apply);
-    if (!this.onCycleResize) {
-      this.onCycleResize = apply;
-      window.addEventListener('resize', this.onCycleResize);
+    // a touch screen has no pointer to hover with, so there the line fills
+    // itself one word at a time and the reader watches rather than drives
+    // it. Hover and auto-fill are exclusive: bound together, a tap would
+    // fill the blank, stop the loop, then clear again on touch-end
+    if (window.matchMedia('(hover: hover)').matches) {
+      words.forEach((word, index) => {
+        word.addEventListener('pointerenter', () => fill(index));
+        word.addEventListener('pointerleave', () => fill(RESTING));
+      });
+      return;
     }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // long enough to read each phrase and glance down at the word it came
+    // from before the next one lands
+    const AUTO_FILL_MS = 2200;
+    // a rebuild hands back a fresh prompt while the previous timer is still
+    // running against the nodes it replaced — this is the only place that
+    // stale loop gets stopped
+    window.clearInterval(this.cycleAutoFillTimer);
+    let picked = RESTING;
+    this.cycleAutoFillTimer = window.setInterval(() => {
+      picked = (picked + 1) % words.length;
+      fill(picked);
+    }, AUTO_FILL_MS);
+  }
+
+  // the #cycle section's closing pill raises the same contact card the nav
+  // dock's avatar opens, through AL.openContactCard (nav.js) rather than by
+  // clicking that button for it — the dock's own handler toggles, so
+  // driving it from here would dismiss an already-open card. Same approach
+  // as the About page's "Still Here?" send icon.
+  //
+  // Guarded on a marker on the button itself rather than an instance
+  // property — see initHeadingFit above for why: support.js can rebuild
+  // this content, and a fresh, unbound pill can arrive under this same
+  // still-mounted instance
+  initCycleCta() {
+    const cta = document.querySelector('[data-cycle-cta]');
+    if (!cta || cta.dataset.cycleCtaBound === '1') return;
+    cta.dataset.cycleCtaBound = '1';
+    cta.addEventListener('click', () => {
+      // nav.js mounts on its own schedule, so the helper can genuinely not
+      // exist yet on a very early click — better to do nothing than throw
+      if (typeof AL.openContactCard === 'function') AL.openContactCard();
+    });
+    // real-hover only: touch fires a synthetic mouseenter right before the
+    // click, which would double this tick against the card's own whoosh
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    cta.addEventListener('mouseenter', () => { AL.playSwitch(); });
   }
 
   // ambient WebGL water-like flow behind the #cycle section's copy — kept
@@ -1778,7 +1801,7 @@ class Component extends DCLogic {
     window.removeEventListener('resize', this.onWorkScroll);
     window.removeEventListener('resize', this.onSignatureResize);
     if (this.signatureResizeObserver) this.signatureResizeObserver.disconnect();
-    window.removeEventListener('resize', this.onCycleResize);
+    window.clearInterval(this.cycleAutoFillTimer);
     window.removeEventListener('resize', this.onCycleShaderResize);
     if (this.cycleShaderFrame) cancelAnimationFrame(this.cycleShaderFrame);
     window.removeEventListener('scroll', this.onBurnScroll);
