@@ -86,33 +86,6 @@
   window.addEventListener('mousemove', function () { mouseHasMoved = true; }, { once: true, passive: true });
   function playSwitchOnRealHover() { if (mouseHasMoved) playSwitch(); }
 
-  // the section headings (h2, e.g. "The advantage that made it work"),
-  // the bold intro statement under "Overview", and the in-body
-  // subheadings (e.g. "Protecting system integrity") all run oversized
-  // for this card — sized (with the h2/statement pair fluid up to
-  // 1.62rem via vw) for the source pages' own wide desktop
-  // columns, not this narrower card. Fixed, smaller sizes here instead
-  // of just capping the clamp(), consistent with how the rest of this
-  // card's typography (body copy, meta-grid values) is already fixed
-  // rather than fluid. Headings match the About page's own numbered
-  // story titles exactly — 1.125rem at -0.015em tracking — kept
-  // deliberately above the 0.9375rem subheadings so the two tiers stay
-  // visually distinct (both are steps on the shared type scale). The first
-  // replace's own output — font-size: 1.125rem; font-weight: 500;
-  // letter-spacing: -0.015em — is byte-for-byte what the second replace's
-  // pattern matches, since that is also the subheadings' native source
-  // style. Chained as plain .replace() calls, the second pass re-caught
-  // what the first had just produced, so headings and subheadings both
-  // ended up at 0.9375rem — indistinguishable from each other and from
-  // body copy. A placeholder holds the first pass's result out of the
-  // second pass's reach until both have run.
-  function shrinkCardHeadings(html) {
-    var HEADING_PLACEHOLDER = '\u0000AL_HEADING\u0000';
-    return html
-      .replace(/font-size:\s*clamp\(1\.125rem,\s*1\.9vw,\s*1\.62rem\);(\s*font-weight:\s*500;\s*line-height:\s*1\.65;\s*)letter-spacing:\s*-0\.022em/gi, 'font-size: ' + HEADING_PLACEHOLDER + ';$1letter-spacing: -0.015em')
-      .replace(/font-size:\s*1\.125rem(;\s*font-weight:\s*500;\s*letter-spacing:\s*-0\.015em;)/gi, 'font-size: 0.9375rem$1')
-      .replace(new RegExp(HEADING_PLACEHOLDER, 'g'), '1.125rem');
-  }
 
 
 
@@ -172,11 +145,13 @@
       return {
         title: h1 ? h1.textContent.trim() : '',
         descHTML: descHTML,
-        // the pages are the same light surface as this card now, so what
-        // they ship is what it shows — the colour, divider, accent-border
-        // and More-work rewrites that used to sit here all became no-ops
-        // and were deleted. Only the heading sizes still differ
-        bodyHTML: main ? shrinkCardHeadings(main.innerHTML) : ''
+        // the pages ARE this card's content now, unmodified. Every rewrite
+        // that used to sit here — text colours, hairline dividers, the
+        // accent border, the More work rule, the heading sizes — became a
+        // no-op once the pages shipped what this chain used to compute,
+        // and went with it. Nothing left to derive, so nothing left to
+        // drift out of step
+        bodyHTML: main ? main.innerHTML : ''
       };
     }).catch(function () {
       // a failed fetch shouldn't poison this href forever — deleting the
@@ -318,12 +293,11 @@
     // instead of this site's own focus treatment
     ".al-pv-card:focus-visible{outline:2px solid var(--al-green,#EF4418);outline-offset:-3px;border-radius:24px;}",
     ".al-pv-card ::selection{background:#54A9FF;color:#0a0606;}",
-    // card-scoped font-size stepping happens in shrinkCardHeadings, on the
-    // HTML string, before it ever reaches the DOM — not here. A CSS rule
-    // used to duplicate that step by matching the same inline substring
-    // shrinkCardHeadings produces, which meant every heading and lead this
-    // card renders got shrunk a second time, collapsing them to the same
-    // size as the subheadings and body copy beneath them
+    // nothing here restyles the fetched content's type: the pages ship the
+    // sizes this card shows. A CSS rule here once re-applied a step-down
+    // the HTML had already been through, which collapsed every heading and
+    // lead to the size of the body copy beneath them — worth remembering
+    // before adding a font-size rule scoped to this card again
     // the "More work" section is rebuilt into a plain list of all four
     // projects (see rebuildMoreWork below) rather than the source's own
     // prev/next card pair, so it needs its own row styling instead of the
