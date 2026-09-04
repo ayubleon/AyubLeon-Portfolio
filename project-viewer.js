@@ -22,6 +22,49 @@
     '/kenyan-banking-redesign'
   ];
 
+  // The card owns the address bar while it is open. Opening a project
+  // pushes that project's own path, so the URL is always something worth
+  // copying and the browser's Back closes the card instead of leaving the
+  // site; moving between projects REPLACES that entry rather than pushing,
+  // so browsing all four doesn't bury Back under four steps.
+  //
+  // DOC_PATH is the path of the document actually loaded underneath. This
+  // file runs on every page, so a card opened from a case study page has
+  // to know where to put the URL back on close — '/' is not a safe
+  // assumption.
+  var DOC_PATH = window.location.pathname;
+  // whether the entry currently showing is one this file pushed. close()
+  // can't otherwise tell "step back to the entry underneath" from "there
+  // is no entry underneath" — the deep-linked case, where the card opened
+  // over the very page the URL already names and nothing was pushed
+  var pushedEntry = false;
+  var canRoute = !!(window.history && window.history.pushState);
+
+  function syncUrl(href) {
+    if (!canRoute) return;
+    if (!pushedEntry && href === window.location.pathname) return;
+    if (pushedEntry) {
+      window.history.replaceState({ alProject: href }, '', href);
+      return;
+    }
+    window.history.pushState({ alProject: href }, '', href);
+    pushedEntry = true;
+  }
+
+  // every close the reader triggers routes through here rather than
+  // calling close() directly, so the history entry and the card come down
+  // together. Where an entry was pushed, stepping back is what closes the
+  // card — the popstate handler below does the DOM half — which keeps the
+  // Back button and the close button landing in exactly the same state
+  function requestClose() {
+    if (pushedEntry && canRoute) {
+      pushedEntry = false;
+      window.history.back();
+      return;
+    }
+    close();
+  }
+
   var SWIPE_MIN_PX = 60; // shorter horizontal drags read as scroll wobble, not an intentional swipe
   var MOVE_MS = 480; // duration of the slot-shift scroll on a project change
 
@@ -557,14 +600,14 @@
     var stage = overlay.querySelector('.al-pv-stage');
 
     var closeBtn = overlay.querySelector('[data-pv-close]');
-    closeBtn.addEventListener('click', close);
+    closeBtn.addEventListener('click', requestClose);
     if (supportsHover) closeBtn.addEventListener('mouseenter', playSwitchOnRealHover);
     // delegated rather than bound per-card at build time — which physical
     // card is clickable-to-navigate changes as slots rotate, so the
     // handler has to read each card's CURRENT slot at click time rather
     // than assume whichever slot it was wired to when the cards were built
     overlay.addEventListener('click', function (e) {
-      if (e.target === overlay || e.target === stage) { close(); return; }
+      if (e.target === overlay || e.target === stage) { requestClose(); return; }
       var card = e.target.closest('.al-pv-card');
       if (!card) return;
       if (card.dataset.slot === 'left') go(-1);
@@ -796,6 +839,7 @@
     var offCard = cards.find(function (c) { return c.dataset.slot === 'offLeft' || c.dataset.slot === 'offRight'; });
 
     currentIndex = mod(currentIndex + delta);
+    syncUrl(ORDER[currentIndex]);
     loadProject(ORDER[mod(currentIndex - 1)]);
     loadProject(ORDER[mod(currentIndex + 1)]);
 
@@ -867,7 +911,7 @@
   }
 
   function onKeydown(e) {
-    if (e.key === 'Escape') { close(); return; }
+    if (e.key === 'Escape') { requestClose(); return; }
     if (e.key === 'ArrowLeft') { go(-1); return; }
     if (e.key === 'ArrowRight') { go(1); return; }
     if (e.key !== 'Tab') return;
@@ -888,10 +932,14 @@
     }
   }
 
-  function open(href) {
+  // skipUrl is for the two openings that must not write history: restoring
+  // a card the reader stepped Forward into, and the deep-link boot below,
+  // where the URL already names this exact project
+  function open(href, skipUrl) {
     if (!overlay) build();
     var idx = ORDER.indexOf(href);
     currentIndex = idx === -1 ? 0 : idx;
+    if (!skipUrl) syncUrl(href);
     render();
     lastFocused = document.activeElement;
     document.body.style.overflow = 'hidden';
@@ -959,4 +1007,39 @@
     }
     open(href);
   });
+
+  // Back and Forward drive the card, rather than the card and the history
+  // stack drifting apart. A state without a project on it is the entry the
+  // card was opened from, so that is a close; one with a project is the
+  // card itself, stepped Forward into
+  window.addEventListener('popstate', function (e) {
+    var target = e.state && e.state.alProject;
+    if (!target || ORDER.indexOf(target) === -1) {
+      pushedEntry = false;
+      if (isOpen()) close();
+      return;
+    }
+    // an entry carrying DOC_PATH is the page's own, reached by deep link
+    // rather than pushed here — closing from it must not step back again
+    pushedEntry = target !== DOC_PATH;
+    if (!isOpen()) { open(target, true); return; }
+    var idx = ORDER.indexOf(target);
+    if (idx !== currentIndex) { currentIndex = idx; render(); }
+  });
+
+  // a link to a case study opens the same card the rest of the site shows,
+  // rather than dropping the reader on the standalone page behind it —
+  // what makes a shared /buzziq land on the view it was shared from.
+  // Nothing is pushed: the URL already names this project, so closing the
+  // card simply reveals the page underneath with the address bar already
+  // correct, and Back still leaves for wherever the reader came from
+  function openFromUrl() {
+    if (ORDER.indexOf(DOC_PATH) === -1) return;
+    open(DOC_PATH, true);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', openFromUrl);
+  } else {
+    openFromUrl();
+  }
 })();
