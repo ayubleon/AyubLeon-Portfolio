@@ -118,7 +118,10 @@
     "}",
     ".case-bullet-item{",
     "font-size: 0.9375rem;",
-    "line-height:1.75;",
+    // 1.78, the same as .case-body-text above: these are the same size,
+    // colour and role, and 1.75 was three hundredths away from it — a
+    // difference nothing on screen could show
+    "line-height:1.78;",
     "color:" + CASE_MUTED + ";",
     "text-wrap:pretty;",
     "}"
