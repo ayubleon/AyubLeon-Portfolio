@@ -86,28 +86,6 @@
   window.addEventListener('mousemove', function () { mouseHasMoved = true; }, { once: true, passive: true });
   function playSwitchOnRealHover() { if (mouseHasMoved) playSwitch(); }
 
-  // the case-study pages' text colors are all tuned for light-on-black;
-  // the center card is now white, so every one of those needs to flip
-  // dark. The source uses two base colors, not one, and they carry
-  // different meaning: 244,238,235 (plus solid #f4eeeb) is the
-  // bright/primary tier — headings, meta-grid values like "IGNITEAMZ" or
-  // "Sole Product Designer", contributor links — and goes solid black;
-  // 239,232,229 is the muted tier — section-title labels, body
-  // paragraphs — and goes to #636262. Both hold regardless of the
-  // original alpha, since alpha alone was tuned for the old dark
-  // background, not for meaning
-  // the (?<!-) guards against matching inside background-color/border-color/
-  // stop-color — without it, any future case-study markup using one of
-  // these exact rgba tuples on a -color property (not just plain `color`)
-  // would get silently rewritten to solid black/grey instead of left alone
-  var TEXT_COLOR_RE = /(?<!-)color:\s*(?:#f4eeeb\b|rgba\(\s*(244,\s*238,\s*235|239,\s*232,\s*229)\s*,\s*[\d.]+\s*\))/gi;
-  function darkenTextColors(html) {
-    return html.replace(TEXT_COLOR_RE, function (match) {
-      var bright = match.indexOf('#f4eeeb') !== -1 || /244,\s*238,\s*235/.test(match);
-      return 'color:' + (bright ? '#000000' : '#636262');
-    });
-  }
-
   // the section headings (h2, e.g. "The advantage that made it work"),
   // the bold intro statement under "Overview", and the in-body
   // subheadings (e.g. "Protecting system integrity") all run oversized
@@ -136,36 +114,8 @@
       .replace(new RegExp(HEADING_PLACEHOLDER, 'g'), '1.125rem');
   }
 
-  // the source's 1px, 55%-opacity accent left-border (the callout list in
-  // BuzzIQ/Danadana's "My role" section) reads as a soft accent against
-  // the dark page it was tuned for, but is nearly invisible at that
-  // width/opacity against this card's light background. Thickened and
-  // brought to full opacity so it still reads as an accent, just a
-  // visible one here
-  function thickenAccentBorders(html) {
-    return html.replace(/border-left:\s*1px solid rgba\(10,\s*132,\s*255,\s*0\.55\)/gi, 'border-left: 4px solid #0A84FF');
-  }
 
-  // same problem, same fix, different border: the source's hairline
-  // section dividers (stat-block rules) are rgba(255,255,255,0.1) — a
-  // white line tuned for the dark page, which all but disappears against
-  // this card's near-white background. Recolor to black at the same
-  // opacity, matching the popup's own hand-authored dividers
-  // (.al-pv-more-row uses this exact rgba(0,0,0,0.1) already)
-  function recolorHairlineDividers(html) {
-    return html.replace(/border(-top|-bottom|-left|-right)?:\s*1px solid rgba\(255,\s*255,\s*255,\s*0\.1\)/gi, 'border$1: 1px solid rgba(0,0,0,0.1)');
-  }
 
-  // the wrapper around the whole "More work" section carries its own
-  // top divider on the source page. Recoloring it the same way as the
-  // others (see above) made it visible here for the first time — and
-  // right below it, .al-pv-more-row:first-child already draws its own
-  // divider immediately above "01". Two rules that close together read
-  // as clutter, not structure, so this one is dropped rather than
-  // recolored; the list's own rule is enough
-  function dropMoreWorkSectionRule(html) {
-    return html.replace(/padding-top:\s*40px;\s*border-top:\s*1px solid rgba\(255,\s*255,\s*255,\s*0\.1\);/gi, 'padding-top: 40px;');
-  }
 
   // each project's own page is the single source of truth for its title,
   // description, and full case-study body — fetched and cached here
@@ -204,53 +154,29 @@
         var hero = main.querySelector('section');
         if (hero) hero.style.paddingTop = '64px';
 
-        // the hero subheading needs a split the generic dark/grey regex
-        // below can't express: the sentence itself goes solid black, but
-        // the trailing client/date clause — already its own <span> in the
-        // source, e.g. "IGNITEAMZ, Sep 2025 – 2026." — stays the grey
-        // tier and drops to its own line instead of trailing inline.
-        // Setting .style.color here (rather than leaving the original
-        // rgba in place) also means darkenTextColors won't touch it below:
-        // it only matches the light-on-dark colors the source ships with
+        // the hero's black sentence and grey trailing clause come from the
+        // page itself now. What's left here is this card's own layout: the
+        // client/date clause — already its own <span> in the source, e.g.
+        // "IGNITEAMZ, Sep 2025 – 2026." — drops to its own line rather
+        // than trailing inline, which it only needs to do at card width
         if (heroP) {
-          heroP.style.color = '#000000';
           var trailingSpan = heroP.querySelector('span');
           if (trailingSpan) {
-            trailingSpan.style.color = '#636262';
             trailingSpan.style.display = 'block';
             trailingSpan.style.marginTop = '6px';
           }
         }
 
-        // same reasoning as heroP just above: case-field-label/case-
-        // section-label/case-body-text/case-figcaption (the shared classes
-        // the four case-study pages use for their repeated typography) get
-        // their color from that class, not an inline style, so darkenText
-        // Colors' regex has nothing in the fetched HTML string to match —
-        // set directly here instead, before this element is ever
-        // serialized to a string. Every one of these classes was always
-        // the muted 239,232,229 tier on its source page (never the bright
-        // 244,238,235 one), so they all take the same #636262 darkenText
-        // Colors would have given them anyway. Only the colour is
-        // adjusted — the tracking is the shared .al-eyebrow standard and
-        // must read the same here as it does on the page. The More-work
-        // teaser, stat captions and bullet/closing-note text join this
-        // list for the same reason: they moved off inline colour onto
-        // these classes so their source could share the page's one base
-        // hue (244,238,235) without darkenTextColors misreading them as
-        // the bright tier — so they need their own forced colour here too
-        var sharedLabels = main.querySelectorAll('.case-field-label, .case-section-label, .case-body-text, .case-figcaption, .case-more-work-teaser, .case-stat-caption, .case-bullet-item');
-        for (var i = 0; i < sharedLabels.length; i++) {
-          sharedLabels[i].style.color = '#636262';
-        }
       }
 
       return {
         title: h1 ? h1.textContent.trim() : '',
         descHTML: descHTML,
-        // the center card is white, so its embedded content needs its
-        // text recolored dark — see darkenTextColors above — and its
-        bodyHTML: main ? recolorHairlineDividers(dropMoreWorkSectionRule(thickenAccentBorders(shrinkCardHeadings(darkenTextColors(main.innerHTML))))) : ''
+        // the pages are the same light surface as this card now, so what
+        // they ship is what it shows — the colour, divider, accent-border
+        // and More-work rewrites that used to sit here all became no-ops
+        // and were deleted. Only the heading sizes still differ
+        bodyHTML: main ? shrinkCardHeadings(main.innerHTML) : ''
       };
     }).catch(function () {
       // a failed fetch shouldn't poison this href forever — deleting the
@@ -488,13 +414,6 @@
     // doesn't fully hide it, and as an outright letterboxed bar around the
     // prototype video, which uses object-fit:contain instead of cover
     ".al-pv-card [data-pv-inner] div:has(> img),.al-pv-card [data-pv-inner] div:has(> video){box-shadow:0 6px 24px -6px rgba(0,0,0,0.14);background:var(--al-card-light,#FDFBF8) !important;border:none !important;}",
-    // the four case-study pages' own shared label/body-text classes
-    // (case-field-label/case-section-label/case-body-text/case-figcaption,
-    // defined once here since this file is the one thing every page —
-    // including this popup's own host page — always loads) reproduced at
-    // their SOURCE-page appearance: darkenTextColors() below still does the
-    // actual light-on-dark -> dark-on-white recolor for this card, the same
-    // way it always has for every other muted-tier element on the page
     // the label type itself comes from shared.js's .al-eyebrow rule, which
     // also matches both case-study label classes, so the markup this card
     // fetches from those pages is styled without needing a copy of it here.

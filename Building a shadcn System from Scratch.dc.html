@@ -7,7 +7,7 @@
 <meta name="description" content="Case study: a component framework built on shadcn/ui, originally a personal project, later adapted to power BuzzIQ.">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="alternate icon" href="favicon.png">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#FDFBF8">
 <meta property="og:title" content="Building a shadcn System from Scratch — Ayub Leon">
 <meta property="og:description" content="Case study: a component framework built on shadcn/ui, originally a personal project, later adapted to power BuzzIQ.">
 <meta property="og:type" content="website">
@@ -18,9 +18,9 @@
 <meta name="twitter:title" content="Building a shadcn System from Scratch — Ayub Leon">
 <meta name="twitter:description" content="Case study: a component framework built on shadcn/ui, originally a personal project, later adapted to power BuzzIQ.">
 <meta name="twitter:image" content="https://ayubleon.vercel.app/images/work-design-system-cover.png">
-<style>html, body { background: #000000; margin: 0; }
+<style>html, body { background: #FDFBF8; margin: 0; }
   @view-transition { navigation: auto; }
-  [data-settle-veil] { position: fixed; inset: 0; z-index: 9999; background: #000000; opacity: 1; transition: opacity .35s ease; }</style>
+  [data-settle-veil] { position: fixed; inset: 0; z-index: 9999; background: #FDFBF8; opacity: 1; transition: opacity .35s ease; }</style>
 <!-- the settle veil is opaque black until shared.js fades it, so anything
      that renders this page without running the scripts — a crawler, an AI
      fetcher, a reader with JS off — sees a black screen over the whole
@@ -74,12 +74,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600&amp;family=Instrument+Serif:ital@0;1&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
 <style>
-  html, body { margin: 0; padding: 0; background: #000000; }
+  html, body { margin: 0; padding: 0; background: #FDFBF8; }
   body { -webkit-font-smoothing: antialiased; }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
-  a { color: rgba(244,238,235,0.72); text-decoration: none; transition: color .35s cubic-bezier(.22,1,.36,1); }
-  a:hover { color: #fff8f4; }
+  a { color: #636262; text-decoration: none; transition: color .35s cubic-bezier(.22,1,.36,1); }
+  a:hover { color: #0A84FF; }
   a:focus-visible, button:focus-visible { outline: 2px solid #EF4418; outline-offset: 3px; border-radius: 4px; }
   a:active, button:active { opacity: 0.7; }
   ::selection { background: #54A9FF; color: #0a0606; }
@@ -100,7 +100,7 @@
   }
 </style>
 </helmet>
-<div style="position: relative; width: 100%; background: #000000; font-family: 'Schibsted Grotesk', Helvetica, Arial, sans-serif; color: #f4eeeb; overflow-x: clip;" data-screen-label="Building a shadcn System from Scratch">
+<div style="position: relative; width: 100%; background: #FDFBF8; font-family: 'Schibsted Grotesk', Helvetica, Arial, sans-serif; color: #000000; overflow-x: clip;" data-screen-label="Building a shadcn System from Scratch">
 
   <div data-nav-mount="1"></div>
 
@@ -109,26 +109,26 @@
 
     <div style="position: relative; display: flex; flex-direction: column; gap: 24px; padding-bottom: 78px;">
 
-      <h1 style="margin: 0; max-width: 20ch; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.944rem, 5vw, 4.0311rem); font-weight: 700; line-height: 0.96; letter-spacing: -0.045em; color: #f4eeeb;">
+      <h1 style="margin: 0; max-width: 20ch; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.944rem, 5vw, 4.0311rem); font-weight: 700; line-height: 0.96; letter-spacing: -0.045em; color: #000000;">
         <span style="display: block; overflow: hidden; padding-bottom: 0.1em;"><span style="display: block; animation: alRise 1.2s cubic-bezier(.19,1,.22,1) .25s both;">Building a shadcn System from Scratch</span></span>
       </h1>
-      <p style="margin: 0; max-width: 48ch; font-size: 1.125rem; line-height: 1.6; color: rgba(244,238,235,0.92); text-wrap: pretty;">A component framework built on shadcn/ui, originally a personal project, later adapted to power BuzzIQ. <span style="color: rgba(244,238,235,0.6);">2024 – Present.</span></p>
+      <p style="margin: 0; max-width: 48ch; font-size: 1.125rem; line-height: 1.6; color: #000000; text-wrap: pretty;">A component framework built on shadcn/ui, originally a personal project, later adapted to power BuzzIQ. <span style="color: #636262;">2024 – Present.</span></p>
     </div>
   </section>
 
   <section class="mobile-gutter" style="max-width: 1400px; margin: 0 auto; padding: 0 40px;">
-    <div style="position: relative; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: #0e0c0b;">
+    <div style="position: relative; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: #FFFFFF;">
       <img src="images/work-design-system-cover.png" alt="Shad.cn interface kit welcome page in Figma" loading="eager" style="width: 100%; height: 100%; object-fit: cover; display: block;">
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 34px 40px; margin: 62px 0 0; padding: 40px 0; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1);">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 34px 40px; margin: 62px 0 0; padding: 40px 0; border-top: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1);">
       <div style="display: flex; flex-direction: column; gap: 8px;">
         <p class="case-field-label">Position</p>
-        <p style="margin: 0; font-size: 0.9375rem; line-height: 1.5; color: rgba(244,238,235,0.94);">Systems Product Designer</p>
+        <p style="margin: 0; font-size: 0.9375rem; line-height: 1.5; color: #636262;">Systems Product Designer</p>
       </div>
       <div style="display: flex; flex-direction: column; gap: 8px;">
         <p class="case-field-label">Product</p>
-        <p style="margin: 0; font-size: 0.9375rem; line-height: 1.5; color: rgba(244,238,235,0.94);">BuzzIQ</p>
+        <p style="margin: 0; font-size: 0.9375rem; line-height: 1.5; color: #636262;">BuzzIQ</p>
       </div>
     </div>
 
@@ -147,9 +147,9 @@
         <p class="case-section-label">Documentation Elements</p>
       </div>
       <div style="display: flex; flex-direction: column; gap: 32px; max-width: 68ch;">
-        <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.125rem, 1.9vw, 1.62rem); font-weight: 500; line-height: 1.65; letter-spacing: -0.022em; color: #f4eeeb; text-wrap: pretty;">30+ reusable components and 400+ variants, documented with spacing and text tokens as named styles. Every component is built and shown across both light and dark mode states, and the system standardizes on Lucide for icons and Sonner for toast notifications, both tools shadcn/ui itself is built around.</p>
+        <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.125rem, 1.9vw, 1.62rem); font-weight: 500; line-height: 1.65; letter-spacing: -0.022em; color: #000000; text-wrap: pretty;">30+ reusable components and 400+ variants, documented with spacing and text tokens as named styles. Every component is built and shown across both light and dark mode states, and the system standardizes on Lucide for icons and Sonner for toast notifications, both tools shadcn/ui itself is built around.</p>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 28px; padding: 32px 0; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 28px; padding: 32px 0; border-top: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.1);">
           <div style="display: flex; flex-direction: column; gap: 8px;">
             <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.944rem, 3.4vw, 2.7994rem); font-weight: 700; letter-spacing: -0.04em; line-height: 1; color: #0A84FF;">30+</p>
             <p class="case-stat-caption" style="margin: 0;">components, all reusable</p>
@@ -164,13 +164,13 @@
 
     <div class="case-figure-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin: 96px 0 0;">
       <figure style="margin: 0; display: flex; flex-direction: column; gap: 12px;">
-        <div style="position: relative; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden; background: #0e0c0b; border: 1px solid rgba(255,255,255,0.07);">
+        <div style="position: relative; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.07);">
           <img src="images/ds-tokens.png" alt="Text style and spacing token documentation in Figma" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
         </div>
         <figcaption class="case-figcaption">01 — Spacing and text tokens, documented as named styles.</figcaption>
       </figure>
       <figure style="margin: 0; display: flex; flex-direction: column; gap: 12px;">
-        <div style="position: relative; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden; background: #0e0c0b; border: 1px solid rgba(255,255,255,0.07);">
+        <div style="position: relative; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.07);">
           <img src="images/ds-components.png" alt="Component states in light and dark mode" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
         </div>
         <figcaption class="case-figcaption">02 — Components across their full state range, with automatic light and dark modes.</figcaption>
@@ -191,9 +191,9 @@
         <p class="case-section-label">Challenges</p>
       </div>
       <div style="display: flex; flex-direction: column; gap: 20px; max-width: 68ch;">
-        <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.125rem, 1.9vw, 1.62rem); font-weight: 500; line-height: 1.65; letter-spacing: -0.022em; color: #f4eeeb;">Navigating challenges &amp; quality control</h2>
+        <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.125rem, 1.9vw, 1.62rem); font-weight: 500; line-height: 1.65; letter-spacing: -0.022em; color: #000000;">Navigating challenges &amp; quality control</h2>
         <div>
-          <p style="margin: 0 0 12px; font-family: Poppins, Helvetica, sans-serif; font-size: 1.125rem; font-weight: 500; letter-spacing: -0.015em; color: #f4eeeb;">Adapting a system built for no specific product to a real one</p>
+          <p style="margin: 0 0 12px; font-family: Poppins, Helvetica, sans-serif; font-size: 1.125rem; font-weight: 500; letter-spacing: -0.015em; color: #000000;">Adapting a system built for no specific product to a real one</p>
           <p class="case-body-text">The system wasn't originally built with BuzzIQ, or any single product, in mind. Once I brought it into a fast-moving project with real requirements, I had to adjust it for BuzzIQ's specific needs and build a handful of custom components and variant states it didn't originally cover. Most of the system held up as-is, but knowing where it needed to flex versus where it could be used directly was its own design decision.</p>
         </div>
       </div>
@@ -204,7 +204,7 @@
         <p class="case-section-label">Impact</p>
       </div>
       <div style="display: flex; flex-direction: column; gap: 20px; max-width: 68ch;">
-        <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.125rem, 1.9vw, 1.62rem); font-weight: 500; line-height: 1.65; letter-spacing: -0.022em; color: #f4eeeb;">Business &amp; workflow impact</h2>
+        <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.125rem, 1.9vw, 1.62rem); font-weight: 500; line-height: 1.65; letter-spacing: -0.022em; color: #000000;">Business &amp; workflow impact</h2>
         <p class="case-body-text">Because the foundation already existed, most of BuzzIQ moved faster than it would have starting from zero. The system's light and dark mode support, built in from day one rather than retrofitted, made designing both states across the product straightforward instead of a late addition.</p>
         <p class="case-body-text">And because it standardized on one icon set and one toast pattern from the start, developers didn't have to reconcile mismatched libraries the way they might have with an ad hoc component set.</p>
       </div>
@@ -212,17 +212,17 @@
   </section>
 
   <section class="mobile-gutter" style="max-width: 1400px; margin: 118px auto 0; padding: 0 40px 120px;">
-    <div style="padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1);">
+    <div style="padding-top: 40px;">
       <p class="case-section-label">More work</p>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 30px;">
-        <a href="/danadana" style="display: flex; flex-direction: column; gap: 12px; padding: 30px 32px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.09); color: inherit;">
+        <a href="/danadana" style="display: flex; flex-direction: column; gap: 12px; padding: 30px 32px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.09); color: inherit;">
           <p class="case-field-label">← Previous</p>
-          <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.35rem; font-weight: 600; letter-spacing: -0.025em; color: #f4eeeb;">Danadana</p>
+          <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.35rem; font-weight: 600; letter-spacing: -0.025em; color: #000000;">Danadana</p>
           <p class="case-more-work-teaser" style="margin: 0;">A crash betting game licensed to gambling operators, built with player-protection safeguards from the start.</p>
         </a>
-        <a href="/kenyan-banking-redesign" style="display: flex; flex-direction: column; gap: 12px; padding: 30px 32px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.09); color: inherit; text-align: right;">
+        <a href="/kenyan-banking-redesign" style="display: flex; flex-direction: column; gap: 12px; padding: 30px 32px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.09); color: inherit; text-align: right;">
           <p class="case-field-label">Next →</p>
-          <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.35rem; font-weight: 600; letter-spacing: -0.025em; color: #f4eeeb;">Kenyan Banking Redesign</p>
+          <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.35rem; font-weight: 600; letter-spacing: -0.025em; color: #000000;">Kenyan Banking Redesign</p>
           <p class="case-more-work-teaser" style="margin: 0;">Overhauling digital banking friction across four major regional apps</p>
         </a>
       </div>
@@ -230,7 +230,7 @@
   </section>
 
   </main>
-  <div data-footer-mount="1"></div>
+  <div data-footer-mount="1" style="background: #000000;"></div>
 </div>
 
 </x-dc>

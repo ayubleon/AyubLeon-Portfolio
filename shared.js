@@ -51,6 +51,12 @@
   // too: it does an eyebrow's job — a small label naming the value under
   // it — and shipped larger than the value it labelled, which read as the
   // hierarchy being inverted.
+  // the case-study pages and the card that shows them are the same light
+  // surface now, so their prose is one colour in both rather than the card
+  // recolouring the page's own at runtime. #000000 carries the headings,
+  // this carries everything under them
+  var CASE_MUTED = '#636262';
+
   var labelStyle = document.createElement('style');
   labelStyle.textContent = [
     ".al-eyebrow,.case-section-label,.case-field-label{",
@@ -60,7 +66,11 @@
     "letter-spacing:0.18em;",
     "text-transform:uppercase;",
     "color:var(--al-section-title);",
-    "}"
+    "}",
+    // the case-study pages are light now, and these two labels only ever
+    // appear there — everything else wearing .al-eyebrow is still on the
+    // dark site, so the colour splits off here rather than the whole rule
+    ".case-section-label,.case-field-label{color:" + CASE_MUTED + ";}"
   ].join('');
   document.head.appendChild(labelStyle);
 
@@ -78,7 +88,7 @@
     ".case-body-text{",
     "font-size: 0.9375rem;",
     "line-height:1.78;",
-    "color:rgba(244,238,235,0.86);",
+    "color:" + CASE_MUTED + ";",
     "text-wrap:pretty;",
     "}",
     ".case-figcaption{",
@@ -86,7 +96,7 @@
     "font-size: 0.7812rem;",
     "line-height:1.6;",
     "letter-spacing:0.02em;",
-    "color:rgba(244,238,235,0.5);",
+    "color:" + CASE_MUTED + ";",
     "}",
     // the "More work" teaser line, the stat-block captions ("550+ /
     // screens across mobile..."), and the bulleted highlight list were the
@@ -99,17 +109,17 @@
     ".case-more-work-teaser{",
     "font-size: 0.9375rem;",
     "line-height:1.78;",
-    "color:rgba(244,238,235,0.66);",
+    "color:" + CASE_MUTED + ";",
     "}",
     ".case-stat-caption{",
     "font-size: 0.9375rem;",
     "line-height:1.78;",
-    "color:rgba(244,238,235,0.82);",
+    "color:" + CASE_MUTED + ";",
     "}",
     ".case-bullet-item{",
     "font-size: 0.9375rem;",
     "line-height:1.75;",
-    "color:rgba(244,238,235,0.86);",
+    "color:" + CASE_MUTED + ";",
     "text-wrap:pretty;",
     "}"
   ].join('');
