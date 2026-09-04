@@ -976,11 +976,19 @@ class Component extends DCLogic {
     let animating = false;
     let settleTimer = null;
     // the blocks that carry their own arrival animation, by 0-based index:
-    // block 2's multiplayer cursor and block 3's inline AI icon. Landing on
-    // one of these, from either direction, is what cues it — kept as a map
-    // rather than a flag per animation so adding one to another block is
-    // just another entry here
+    // block 1's bulb-and-car, block 2's multiplayer cursor and block 3's
+    // inline AI icon. Landing on one of these, from either direction, is
+    // what cues it — kept as a map rather than a flag per animation so
+    // adding one to another block is just another entry here.
+    //
+    // Block 1 is listed here as well as in initBurnText's engagement check
+    // above, and the two cover different arrivals. That check catches the
+    // section being pinned for the first time, when no goTo has run; this
+    // catches scrolling back up to block 1 from a later one, where the
+    // runway never disengages — so the check above stays disarmed for the
+    // whole trip and the bulb would otherwise sit there already spent
     const ARRIVAL_ANIMATIONS = {
+      0: () => this.playCuriosityIcon(),
       1: () => this.playPitchCursor(),
       2: () => this.playProcessIcon()
     };
