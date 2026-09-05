@@ -441,6 +441,12 @@
   '</svg>';
 
   var overlay = null;
+  // one stop() per video currently mounted in the centre card, cleared
+  // whenever that card's content is replaced — an observer left watching a
+  // detached <video> from the previous project would otherwise keep it,
+  // and its decoder, alive
+  var stopVideos = [];
+
   var currentIndex = 0;
   var animating = false;
   var lastFocused = null;
@@ -673,14 +679,15 @@
       if (card.dataset.href !== href) return;
       inner.innerHTML = data.bodyHTML;
       inner.scrollTop = 0;
-      // componentDidMount on the real page sets these directly on the DOM
-      // node (bare boolean attributes get dropped by the page's own
-      // template renderer) — replicated here since that code never runs
-      // against this injected copy
+      // the same watcher each case-study page runs for its own copy of
+      // this video (AL.watchVideoVisibility in shared.js) — that page's
+      // script never runs against this injected copy, so it is called
+      // here. The card scrolls inside `inner` rather than the viewport,
+      // which is what the root argument is for
+      stopVideos.forEach(function (stop) { stop(); });
+      stopVideos = [];
       inner.querySelectorAll('video[autoplay]').forEach(function (v) {
-        v.muted = true;
-        v.loop = true;
-        v.play().catch(function () {});
+        stopVideos.push(AL.watchVideoVisibility(v, inner));
       });
       rebuildMoreWork(inner, href);
       fixMediaCrops(inner);
@@ -868,6 +875,13 @@
       if (header) header.classList.remove('al-pv-header-hidden');
       animating = false;
     }
+    // a closed overlay is opacity:0, not display:none, so a video inside
+    // it still counts as intersecting its scroller and would go on
+    // playing behind the page nobody can see it over
+    stopVideos.forEach(function (stop) { stop(); });
+    stopVideos = [];
+    overlay.querySelectorAll('video').forEach(function (v) { v.pause(); });
+
     overlay.classList.remove('al-pv-open');
     overlay.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';

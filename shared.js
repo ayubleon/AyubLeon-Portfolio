@@ -128,6 +128,63 @@
   ].join('');
   document.head.appendChild(proseStyle);
 
+  // A prototype video plays only while it is actually on screen. It used to
+  // loop from mount for as long as the page was open, decoding frames
+  // nobody was looking at — and by the time a reader scrolled down to it,
+  // it was always mid-loop rather than starting for them.
+  //
+  // `root` is the element the video scrolls inside: the viewport on a case
+  // study page, and the card's own scroller in the project popup. Both
+  // views share this one implementation so the video behaves the same in
+  // each, which is the whole point of the pages and the card being the
+  // same content.
+  //
+  // Returns a stop() for unmount. Callers keep it; nothing here holds a
+  // reference back to them.
+  AL.watchVideoVisibility = function (video, root) {
+    // the page's own template renderer drops bare boolean attributes, so
+    // these two are set on the node rather than written in the markup
+    video.muted = true;
+    video.loop = true;
+    // muting an autoplay video makes the browser eligible to start it on
+    // its own, off screen, which is the exact thing this function exists
+    // to stop — so playback stops being the markup's decision here and
+    // becomes entirely the observer's below
+    video.removeAttribute('autoplay');
+    video.pause();
+
+    var startPlaying = function () {
+      if (video.paused) video.play().catch(function () {});
+    };
+    // no IntersectionObserver is not a reason to show a dead poster with
+    // no controls to start it — fall back to the old always-playing
+    if (!('IntersectionObserver' in window)) {
+      startPlaying();
+      return function () {};
+    }
+
+    var onScreen = false;
+    // resumes only if the video is still on screen: switching tabs and
+    // coming back should not start a video the reader has scrolled past
+    var onVisibilityChange = function () {
+      if (onScreen && !document.hidden) startPlaying();
+    };
+    // a quarter of it showing — far enough in that it has clearly arrived,
+    // early enough that it is already moving by the time it is read
+    var observer = new IntersectionObserver(function (entries) {
+      onScreen = entries[entries.length - 1].isIntersecting;
+      if (onScreen) startPlaying();
+      else if (!video.paused) video.pause();
+    }, { root: root || null, threshold: 0.25 });
+
+    observer.observe(video);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return function stop() {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  };
+
   // self-healing mount/patch runner: support.js can rebuild the page's
   // <main> content from its own internal template after first paint, in
   // one or more waves — this re-runs `runFn` on every DOM mutation until a

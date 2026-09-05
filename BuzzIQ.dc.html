@@ -265,19 +265,15 @@
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
   renderVals() { return {}; }
+  // plays while it is on screen and pauses when it isn't — see
+  // AL.watchVideoVisibility in shared.js, which the project popup calls
+  // for this same video so both views behave identically. The old version
+  // here looped from mount forever and re-played on every `pause` event,
+  // which also meant nothing could ever pause it deliberately
   initPrototypeVideo() {
     const video = document.querySelector('video[src*="buzziq-prototype"]');
-    if (!video) return;
-    // the template renderer drops bare boolean attributes like `loop`/`muted` from
-    // this element, so they're set directly on the DOM node here instead
-    video.loop = true;
-    video.muted = true;
-    const resume = () => { if (!document.hidden && video.paused) video.play().catch(() => {}); };
-    video.addEventListener('pause', resume);
-    video.addEventListener('ended', () => { video.currentTime = 0; resume(); });
-    document.addEventListener('visibilitychange', resume);
-    this.onPrototypeVideoVisibility = resume;
-    resume();
+    if (!video || this.stopPrototypeVideo) return;
+    this.stopPrototypeVideo = AL.watchVideoVisibility(video);
   }
 
   componentDidMount() {
@@ -285,7 +281,7 @@ class Component extends DCLogic {
   }
   componentWillUnmount() {
     window.removeEventListener('resize', this.onNavResize);
-    if (this.onPrototypeVideoVisibility) document.removeEventListener('visibilitychange', this.onPrototypeVideoVisibility);
+    if (this.stopPrototypeVideo) this.stopPrototypeVideo();
   }
 }
 
