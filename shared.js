@@ -342,12 +342,23 @@
     var root = document.querySelector('[data-screen-label]');
     var label = root ? root.getAttribute('data-screen-label') : '';
     if (label === 'Hero') {
-      return { home: '#top', work: '#work', about: '/about', active: 'home' };
+      return { home: '#top', work: '/work', about: '/about', active: 'home' };
     }
     if (label === 'About') {
-      return { home: '/', work: '/#work', about: '#top', active: 'about' };
+      return { home: '/', work: '/work', about: '#top', active: 'about' };
     }
-    return { home: '/', work: '/#work', about: '/about', active: 'work' };
+    // the Work index page points its own nav item at itself, same as every
+    // other page does — Home is '#top' on the Hero page, About is '#top'
+    // on the About page, so Work is '#top' here rather than a fresh
+    // navigation to the page already on screen
+    if (label === 'Work') {
+      return { home: '/', work: '#top', about: '/about', active: 'work' };
+    }
+    // every case-study page: still the same 'active: work' state as
+    // before this page existed. That's deliberate, not an oversight — a
+    // case study is still "the work", and this is the one thing that
+    // hasn't changed now that /work is a page it can point to
+    return { home: '/', work: '/work', about: '/about', active: 'work' };
   };
 
   // shared by every cursor-following tooltip (the About page's Behance

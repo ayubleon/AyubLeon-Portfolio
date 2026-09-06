@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work — Ayub Leon</title>
+<meta name="description" content="Selected product design work by Ayub Leon: BuzzIQ, Danadana, a shadcn design system built from scratch, and a Kenyan banking redesign.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="alternate icon" href="favicon.png">
+<meta name="theme-color" content="#000000">
+<meta property="og:title" content="Work — Ayub Leon">
+<meta property="og:description" content="Selected product design work by Ayub Leon: BuzzIQ, Danadana, a shadcn design system built from scratch, and a Kenyan banking redesign.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://ayubleon.vercel.app/work">
+<meta property="og:url" content="https://ayubleon.vercel.app/work">
+<meta property="og:image" content="https://ayubleon.vercel.app/images/work-buzziq-cover.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Work — Ayub Leon">
+<meta name="twitter:description" content="Selected product design work by Ayub Leon: BuzzIQ, Danadana, a shadcn design system built from scratch, and a Kenyan banking redesign.">
+<meta name="twitter:image" content="https://ayubleon.vercel.app/images/work-buzziq-cover.png">
+<style>html, body { background: #000000; margin: 0; }
+  @view-transition { navigation: auto; }
+  [data-settle-veil] { position: fixed; inset: 0; z-index: 9999; background: #000000; opacity: 1; transition: opacity .35s ease; }</style>
+<!-- the settle veil is opaque black until shared.js fades it, so anything
+     that renders this page without running the scripts — a crawler, an AI
+     fetcher, a reader with JS off — sees a black screen over the whole
+     page. Everything below is the no-JS counterpart of a state JS would
+     otherwise have cleared -->
+<noscript><style>
+  [data-settle-veil] { display: none !important; }
+</style></noscript>
+<link rel="preload" as="script" href="./support.js">
+<!-- support.js's own boot() re-fetches this exact document a second time
+     right after first paint (unless window.__resources is already set —
+     it's meant for a build mode that bundles resources locally, which
+     this static export doesn't use) and rebuilds part of the page from
+     that second copy, even though the first, synchronous parse of this
+     same already-loaded HTML already rendered everything correctly. Pre-
+     seeding an empty object here — before support.js's own deferred
+     script ever runs — satisfies that check and skips the redundant
+     pass; every other place support.js reads __resources (CDN script
+     URLs, bundled stylesheets, sibling component fetches) already falls
+     back to normal fetching when a key is simply missing, so an empty
+     object changes nothing else -->
+<!-- browsers restore the previous scroll position on a plain reload
+     (history.scrollRestoration defaults to 'auto'), which reads as the
+     page randomly jumping mid-scroll on refresh rather than a fresh load.
+     Disabling it here, before support.js or anything else runs, makes a
+     reload behave like any other fresh navigation: starting at the top -->
+<script>window.__resources = {}; history.scrollRestoration = 'manual';</script>
+<!-- shared.js before support.js, and both deferred so they run in document
+     order: support.js mounts each page's component, and every page's
+     componentDidMount opens by calling AL.selfHeal, which shared.js defines.
+     With support.js first that call threw "AL is not defined" — and since
+     support.js wraps componentDidMount in a catch that only logs, every init
+     after the throw silently never registered, leaving the page's JS-driven
+     content (headings, reveals, scroll-scrub, shaders) dead with no retry -->
+<script src="shared.js" defer></script>
+<script src="./support.js" defer></script>
+<script src="project-viewer.js" defer></script>
+<script src="footer.js" defer></script>
+<script src="nav.js" defer></script>
+<script src="badge.js" defer></script>
+</head>
+<body>
+<!-- sits outside <x-dc> so boot()'s dc.replaceWith swap (see the
+     __resources script's own comment in <head> above) can never touch
+     it — see installSettleVeil in shared.js for why this exists and
+     how it decides when to fade out -->
+<div data-settle-veil aria-hidden="true"></div>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600&amp;family=Instrument+Serif:ital@0;1&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #000000; }
+  body { -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  a { color: rgba(244,238,235,0.72); text-decoration: none; transition: color .35s cubic-bezier(.22,1,.36,1), opacity .35s ease; }
+  a:hover { color: #fff8f4; }
+  a:focus-visible, button:focus-visible { outline: 2px solid #EF4418; outline-offset: 3px; border-radius: 4px; }
+  a:active, button:active { opacity: 0.7; }
+  ::selection { background: #54A9FF; color: #0a0606; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation-duration: .01ms !important; transition: none !important; } }
+  /* the whole card is the link (no title-only hit target) and carries no
+     hover color of its own — its own rule below overrides the generic
+     a:hover above, since the card's feedback is the border glow, not a
+     text-color change */
+  .al-index-card { color: inherit; }
+  .al-index-card:hover { color: inherit; }
+  /* border-only glow that tracks the cursor — identical technique and
+     values to the "More work" nav cards every case-study page already
+     uses (more-work-cards.js), so a card that links to a project reads
+     the same way here as it does there. Kept as its own small copy
+     rather than a shared import: that file's own complexity exists
+     entirely to patch a support.js-generated template on a page it
+     doesn't control, a problem this hand-authored page doesn't have */
+  .al-index-glow { position: absolute; inset: 0; border-radius: inherit; padding: 1px; background: radial-gradient(farthest-corner circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.95) 0%, transparent 65%); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; opacity: 0; transition: opacity .3s ease; }
+  .al-index-card:hover .al-index-glow, .al-index-card:focus-visible .al-index-glow { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { .al-index-glow { display: none; } }
+  @media (max-width: 700px) {
+    .mobile-gutter { padding-left: 16px !important; padding-right: 16px !important; }
+    .work-index-grid { grid-template-columns: 1fr !important; }
+    /* 148px is the case-study pages' own top clearance, carried over
+       unchanged when this page was built — correct at desktop width, but
+       never actually a mobile-tuned value (the case studies don't have
+       one either). About's own #top section already solved this exact
+       problem with an explicit mobile override; this page is closer in
+       kind to About (a plain index page, not a case study), so it
+       adopts that same number rather than inventing a third */
+    #top { padding-top: 100px !important; }
+  }
+</style>
+</helmet>
+<div style="position: relative; width: 100%; background: #000000; font-family: 'Schibsted Grotesk', Helvetica, Arial, sans-serif; color: #f4eeeb; overflow-x: clip;" data-screen-label="Work">
+
+  <div data-nav-mount="1"></div>
+  <div data-badge-mount="1"></div>
+
+  <main>
+  <section id="top" class="mobile-gutter" style="position: relative; max-width: 1400px; margin: 0 auto; padding: 148px 40px 160px;">
+    <h1 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.944rem, 5vw, 4.0311rem); font-weight: 700; line-height: 0.96; letter-spacing: -0.045em; color: #f4eeeb;">Selected work</h1>
+
+    <div class="work-index-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px 40px; margin-top: 64px;">
+
+      <a class="al-index-card" href="/buzziq" style="position: relative; display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; background: var(--al-card,#1C1C1E); border: 1px solid var(--al-border-strong,rgba(255,255,255,0.16));">
+        <span class="al-index-glow" aria-hidden="true"></span>
+        <div style="position: relative; aspect-ratio: 16 / 10.4; background: #f4f2f0;">
+          <img src="images/work-buzziq.png" alt="BuzzIQ dashboard and creator detail screens" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+        </div>
+        <div style="position: relative; display: flex; flex-direction: column; gap: 10px; padding: 24px 28px 28px;">
+          <span style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.62rem, 2.4vw, 1.944rem); font-weight: 600; letter-spacing: -0.032em; color: #f4eeeb;">BuzzIQ</span>
+          <span style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; line-height: 1.5; color: rgba(244,238,235,0.72); text-wrap: pretty;">TikTok Shop intelligence platform built for IGNITEAMZ, a US-based creator commerce company</span>
+          <span style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.7812rem; color: rgba(244,238,235,0.5);"><span>Sole Product Designer</span><span>2025 – 2026</span></span>
+        </div>
+      </a>
+
+      <a class="al-index-card" href="/danadana" style="position: relative; display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; background: var(--al-card,#1C1C1E); border: 1px solid var(--al-border-strong,rgba(255,255,255,0.16));">
+        <span class="al-index-glow" aria-hidden="true"></span>
+        <div style="position: relative; aspect-ratio: 16 / 10.4; background: #f4f2f0;">
+          <img src="images/work-danadana.png" alt="Danadana brand key visual" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+        </div>
+        <div style="position: relative; display: flex; flex-direction: column; gap: 10px; padding: 24px 28px 28px;">
+          <span style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.62rem, 2.4vw, 1.944rem); font-weight: 600; letter-spacing: -0.032em; color: #f4eeeb;">Danadana</span>
+          <span style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; line-height: 1.5; color: rgba(244,238,235,0.72); text-wrap: pretty;">A crash betting game licensed to gambling operators, built with player-protection safeguards from the start.</span>
+          <span style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.7812rem; color: rgba(244,238,235,0.5);"><span>Product Designer</span><span>2024 – 2025</span></span>
+        </div>
+      </a>
+
+      <a class="al-index-card" href="/building-a-shadcn-system-from-scratch" style="position: relative; display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; background: var(--al-card,#1C1C1E); border: 1px solid var(--al-border-strong,rgba(255,255,255,0.16));">
+        <span class="al-index-glow" aria-hidden="true"></span>
+        <div style="position: relative; aspect-ratio: 16 / 10.4; background: #f4f2f0;">
+          <img src="images/work-design-system.png" alt="Component documentation pages in light and dark" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+        </div>
+        <div style="position: relative; display: flex; flex-direction: column; gap: 10px; padding: 24px 28px 28px;">
+          <span style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.62rem, 2.4vw, 1.944rem); font-weight: 600; letter-spacing: -0.032em; color: #f4eeeb;">Building a shadcn System from Scratch</span>
+          <span style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; line-height: 1.5; color: rgba(244,238,235,0.72); text-wrap: pretty;">A shadcn component system built from scratch as a personal project, later adapted to power BuzzIQ</span>
+          <span style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.7812rem; color: rgba(244,238,235,0.5);"><span>Systems Product Designer</span><span>2024 – Present</span></span>
+        </div>
+      </a>
+
+      <a class="al-index-card" href="/kenyan-banking-redesign" style="position: relative; display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; background: var(--al-card,#1C1C1E); border: 1px solid var(--al-border-strong,rgba(255,255,255,0.16));">
+        <span class="al-index-glow" aria-hidden="true"></span>
+        <div style="position: relative; aspect-ratio: 16 / 10.4; background: #f4f2f0;">
+          <img src="images/work-banking.png" alt="Banking app home and card management screens" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+        </div>
+        <div style="position: relative; display: flex; flex-direction: column; gap: 10px; padding: 24px 28px 28px;">
+          <span style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.62rem, 2.4vw, 1.944rem); font-weight: 600; letter-spacing: -0.032em; color: #f4eeeb;">Kenyan Banking Redesign</span>
+          <span style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; line-height: 1.5; color: rgba(244,238,235,0.72); text-wrap: pretty;">Overhauling digital banking friction across four major regional apps</span>
+          <span style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.7812rem; color: rgba(244,238,235,0.5);"><span>UX Designer, UI Designer</span><span>2025</span></span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+  </main>
+  <div data-footer-mount="1"></div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+
+  // the cursor-tracked border glow on each card — same technique as
+  // more-work-cards.js's .al-glass-glow, kept as a local copy rather than
+  // a shared import (see this page's own <style> comment above for why)
+  initIndexCardGlow() {
+    const cards = Array.from(document.querySelectorAll('.al-index-card'));
+    if (!cards.length || (this.indexGlowBound && cards.every((c) => c.__indexGlowWired))) return;
+    this.indexGlowBound = true;
+    cards.forEach((card) => {
+      if (card.__indexGlowWired) return;
+      card.__indexGlowWired = true;
+      const glow = card.querySelector('.al-index-glow');
+      if (!glow) return;
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        glow.style.setProperty('--mx', ((e.clientX - rect.left) / rect.width) * 100 + '%');
+        glow.style.setProperty('--my', ((e.clientY - rect.top) / rect.height) * 100 + '%');
+      });
+    });
+  }
+
+  componentDidMount() {
+    AL.selfHeal(() => this.initIndexCardGlow(), 5000);
+  }
+  componentWillUnmount() {}
+}
+
+</script>
+</body>
+</html>

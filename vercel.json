@@ -9,6 +9,10 @@
       "destination": "/Ayub%20Leon%20-%20About.dc.html"
     },
     {
+      "source": "/work",
+      "destination": "/Ayub%20Leon%20-%20Work.dc.html"
+    },
+    {
       "source": "/buzziq",
       "destination": "/BuzzIQ.dc.html"
     },
@@ -38,6 +42,11 @@
     {
       "source": "/Ayub%20Leon%20-%20About.dc.html",
       "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/Ayub%20Leon%20-%20Work.dc.html",
+      "destination": "/work",
       "permanent": true
     },
     {
