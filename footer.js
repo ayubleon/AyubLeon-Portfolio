@@ -239,7 +239,7 @@
             '</div>' +
           '</div>' +
           '<p data-wordmark style="margin:56px 0 0;text-align:center;opacity:0;white-space:nowrap;font-family:Poppins,Helvetica,sans-serif;font-weight:700;line-height:1;color:rgba(244,238,235,0.12);">ayubleon</p>' +
-          '<p style="margin:40px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size: 0.651rem;line-height:1.6;color:var(--al-text-muted,rgba(244,238,235,0.45));">©2026<br>Designed in Figma, Built with Claude</p>' +
+          '<p style="margin:40px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size: 0.651rem;line-height:1.6;color:rgba(244,238,235,0.3);">©2026<br>Designed in Figma, Built with Claude</p>' +
         '</div>' +
       '</footer>' +
       '<span data-figma-tooltip aria-hidden="true" style="' + CURSOR_TOOLTIP_CSS + '">Website breakdown</span>' +
