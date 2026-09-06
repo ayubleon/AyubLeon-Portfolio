@@ -75,6 +75,9 @@
     ".site-contact-avatar{width:76px;height:76px;border-radius:50%;background:#fff;display:block;object-fit:cover;}",
     ".site-contact-name{margin:0;font-family:Poppins,Helvetica,sans-serif;font-weight:600;font-size: 0.9375rem;color:#fff;}",
     ".site-contact-role{margin:2px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;font-weight:500;color:#0A84FF;}",
+    // grouped with the email below, not the name/role above — this answers
+    // "when can I reach this person", which belongs with "how", not "who"
+    ".site-contact-meta{margin:18px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;color:rgba(244,238,235,0.5);text-align:center;}",
     ".site-contact-blurb{margin:18px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;line-height:1.6;color:rgba(244,238,235,0.82);}",
     ".site-contact-link{display:block;color:#FFFFFF;text-decoration:none;}",
     ".site-contact-link:hover{color:#54A9FF;}",
@@ -84,7 +87,7 @@
     ".site-contact-action span{font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;color:rgba(244,238,235,0.75);transition:color .25s ease;}",
     ".site-contact-action:hover span{color:#fff;}",
     ".site-contact-action svg{display:block;}",
-    ".site-contact-email{margin:16px 0 0;text-align:center;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;color:var(--al-text-muted,rgba(244,238,235,0.45));}"
+    ".site-contact-email{margin:4px 0 0;text-align:center;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;color:var(--al-text-muted,rgba(244,238,235,0.45));}"
   ].join('');
   var styleTag = document.createElement('style');
   styleTag.textContent = CSS;
@@ -224,12 +227,17 @@
             '<p class="site-contact-role">Product Designer</p>' +
           '</div>' +
         '</div>' +
-        '<p class="site-contact-blurb">I\'m currently open to full time roles, contract work, and high impact product builds. If you need a designer who takes ownership from first sketch to final QA, <a class="site-contact-link" href="mailto:ayubleon.pd@gmail.com">let\'s talk.</a></p>' +
+        '<p class="site-contact-blurb">I\'m currently open to full-time roles and high impact product builds. If you need a designer who takes ownership from first sketch to final QA, <a class="site-contact-link" href="mailto:ayubleon.pd@gmail.com">let\'s talk.</a></p>' +
         '<div class="site-contact-actions">' +
           '<a class="site-contact-action" href="mailto:ayubleon.pd@gmail.com" data-contact-copy-email>' + MAIL_SVG + '<span>Email</span></a>' +
           '<a class="site-contact-action" href="/resume" target="_blank" rel="noopener noreferrer">' + RESUME_SVG + '<span>Resume</span></a>' +
           '<a class="site-contact-action" href="https://www.linkedin.com/in/ayubleon" target="_blank" rel="noopener noreferrer">' + LINKEDIN_SVG + '<span>Linked in</span></a>' +
         '</div>' +
+        // UTC rather than the EAT abbreviation: understood worldwide without
+        // having to know what East Africa Time is. The time itself is live
+        // (see initContactCard's clock timer below) so this string is only
+        // ever the initial paint, replaced before the card finishes opening
+        '<p class="site-contact-meta" data-contact-meta>Nairobi, Kenya &middot; UTC+3 &middot; <span data-contact-clock></span></p>' +
         '<p class="site-contact-email">ayubleon.pd@gmail.com</p>' +
       '</div>'
     );
@@ -243,6 +251,19 @@
     var avatarFlip = el.querySelector('[data-avatar-flip]');
     if (!toggleBtn || !card) return;
     var hintTimer = null;
+    var clockTimer = null;
+
+    // the meta line's clock, live rather than the string painted at build
+    // time — ticks only while the card is actually open (started/stopped
+    // from setOpen below), so it isn't running in the background for as
+    // long as the page stays open
+    var tickClock = function () {
+      var clockEl = card.querySelector('[data-contact-clock]');
+      if (!clockEl) return;
+      clockEl.textContent = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Africa/Nairobi', hour: 'numeric', minute: '2-digit', hour12: true
+      }).format(new Date());
+    };
     // touch devices fire a synthetic mouseenter right before click on first
     // tap, so a hover-triggered sound would double up with the click sound
     // on a real tap — gating hover sound/effects behind real hover support
@@ -289,7 +310,11 @@
             avatarFlip.classList.add('is-hint');
           }, 550);
         }
+        tickClock();
+        clearInterval(clockTimer);
+        clockTimer = setInterval(tickClock, 30000);
       } else {
+        clearInterval(clockTimer);
         if (avatarFlip) {
           clearTimeout(hintTimer);
           avatarFlip.classList.remove('is-hint');
