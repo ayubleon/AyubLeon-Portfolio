@@ -85,22 +85,9 @@
   a:active, button:active { opacity: 0.7; }
   ::selection { background: #54A9FF; color: #0a0606; }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation-duration: .01ms !important; transition: none !important; } }
-  /* the whole card is the link (no title-only hit target) and carries no
-     hover color of its own — its own rule below overrides the generic
-     a:hover above, since the card's feedback is the border glow, not a
-     text-color change */
   .al-index-card { color: inherit; }
-  .al-index-card:hover { color: inherit; }
-  /* border-only glow that tracks the cursor — identical technique and
-     values to the "More work" nav cards every case-study page already
-     uses (more-work-cards.js), so a card that links to a project reads
-     the same way here as it does there. Kept as its own small copy
-     rather than a shared import: that file's own complexity exists
-     entirely to patch a support.js-generated template on a page it
-     doesn't control, a problem this hand-authored page doesn't have */
-  .al-index-glow { position: absolute; inset: 0; border-radius: inherit; padding: 1px; background: radial-gradient(farthest-corner circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.95) 0%, transparent 65%); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; opacity: 0; transition: opacity .3s ease; }
-  .al-index-card:hover .al-index-glow, .al-index-card:focus-visible .al-index-glow { opacity: 1; }
-  @media (prefers-reduced-motion: reduce) { .al-index-glow { display: none; } }
+  .al-index-card img { transition: transform .5s cubic-bezier(.22, 1, .36, 1); }
+  .al-index-card:hover img { transform: scale(1.045); }
   @media (max-width: 700px) {
     .mobile-gutter { padding-left: 16px !important; padding-right: 16px !important; }
     .work-index-grid { grid-template-columns: 1fr !important; }
@@ -126,48 +113,44 @@
 
     <div class="work-index-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px 40px; margin-top: 64px;">
 
-      <a class="al-index-card" href="/buzziq" style="position: relative; display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; background: var(--al-card,#1C1C1E); border: 1px solid var(--al-border-strong,rgba(255,255,255,0.16));">
-        <span class="al-index-glow" aria-hidden="true"></span>
-        <div style="position: relative; aspect-ratio: 16 / 10.4; background: #f4f2f0;">
+      <a class="al-index-card" href="/buzziq" style="display: flex; flex-direction: column;">
+        <div style="position: relative; aspect-ratio: 16 / 10.4; border-radius: 16px; overflow: hidden; background: #f4f2f0; border: 1px solid var(--al-border-strong,rgba(255,255,255,0.16));">
           <img src="images/work-buzziq.png" alt="BuzzIQ dashboard and creator detail screens" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
         </div>
-        <div style="position: relative; display: flex; flex-direction: column; gap: 10px; padding: 24px 28px 28px;">
+        <div style="position: relative; display: flex; flex-direction: column; gap: 10px; padding: 16px 0 0;">
           <span style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.62rem, 2.4vw, 1.944rem); font-weight: 600; letter-spacing: -0.032em; color: #f4eeeb;">BuzzIQ</span>
           <span style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; line-height: 1.5; color: rgba(244,238,235,0.72); text-wrap: pretty;">TikTok Shop intelligence platform built for IGNITEAMZ, a US-based creator commerce company</span>
           <span style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.7812rem; color: rgba(244,238,235,0.5);"><span>Sole Product Designer</span><span>2025 – 2026</span></span>
         </div>
       </a>
 
-      <a class="al-index-card" href="/danadana" style="position: relative; display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; background: var(--al-card,#1C1C1E); border: 1px solid var(--al-border-strong,rgba(255,255,255,0.16));">
-        <span class="al-index-glow" aria-hidden="true"></span>
-        <div style="position: relative; aspect-ratio: 16 / 10.4; background: #f4f2f0;">
+      <a class="al-index-card" href="/danadana" style="display: flex; flex-direction: column;">
+        <div style="position: relative; aspect-ratio: 16 / 10.4; border-radius: 16px; overflow: hidden; background: #f4f2f0; border: 1px solid var(--al-border-strong,rgba(255,255,255,0.16));">
           <img src="images/work-danadana.png" alt="Danadana brand key visual" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
         </div>
-        <div style="position: relative; display: flex; flex-direction: column; gap: 10px; padding: 24px 28px 28px;">
+        <div style="position: relative; display: flex; flex-direction: column; gap: 10px; padding: 16px 0 0;">
           <span style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.62rem, 2.4vw, 1.944rem); font-weight: 600; letter-spacing: -0.032em; color: #f4eeeb;">Danadana</span>
           <span style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; line-height: 1.5; color: rgba(244,238,235,0.72); text-wrap: pretty;">A crash betting game licensed to gambling operators, built with player-protection safeguards from the start.</span>
           <span style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.7812rem; color: rgba(244,238,235,0.5);"><span>Product Designer</span><span>2024 – 2025</span></span>
         </div>
       </a>
 
-      <a class="al-index-card" href="/building-a-shadcn-system-from-scratch" style="position: relative; display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; background: var(--al-card,#1C1C1E); border: 1px solid var(--al-border-strong,rgba(255,255,255,0.16));">
-        <span class="al-index-glow" aria-hidden="true"></span>
-        <div style="position: relative; aspect-ratio: 16 / 10.4; background: #f4f2f0;">
+      <a class="al-index-card" href="/building-a-shadcn-system-from-scratch" style="display: flex; flex-direction: column;">
+        <div style="position: relative; aspect-ratio: 16 / 10.4; border-radius: 16px; overflow: hidden; background: #f4f2f0; border: 1px solid var(--al-border-strong,rgba(255,255,255,0.16));">
           <img src="images/work-design-system.png" alt="Component documentation pages in light and dark" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
         </div>
-        <div style="position: relative; display: flex; flex-direction: column; gap: 10px; padding: 24px 28px 28px;">
+        <div style="position: relative; display: flex; flex-direction: column; gap: 10px; padding: 16px 0 0;">
           <span style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.62rem, 2.4vw, 1.944rem); font-weight: 600; letter-spacing: -0.032em; color: #f4eeeb;">Building a shadcn System from Scratch</span>
           <span style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; line-height: 1.5; color: rgba(244,238,235,0.72); text-wrap: pretty;">A shadcn component system built from scratch as a personal project, later adapted to power BuzzIQ</span>
           <span style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.7812rem; color: rgba(244,238,235,0.5);"><span>Systems Product Designer</span><span>2024 – Present</span></span>
         </div>
       </a>
 
-      <a class="al-index-card" href="/kenyan-banking-redesign" style="position: relative; display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; background: var(--al-card,#1C1C1E); border: 1px solid var(--al-border-strong,rgba(255,255,255,0.16));">
-        <span class="al-index-glow" aria-hidden="true"></span>
-        <div style="position: relative; aspect-ratio: 16 / 10.4; background: #f4f2f0;">
+      <a class="al-index-card" href="/kenyan-banking-redesign" style="display: flex; flex-direction: column;">
+        <div style="position: relative; aspect-ratio: 16 / 10.4; border-radius: 16px; overflow: hidden; background: #f4f2f0; border: 1px solid var(--al-border-strong,rgba(255,255,255,0.16));">
           <img src="images/work-banking.png" alt="Banking app home and card management screens" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
         </div>
-        <div style="position: relative; display: flex; flex-direction: column; gap: 10px; padding: 24px 28px 28px;">
+        <div style="position: relative; display: flex; flex-direction: column; gap: 10px; padding: 16px 0 0;">
           <span style="font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.62rem, 2.4vw, 1.944rem); font-weight: 600; letter-spacing: -0.032em; color: #f4eeeb;">Kenyan Banking Redesign</span>
           <span style="max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; line-height: 1.5; color: rgba(244,238,235,0.72); text-wrap: pretty;">Overhauling digital banking friction across four major regional apps</span>
           <span style="display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 42ch; font-family: Poppins, Helvetica, sans-serif; font-size: 0.7812rem; color: rgba(244,238,235,0.5);"><span>UX Designer, UI Designer</span><span>2025</span></span>
@@ -185,29 +168,7 @@
 class Component extends DCLogic {
   renderVals() { return {}; }
 
-  // the cursor-tracked border glow on each card — same technique as
-  // more-work-cards.js's .al-glass-glow, kept as a local copy rather than
-  // a shared import (see this page's own <style> comment above for why)
-  initIndexCardGlow() {
-    const cards = Array.from(document.querySelectorAll('.al-index-card'));
-    if (!cards.length || (this.indexGlowBound && cards.every((c) => c.__indexGlowWired))) return;
-    this.indexGlowBound = true;
-    cards.forEach((card) => {
-      if (card.__indexGlowWired) return;
-      card.__indexGlowWired = true;
-      const glow = card.querySelector('.al-index-glow');
-      if (!glow) return;
-      card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        glow.style.setProperty('--mx', ((e.clientX - rect.left) / rect.width) * 100 + '%');
-        glow.style.setProperty('--my', ((e.clientY - rect.top) / rect.height) * 100 + '%');
-      });
-    });
-  }
-
-  componentDidMount() {
-    AL.selfHeal(() => this.initIndexCardGlow(), 5000);
-  }
+  componentDidMount() {}
   componentWillUnmount() {}
 }
 
