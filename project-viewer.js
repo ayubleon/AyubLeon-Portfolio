@@ -123,9 +123,13 @@
         // the hero section's 148px top padding exists to clear the real
         // page's fixed nav bar sitting over it — this card has its own
         // close button instead, not a full nav, so that much clearance
-        // just reads as a gap between it and the title
+        // just reads as a gap between it and the title. Matched to the
+        // frosted header's own 96px height (see .al-pv-header below) so
+        // its blur fade never overlaps the title itself — this used to be
+        // a mismatched 64px, letting the header's last ~32px of blur cut
+        // across the top of every project's heading
         var hero = main.querySelector('section');
-        if (hero) hero.style.paddingTop = '64px';
+        if (hero) hero.style.paddingTop = '96px';
 
         // the hero's black sentence and grey trailing clause come from the
         // page itself now. What's left here is this card's own layout: the
