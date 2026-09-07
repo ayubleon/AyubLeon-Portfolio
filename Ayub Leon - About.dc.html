@@ -110,6 +110,34 @@
     100% { transform: translate3d(10%, 8%, 0) scale(1.1); }
   }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation-duration: .01ms !important; transition: none !important; } }
+  /* desktop/tablet only — initImageLightbox() itself re-checks the same
+     700px cutoff at click time before ever opening, so a touch device
+     tapping one of these (which still fires a click event) is a no-op
+     there too; this cursor is just the visual hint for the pointer that
+     can actually hover it */
+  [data-lightbox] { cursor: zoom-in; }
+  .al-lightbox { position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center; padding: 40px; opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+  .al-lightbox.is-open { opacity: 1; pointer-events: auto; }
+  .al-lightbox-backdrop { position: absolute; inset: 0; background: rgba(10,6,6,0.78); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); }
+  .al-lightbox-img { position: relative; z-index: 1; max-width: min(88vw, 1400px); max-height: 88vh; width: auto; height: auto; display: block; object-fit: contain; border-radius: 12px; box-shadow: 0 40px 100px -30px rgba(0,0,0,0.7); transform: scale(0.96); transition: transform .35s cubic-bezier(.22,1,.36,1); }
+  .al-lightbox.is-open .al-lightbox-img { transform: scale(1); }
+  /* frosted glass, not the site's usual solid-fill close buttons — the
+     backdrop behind it is already the darkest, busiest part of the page,
+     so a solid button would just read as another opaque block on top of
+     it; the blur lets it sit as a control floating over the image itself */
+  /* border matches the nav dock's own (.site-nav-dock in nav.js) —
+     var(--al-border) with the identical fallback — rather than a new
+     color invented just for this button */
+  .al-lightbox-close { position: fixed; top: 24px; right: 24px; z-index: 2; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--al-border,rgba(255,255,255,0.13)); background: rgba(255,255,255,0.1); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); color: #f4eeeb; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .25s ease, transform .3s cubic-bezier(.22,1,.36,1); }
+  .al-lightbox-close:hover { background: rgba(255,255,255,0.2); }
+  /* outline:none only, no added ring color of its own — the button's
+     always-visible border above is treated as enough of a focus
+     indicator here, rather than inventing a separate highlight color */
+  .al-lightbox-close:focus-visible { outline: none; }
+  .al-lightbox-close-stroke { transform-origin: 7px 7px; transition: transform .3s cubic-bezier(.22,1,.36,1); }
+  .al-lightbox-close:hover .al-lightbox-close-stroke:first-child { transform: rotate(90deg); }
+  .al-lightbox-close:hover .al-lightbox-close-stroke:last-child { transform: rotate(-90deg); }
+  @media (max-width: 700px) { .al-lightbox { display: none; } }
   .photo-stack-card { cursor: grab; will-change: transform; backface-visibility: hidden; }
   .photo-stack-card:active { cursor: grabbing; }
   .photo-stack-wrap { display: none; }
@@ -130,6 +158,7 @@
   }
   @media (max-width: 700px) {
     #top { min-height: auto !important; padding-top: 64px !important; padding-bottom: 40px !important; }
+    .about-hero-grid img[src="images/ayub-avatar.svg"] { width: 110px !important; }
     .about-hero-card { padding: 32px 24px 36px !important; }
     .about-hero-photo-1 { display: none !important; }
     .about-hero-photos { grid-template-columns: 1fr !important; }
@@ -165,10 +194,10 @@
 
         <div class="about-hero-photos" style="display: grid; grid-template-columns: minmax(0, 0.82fr) minmax(0, 1fr); align-items: end; gap: 22px;">
           <div class="about-hero-photo-1" data-reveal="1" data-parallax="0.10" style="position: relative; aspect-ratio: 3 / 4; border-radius: 8px; overflow: hidden; background: #f4f2f0;">
-            <img src="images/image-1.png" alt="The pier at the coast" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+            <img src="images/image-1.jpg" alt="The pier at the coast" loading="lazy" data-lightbox style="width: 100%; height: 100%; object-fit: cover; display: block;">
           </div>
           <div class="about-hero-photo-2" data-reveal="2" data-parallax="-0.05" style="position: relative; aspect-ratio: 3 / 4.05; border-radius: 8px; overflow: hidden; background: #f4f2f0;">
-            <img src="images/image-2.png" alt="Ayub Leon" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block; transform: scaleX(-1);">
+            <img src="images/image-2.jpg" alt="Ayub Leon" loading="lazy" data-lightbox style="width: 100%; height: 100%; object-fit: cover; display: block; transform: scaleX(-1);">
           </div>
         </div>
       </div>
@@ -178,7 +207,7 @@
   <section class="mobile-gutter" style="max-width: 1400px; margin: 86px auto 0; padding: 0 40px;">
     <div class="story-grid-1" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px 72px; align-items: start;">
       <div class="story-photo-wrap" data-reveal="1" data-parallax="0.06" style="position: relative; aspect-ratio: 4 / 3.15; border-radius: 12px; overflow: hidden; background: #0e0c0b; width: 100%; height: auto;">
-        <img src="images/image-3.png" alt="Boats on the shore in Mombasa" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 8px">
+        <img src="images/image-3.jpg" alt="Boats on the shore in Mombasa" loading="lazy" data-lightbox style="width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 8px">
       </div>
 
       <div data-reveal="2">
@@ -204,25 +233,25 @@
 
     <div class="story-photo-trio" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin: 84px 0 0;">
       <div data-reveal="1" data-parallax="0.08" style="position: relative; aspect-ratio: 3 / 4; border-radius: 12px; overflow: hidden; background: #0e0c0b;">
-        <img src="images/image-4.png" alt="Street mural at the coast" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 8px">
+        <img src="images/image-4.jpg" alt="Street mural at the coast" loading="lazy" data-lightbox style="width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 8px">
       </div>
       <div data-reveal="2" data-parallax="0.14" style="position: relative; aspect-ratio: 3 / 4; border-radius: 12px; overflow: hidden; background: #0e0c0b;">
-        <img src="images/image-5.png" alt="Empty beach and kite in the distance" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 8px">
+        <img src="images/image-5.jpg" alt="Empty beach and kite in the distance" loading="lazy" data-lightbox style="width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 8px">
       </div>
       <div data-reveal="3" data-parallax="0.20" style="position: relative; aspect-ratio: 3 / 4; border-radius: 12px; overflow: hidden; background: #0e0c0b;">
-        <img src="images/image-6.png" alt="On a boat ride at the coast" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 8px">
+        <img src="images/image-6.jpg" alt="On a boat ride at the coast" loading="lazy" data-lightbox style="width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 8px">
       </div>
     </div>
     <div class="photo-stack-wrap" style="margin: 84px auto 0; width: min(100%, 380px);">
       <div class="photo-stack" data-photo-stack style="position: relative; aspect-ratio: 3 / 4;">
         <div class="photo-stack-card" data-stack-card style="position: absolute; inset: 0; border-radius: 16px; overflow: hidden; background: #0e0c0b; box-shadow: 0 30px 70px -35px rgba(0,0,0,0.85); touch-action: pan-y; user-select: none;">
-          <img src="images/image-4.png" alt="Street mural at the coast" loading="lazy" draggable="false" style="width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; -webkit-user-drag: none;">
+          <img src="images/image-4.jpg" alt="Street mural at the coast" loading="lazy" draggable="false" style="width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; -webkit-user-drag: none;">
         </div>
         <div class="photo-stack-card" data-stack-card style="position: absolute; inset: 0; border-radius: 16px; overflow: hidden; background: #0e0c0b; box-shadow: 0 30px 70px -35px rgba(0,0,0,0.85); touch-action: pan-y; user-select: none;">
-          <img src="images/image-5.png" alt="Empty beach and kite in the distance" loading="lazy" draggable="false" style="width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; -webkit-user-drag: none;">
+          <img src="images/image-5.jpg" alt="Empty beach and kite in the distance" loading="lazy" draggable="false" style="width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; -webkit-user-drag: none;">
         </div>
         <div class="photo-stack-card" data-stack-card style="position: absolute; inset: 0; border-radius: 16px; overflow: hidden; background: #0e0c0b; box-shadow: 0 30px 70px -35px rgba(0,0,0,0.85); touch-action: pan-y; user-select: none;">
-          <img src="images/image-6.png" alt="On a boat ride at the coast" loading="lazy" draggable="false" style="width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; -webkit-user-drag: none;">
+          <img src="images/image-6.jpg" alt="On a boat ride at the coast" loading="lazy" draggable="false" style="width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; -webkit-user-drag: none;">
         </div>
       </div>
       <p style="margin: 32px 0 0; text-align: center; font-family: Poppins; font-size: 0.651rem; letter-spacing: normal; text-transform: none; color: rgba(244,238,235,0.42);">Swipe to see more</p>
@@ -379,6 +408,78 @@ class Component extends DCLogic {
     trigger.addEventListener('click', this.onContactTipLeave);
   }
 
+  // desktop/tablet only, per the brief — the 700px cutoff matches the
+  // site's own mobile breakpoint used everywhere else on this page. The
+  // overlay itself lives outside <main> (appended straight to <body>), so
+  // support.js's rebuild waves never touch it; only the per-image click
+  // wiring needs the usual re-run guard
+  initImageLightbox() {
+    const imgs = Array.from(document.querySelectorAll('[data-lightbox]'));
+    if (!imgs.length) return;
+    if (this.lightboxBound && imgs.every((img) => img.__lightboxWired)) return;
+    this.lightboxBound = true;
+    imgs.forEach((img) => { img.__lightboxWired = true; });
+
+    const MOBILE_MAX_WIDTH = 700;
+
+    let overlay = document.querySelector('[data-lightbox-overlay]');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.className = 'al-lightbox';
+      overlay.setAttribute('data-lightbox-overlay', '');
+      overlay.setAttribute('aria-hidden', 'true');
+      overlay.innerHTML =
+        '<div class="al-lightbox-backdrop" data-lightbox-backdrop></div>' +
+        '<img class="al-lightbox-img" data-lightbox-img alt="">' +
+        '<button type="button" class="al-lightbox-close" data-lightbox-close aria-label="Close">' +
+          '<svg width="14" height="14" viewBox="0 0 14 14" fill="none">' +
+            '<path class="al-lightbox-close-stroke" d="M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
+            '<path class="al-lightbox-close-stroke" d="M1 1L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
+          '</svg>' +
+        '</button>';
+      document.body.appendChild(overlay);
+
+      const backdrop = overlay.querySelector('[data-lightbox-backdrop]');
+      const lightboxImg = overlay.querySelector('[data-lightbox-img]');
+      const closeBtn = overlay.querySelector('[data-lightbox-close]');
+      let lastFocused = null;
+
+      const onKeydown = (e) => { if (e.key === 'Escape') close(); };
+      const close = () => {
+        overlay.classList.remove('is-open');
+        overlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        document.removeEventListener('keydown', onKeydown);
+        window.removeEventListener('resize', onResize);
+        if (lastFocused && lastFocused.focus) lastFocused.focus();
+      };
+      // resizing down to mobile mid-view would otherwise leave the page
+      // scroll-locked forever — the CSS hides the overlay itself at this
+      // width already, this just releases the scroll lock along with it
+      const onResize = () => { if (window.innerWidth < MOBILE_MAX_WIDTH) close(); };
+      this.openLightbox = (sourceImg) => {
+        lastFocused = sourceImg;
+        lightboxImg.src = sourceImg.src;
+        lightboxImg.alt = sourceImg.alt || '';
+        overlay.classList.add('is-open');
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        closeBtn.focus();
+        document.addEventListener('keydown', onKeydown);
+        window.addEventListener('resize', onResize);
+      };
+      backdrop.addEventListener('click', close);
+      closeBtn.addEventListener('click', close);
+    }
+
+    imgs.forEach((img) => {
+      img.addEventListener('click', () => {
+        if (window.innerWidth < MOBILE_MAX_WIDTH) return;
+        this.openLightbox(img);
+      });
+    });
+  }
+
   // guarded by an instance property AND a per-card marker together (like
   // initBurnText/initReveals elsewhere in this file) so repeated calls
   // (see componentDidMount, which wraps this in AL.selfHeal) skip cards
@@ -512,6 +613,7 @@ class Component extends DCLogic {
     AL.selfHeal(() => this.initBehanceTooltip(), 5000);
     AL.selfHeal(() => this.initFriendHoverSound(), 5000);
     AL.selfHeal(() => this.initContactSend(), 5000);
+    AL.selfHeal(() => this.initImageLightbox(), 5000);
     // wrapped like initPhotoStack above (not called once): these two also
     // touch nodes inside the same rebuildable <main>, and calling them
     // once left the hero/story/photo-trio images with no scroll-reveal or
