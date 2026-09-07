@@ -91,13 +91,11 @@
   @media (max-width: 700px) {
     .mobile-gutter { padding-left: 16px !important; padding-right: 16px !important; }
     .work-index-grid { grid-template-columns: 1fr !important; }
-    /* 148px is the case-study pages' own top clearance, carried over
-       unchanged when this page was built — correct at desktop width, but
-       never actually a mobile-tuned value (the case studies don't have
-       one either). About's own #top section already solved this exact
-       problem with an explicit mobile override; this page is closer in
-       kind to About (a plain index page, not a case study), so it
-       adopts that same number rather than inventing a third */
+    /* the desktop value is already fairly tight, but still too much
+       clearance once the mobile gutter narrows everything else down —
+       About's own #top section solves this with the same override, so
+       this page (closer in kind to About than to a case study) adopts
+       that same number rather than inventing a third */
     #top { padding-top: 64px !important; }
   }
 </style>
@@ -108,7 +106,7 @@
   <div data-badge-mount="1"></div>
 
   <main>
-  <section id="top" class="mobile-gutter" style="position: relative; max-width: 1400px; margin: 0 auto; padding: 148px 40px 160px;">
+  <section id="top" class="mobile-gutter" style="position: relative; max-width: 1400px; margin: 0 auto; padding: 96px 40px 160px;">
     <h1 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.944rem, 5vw, 4.0311rem); font-weight: 700; line-height: 0.96; letter-spacing: -0.045em; color: #f4eeeb;">Selected work</h1>
 
     <div class="work-index-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px 40px; margin-top: 64px;">

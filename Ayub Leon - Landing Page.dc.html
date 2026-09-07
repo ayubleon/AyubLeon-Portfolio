@@ -45,7 +45,7 @@
   [data-burn-runway] { height: auto !important; }
   [data-burn-viewport] { position: static !important; height: auto !important; overflow: visible !important; padding: 32px 0; }
   [data-burn-block] { position: static !important; visibility: visible !important; opacity: 1 !important; transform: none !important; display: block !important; margin-bottom: 28px; }
-  [data-burn-progress], [data-burn-grain], [data-burn-scrollcue], [data-pitch-cursor] { display: none !important; }
+  [data-burn-grain], [data-pitch-cursor] { display: none !important; }
 </style></noscript><link rel="preload" as="script" href="./support.js">
 <!-- support.js's own boot() re-fetches this exact document a second time
      right after first paint (unless window.__resources is already set —
@@ -130,10 +130,10 @@
      block boxes (unlike plain inline text) size themselves to the full
      inherited line-height rather than just the font's own glyph
      metrics — left at the paragraph's line-height: 2, this box would
-     come out oddly tall. background is pinned to the section's own
-     base color rather than left transparent, as a second guarantee
-     against any highlight color showing through here. */
-  [data-figma-frame] { position: relative; display: inline-block; line-height: normal; margin-left: 14px; margin-right: 14px; background: rgb(253, 251, 248); }
+     come out oddly tall. background is pinned to the card's own white
+     rather than left transparent, as a second guarantee against any
+     highlight color showing through here. */
+  [data-figma-frame] { position: relative; display: inline-block; line-height: normal; margin-left: 14px; margin-right: 14px; background: #FFFFFF; }
   [data-figma-frame]::before {
     content: ''; position: absolute; inset: -2px -6px;
     border: 1.5px solid #0D99FF; pointer-events: none;
@@ -171,16 +171,22 @@
   @media (max-width: 480px) {
     .figma-frame-label { display: none; }
     /* the clamp() on [data-burn-text]'s inline font-size already bottoms
-       out at its 1.62rem floor by this width, so this needs !important to
+       out at its 1.35rem floor by this width, so this needs !important to
        size it down further — combined with the tighter line-height, this
        is what keeps the copy from reading oversized and overly
        spaced-out on a phone screen. These blocks share the project
        titles' ramp so the two track together, but they carry whole
        sentences rather than a short title, so they alone step down here
-       — to 1.125rem, still a step on the scale */
-    [data-burn-text] { font-size: 1.125rem !important; line-height: 1.65 !important; }
+       — to 0.9375rem, still a step on the scale */
+    [data-burn-text] { font-size: 0.9375rem !important; line-height: 1.65 !important; }
   }
   [data-burn-grain] { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='gamma' exponent='4'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"); background-size: 180px; }
+  /* each block is its own white card floating on the section's black
+     stage — rounded corners and a shadow so the one sliding up over the
+     last reads as a card arriving rather than a flat color swap, and an
+     opaque background of its own since it has to fully cover whatever
+     was under it, not blend into it the way a crossfade would */
+  [data-burn-block] { background: #FFFFFF; border-radius: 16px; box-shadow: 0 -30px 60px -40px rgba(0,0,0,0.35), 0 50px 100px -50px rgba(0,0,0,0.6); }
   /* the block-4 curiosity cat: five drawn poses (looking up, arm low →
      looking down, arm raised → arm lowered) held in a fixed-size box and
      played as a frame animation — see the keyframes' own comment below
@@ -258,20 +264,18 @@
     .cycle-slot-phrase, .cycle-word { transition: none; }
     .cycle-word.is-picked { transform: none; }
   }
-  /* the crossfade is a scroll-position effect, not a CSS animation, so the
-     generic `* { animation-duration: .01ms }` rule below can't neutralize
-     it — this collapses the pinned runway back into a plain static stack
-     of fully-visible paragraphs instead */
+  /* the stack transform is a scroll-position effect, not a CSS animation,
+     so the generic `* { animation-duration: .01ms }` rule below can't
+     neutralize it — this collapses the pinned runway back into a plain
+     static stack of fully-visible cards instead */
   @media (prefers-reduced-motion: reduce) {
     [data-burn-runway] { height: auto !important; }
     [data-burn-viewport] { position: static !important; height: auto !important; overflow: visible !important; padding: 32px 0; }
     [data-burn-block] { position: static !important; visibility: visible !important; opacity: 1 !important; transform: none !important; display: block !important; margin-bottom: 28px; }
-    /* the scroll cue goes with them: this fallback unpins the runway into a
-       plain stack, so there's no one-block-at-a-time scrolling left to cue */
     /* the pitch cursor goes too: it's parked by JS from the measured
        position of the phrase it points at, and that never runs here, so
        it would otherwise sit at the paragraph's top-left over the text */
-    [data-burn-progress], [data-burn-grain], [data-burn-scrollcue], [data-pitch-cursor] { display: none !important; }
+    [data-burn-grain], [data-pitch-cursor] { display: none !important; }
     /* [data-burn-icon] sits opacity:0 by default (see its inline style),
        only revealed by playProcessIcon()'s fly-in — which never runs
        here, since that method's own reduced-motion check returns before
@@ -343,36 +347,24 @@
     </div>
   </section>
 
-  <section id="curiosity" style="position: relative; z-index: 2; width: 100%; background: var(--al-card-light,#FDFBF8); color: #0a0606;">
+  <section id="curiosity" style="position: relative; z-index: 2; width: 100%; background: #000000; color: #0a0606;">
     <div data-burn-runway style="width: 100%; height: calc(170vh * 4);">
       <div data-burn-viewport style="position: sticky; top: 0; height: 100svh; width: 100%; overflow: hidden;">
-        <!-- sits above the nav dock rather than centred on the viewport
-             floor: the dock is fixed at bottom:22px (16px under 700px) and
-             is ~64px tall, so anything below ~86px from the bottom is
-             covered by it. aria-hidden because it's a pointing device for
-             sighted users only: the blocks themselves carry the copy -->
-        <span data-burn-scrollcue aria-hidden="true" style="position: absolute; bottom: 108px; left: 50%; transform: translateX(-50%); z-index: 5; font-family: Poppins, Helvetica, sans-serif; font-size: 0.7812rem; font-weight: 500; letter-spacing: 0.06em; color: rgba(10,6,6,0.3); pointer-events: none; white-space: nowrap;">Scroll ↓</span>
-        <div data-burn-progress aria-hidden="true" style="position: absolute; top: 40px; left: 50%; transform: translateX(-50%); width: min(420px, 40vw); height: 3px; display: flex; gap: 6px; z-index: 5;">
-          <div class="burn-progress-seg" style="flex: 1; height: 100%; border-radius: 999px; overflow: hidden; background: rgba(10,6,6,0.12);"><div class="burn-progress-seg-fill" style="height: 100%; width: 0%; background: #0a0606; border-radius: inherit;"></div></div>
-          <div class="burn-progress-seg" style="flex: 1; height: 100%; border-radius: 999px; overflow: hidden; background: rgba(10,6,6,0.12);"><div class="burn-progress-seg-fill" style="height: 100%; width: 0%; background: #0a0606; border-radius: inherit;"></div></div>
-          <div class="burn-progress-seg" style="flex: 1; height: 100%; border-radius: 999px; overflow: hidden; background: rgba(10,6,6,0.12);"><div class="burn-progress-seg-fill" style="height: 100%; width: 0%; background: #0a0606; border-radius: inherit;"></div></div>
-          <div class="burn-progress-seg" style="flex: 1; height: 100%; border-radius: 999px; overflow: hidden; background: rgba(10,6,6,0.12);"><div class="burn-progress-seg-fill" style="height: 100%; width: 0%; background: #0a0606; border-radius: inherit;"></div></div>
-        </div>
-        <div data-burn-block style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.62rem, 2.4vw, 1.944rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">Curiosity is what <span data-curiosity-flash>drives</span> how I work.</p>
+        <div data-burn-block style="position: absolute; inset: max(24px, 14.64vh) max(24px, 14.64vw); display: flex; align-items: center; justify-content: center;">
+          <p data-burn-text style="position: relative; margin: 0; max-width: min(60vw, 38rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.4vw, 1.62rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">Curiosity is what <span data-curiosity-flash>drives</span> how I work.</p>
           <div data-curiosity-icon aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 0; height: 0; opacity: 0; pointer-events: none; z-index: 6;">
             <img data-curiosity-bulb src="images/curiosity-bulb.svg" alt="" style="position: absolute; left: 0; top: 0; height: 42px; width: auto; transform: translate(-50%, -50%); filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));">
             <img data-curiosity-car src="images/curiosity-car.png" alt="" style="position: absolute; left: 0; top: 0; height: 22px; width: auto; opacity: 0; transform: translate(-50%, -50%); filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));">
           </div>
         </div>
-        <div data-burn-block style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.62rem, 2.4vw, 1.944rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">It shows up early. I ask why a flow works the way it does, or <span class="hl hl-seam-a">whether a feature is </span><span data-pitch-anchor><span class="hl hl-seam-b">solving the right problem, before anyone starts</span> <span data-figma-frame>building<span class="figma-frame-label" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tr" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="bl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="br" aria-hidden="true"></span></span></span>. That&#39;s where the real problems are still cheap to fix.<span data-pitch-cursor aria-hidden="true" style="position: absolute; left: 0; top: 0; z-index: 2; display: block; opacity: 0; pointer-events: none; transform-origin: 0 0; will-change: transform, opacity;"><svg width="17" height="18" viewBox="0 0 17 18" fill="none" style="display: block; flex: 0 0 auto; filter: drop-shadow(0 2px 5px rgba(10,6,6,0.28));"><path d="M1.4 1.1 L1.4 13.9 L4.8 10.7 L7.1 15.9 L9.6 14.7 L7.3 9.6 L12 9.4 Z" fill="#0056FF" stroke="#FDFBF8" stroke-width="1.1" stroke-linejoin="round"/></svg></span></p>
+        <div data-burn-block style="position: absolute; inset: max(24px, 14.64vh) max(24px, 14.64vw); display: flex; align-items: center; justify-content: center;">
+          <p data-burn-text style="position: relative; margin: 0; max-width: min(60vw, 38rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.4vw, 1.62rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">It shows up early. I ask why a flow works the way it does, or <span class="hl hl-seam-a">whether a feature is </span><span data-pitch-anchor><span class="hl hl-seam-b">solving the right problem, before anyone starts</span> <span data-figma-frame>building<span class="figma-frame-label" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tr" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="bl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="br" aria-hidden="true"></span></span></span>. That&#39;s where the real problems are still cheap to fix.<span data-pitch-cursor aria-hidden="true" style="position: absolute; left: 0; top: 0; z-index: 2; display: block; opacity: 0; pointer-events: none; transform-origin: 0 0; will-change: transform, opacity;"><svg width="17" height="18" viewBox="0 0 17 18" fill="none" style="display: block; flex: 0 0 auto; filter: drop-shadow(0 2px 5px rgba(10,6,6,0.28));"><path d="M1.4 1.1 L1.4 13.9 L4.8 10.7 L7.1 15.9 L9.6 14.7 L7.3 9.6 L12 9.4 Z" fill="#0056FF" stroke="#FFFFFF" stroke-width="1.1" stroke-linejoin="round"/></svg></span></p>
         </div>
-        <div data-burn-block style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.62rem, 2.4vw, 1.944rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;"><span data-process-icon-origin>That&#39;s</span> also why I&#39;ve spent the last year bringing AI into my process<img data-search-icon src="images/search-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block; margin-left: 0.34em; margin-right: 0.22em;"><img data-burn-icon src="images/claude-ai-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block; opacity: 0; margin-right: 0.22em;"><img data-figma-icon src="images/figma-logo.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block;"> <span class="hl">not as a shortcut</span>, but as another way to <span class="hl">dig deeper into problems, explore more possibilities</span>, and get from an idea to something tangible <span class="hl">faster.</span></p>
+        <div data-burn-block style="position: absolute; inset: max(24px, 14.64vh) max(24px, 14.64vw); display: flex; align-items: center; justify-content: center;">
+          <p data-burn-text style="position: relative; margin: 0; max-width: min(60vw, 38rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.4vw, 1.62rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;"><span data-process-icon-origin>That&#39;s</span> also why I&#39;ve spent the last year bringing AI into my process<img data-search-icon src="images/search-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block; margin-left: 0.34em; margin-right: 0.22em;"><img data-burn-icon src="images/claude-ai-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block; opacity: 0; margin-right: 0.22em;"><img data-figma-icon src="images/figma-logo.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block;"> <span class="hl">not as a shortcut</span>, but as another way to <span class="hl">dig deeper into problems, explore more possibilities</span>, and get from an idea to something tangible <span class="hl">faster.</span></p>
         </div>
-        <div data-burn-block style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(84vw, 46rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.62rem, 2.4vw, 1.944rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">Because good ideas only matter when they work, I collaborate closely with developers and stakeholders to turn them into products people can actually use.<span class="curiosity-cat" aria-hidden="true" style="position: relative; display: block; height: 1.9em; width: 2.4em; margin: 22px auto 0;"><img src="images/cat-frame-1.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-1"><img src="images/cat-frame-1b.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-2"><img src="images/cat-frame-2.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-3"><img src="images/cat-frame-2b.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-4"><img src="images/cat-frame-3.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-5"></span></p>
+        <div data-burn-block style="position: absolute; inset: max(24px, 14.64vh) max(24px, 14.64vw); display: flex; align-items: center; justify-content: center;">
+          <p data-burn-text style="position: relative; margin: 0; max-width: min(60vw, 38rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.4vw, 1.62rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">Because good ideas only matter when they work, I collaborate closely with developers and stakeholders to turn them into products people can actually use.<span class="curiosity-cat" aria-hidden="true" style="position: relative; display: block; height: 1.9em; width: 2.4em; margin: 22px auto 0;"><img src="images/cat-frame-1.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-1"><img src="images/cat-frame-1b.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-2"><img src="images/cat-frame-2.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-3"><img src="images/cat-frame-2b.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-4"><img src="images/cat-frame-3.svg" alt="" class="curiosity-cat-frame curiosity-cat-frame-5"></span></p>
         </div>
         <div data-burn-grain aria-hidden="true" style="position: absolute; inset: 0; z-index: 4; opacity: 0.4; pointer-events: none;"></div>
       </div>
@@ -434,7 +426,7 @@ class Component extends DCLogic {
     const body = stack[this.props.bodyFont ?? 'Poppins'] || stack['Poppins'];
     const display = stack[this.props.displayFont ?? 'Poppins'] || stack['Poppins'];
     document.body.style.fontFamily = body;
-    document.querySelectorAll('h1, h2, h3, [data-work-title]').forEach((el) => { el.style.fontFamily = display; });
+    document.querySelectorAll('h1, h2, h3').forEach((el) => { el.style.fontFamily = display; });
     document.querySelectorAll('p, a, span, li').forEach((el) => {
       const f = el.style.fontFamily || '';
       if (f.indexOf('JetBrains') !== -1 || f.indexOf('Instrument Serif') !== -1) return;
@@ -735,9 +727,12 @@ class Component extends DCLogic {
     draw(0);
   }
 
-  // scroll effect for the "Curiosity is what..." copy: 4 blocks, each
-  // pinned full-screen in its own slot of a tall runway, one crossfading
-  // into the next as you scroll.
+  // scroll effect for the "Curiosity is what..." copy: 4 cards, each
+  // pinned full-screen in its own slot of a tall runway, each one rising up
+  // to cover the last as you scroll rather than crossfading over it — the
+  // card that's just been covered keeps easing a touch smaller and lifts
+  // slightly rather than sitting flat once hidden, so it still reads as a
+  // physical stack in the instant before the next one fully covers it.
   //
   // Guarded on an instance property AND a per-block marker property (a
   // plain JS property set directly on each block element, not a data-*
@@ -763,8 +758,6 @@ class Component extends DCLogic {
     if (this.onBurnResize) window.removeEventListener('resize', this.onBurnResize);
     if (this.burnResizeObserver) this.burnResizeObserver.disconnect();
 
-    const progressFills = Array.from(runway.querySelectorAll('.burn-progress-seg-fill'));
-
     // reduced motion: the pin/fade is scroll-position math, not a CSS
     // animation, so the site's usual `* { animation-duration: .01ms }`
     // catch-all can't neutralize it — this skips straight to plain text,
@@ -788,12 +781,6 @@ class Component extends DCLogic {
     // into the very first scroll input, well before its "fully visible"
     // hold should even begin
     const START_AT = 0;
-    // fraction of a block's own [0,1] slot spent fading in and (mirrored)
-    // fading out — the two overlap by construction: this block's fade-in
-    // and the previous block's fade-out both run over the same handoff
-    // window, which is what makes the transition a crossfade rather than
-    // a hard cut
-    const FADE_SPAN = 0.28;
 
     // TEST: plays the curiosity bulb/car icon the instant the section
     // becomes fully pinned, rather than consuming a dedicated first swipe
@@ -819,21 +806,34 @@ class Component extends DCLogic {
       const t = START_AT + p * (count - 1);
 
       blocks.forEach(({ wrap }, i) => {
-        const q = t - i;
-        // fills over the same q range this block uses to go from "just
-        // arrived" (q=0) to "fully faded out" (q=1) — set unconditionally,
-        // ahead of the visibility check below, so a block that's already
-        // gone still reports its segment done
-        if (progressFills[i]) progressFills[i].style.width = (clamp01(q) * 100).toFixed(2) + '%';
-
-        const entrance = clamp01((q + FADE_SPAN) / FADE_SPAN);
-        const exit = clamp01((q - (1 - FADE_SPAN)) / FADE_SPAN);
-        if (entrance <= 0 || q > 1) {
-          wrap.style.visibility = 'hidden';
-          return;
-        }
-        wrap.style.visibility = 'visible';
-        wrap.style.opacity = (entrance * (1 - exit)).toFixed(4);
+        // reveal: 0 before this card has started rising, 1 once it has
+        // fully covered whatever was under it (block 0 is the floor of the
+        // stack, so it's always fully "revealed" the moment the section
+        // engages — there's nothing beneath it to rise over)
+        const reveal = i === 0 ? 1 : clamp01(t - (i - 1));
+        // out: 0 while this card is still the one on top, ramping to 1 as
+        // the next card rises over it — drives both the lift/shrink below
+        // and, further down, this card no longer being the interactive one
+        const out = clamp01(t - i);
+        wrap.style.transform = 'translateY(calc(' + ((1 - reveal) * 100) + '% - ' + (out * 14) + 'px)) scale(' + (1 - out * 0.08) + ')';
+        wrap.style.zIndex = i;
+        // the card's edge only just starting to clear the bottom of the
+        // viewport is a thin, hard-edged sliver of its own shadow and
+        // corner radius — barely enough height for either to read as
+        // intentional, closer to a rendering glitch than a card arriving.
+        // A trailing opacity ramp was tried here first and made it worse:
+        // a translucent card blends with whatever sits behind it instead
+        // of hiding it, so the sliver read as a ghostly double-exposure
+        // rather than just vanishing. Delaying the hidden→visible flip
+        // itself until the card has cleared a small threshold keeps every
+        // frame either fully absent or fully opaque, with nothing partial
+        // in between — the reveal still starts a touch late, but there's
+        // no in-between state left to look broken
+        const REVEAL_THRESHOLD = 0.05;
+        // covered cards stay in the DOM (still readable if you scroll back
+        // up) but visibility:hidden takes them out of tab order and the
+        // accessibility tree while a later card sits opaque on top of them
+        wrap.style.visibility = (reveal < REVEAL_THRESHOLD || out >= 1) ? 'hidden' : 'visible';
       });
     };
 
@@ -1555,7 +1555,7 @@ class Component extends DCLogic {
     }
   }
 
-  // arriving with #work / #contact: re-apply the jump once layout has settled.
+  // arriving with #curiosity / #cycle: re-apply the jump once layout has settled.
   // Always instant, never smooth: a smooth jump here would animate through
   // every intermediate scroll position on the way to the target, including
   // the whole #curiosity runway if it sits in between — replaying its
