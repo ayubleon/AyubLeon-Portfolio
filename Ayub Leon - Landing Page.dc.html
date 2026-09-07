@@ -96,7 +96,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=Instrument+Serif:ital@0;1&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
 <style>
-  html, body { margin: 0; padding: 0; background: #000000; }
+  /* overscroll-behavior-y: without it, a trackpad flick or an
+     upward scroll past the very top rubber-bands the whole page
+     down, exposing a beat of the raw html/body background above the
+     hero's own rounded frame before it snaps back — this stops that
+     bounce so the hero's top edge stays put */
+  html, body { margin: 0; padding: 0; background: #000000; overscroll-behavior-y: none; }
   body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -337,13 +342,20 @@
   @media (min-aspect-ratio: 1428/1000) {
     .al-hero-stage { width: 100%; height: auto; }
   }
-  /* the top margin + rounded top corners are a desktop-only flourish —
-     phone and tablet get the full-bleed edge-to-edge treatment instead */
-  @media (max-width: 1100px) {
-    .al-hero-frame { top: 0 !important; height: 100svh !important; }
-  }
   @media (max-width: 700px) {
     .mobile-gutter { padding-left: 16px !important; padding-right: 16px !important; }
+    /* the monitor overlay sits dead center of the desk photo — on a phone's
+       narrower, taller crop that's roughly where the hero text also wants
+       to sit, so the two would overlap. Dropping the monitor here (rather
+       than shrinking or repositioning either one) keeps the text legible
+       instead of cramming both into the same space */
+    [data-hero-monitor] { display: none !important; }
+    /* the monitor's gone here, so the top-anchored clearance
+       initSignatureClearance() computes for desktop (avoiding the
+       monitor) has nothing left to clear — center the text in the
+       screen instead, with its own symmetric padding so it never
+       touches the top/bottom edges either */
+    #top { align-items: center !important; padding-top: 24px; padding-bottom: 24px; }
   }
 </style>
 </helmet>
@@ -354,15 +366,19 @@
        section that follows — the sticky/cover effect starts one section
        later, on #philosophy itself (see its comment below) -->
   <div data-hero-pin style="position: relative; height: 100svh; overflow: hidden;">
-    <div class="al-hero-frame" style="position: absolute; top: 24px; left: 0; right: 0; bottom: 0; height: calc(100svh - 24px); overflow: hidden;">
+    <div class="al-hero-frame" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; height: 100svh; overflow: hidden;">
       <div class="al-hero-stage" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); aspect-ratio: 1428 / 1000;">
         <img src="images/hero-desk.jpg" alt="A warmly lit home desk with plants and books" loading="eager" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block;">
         <img data-hero-monitor src="images/hero-monitor.svg" alt="" style="position: absolute; left: 35.19%; top: 36.35%; width: 29.62%; height: auto; display: block;">
       </div>
-      <div style="position: absolute; inset: 0; z-index: 15; pointer-events: none; background: linear-gradient(180deg, #000000 0%, rgba(0,0,0,0.72) 13%, rgba(0,0,0,0.05) 45%, rgba(0,0,0,0.05) 55%, rgba(0,0,0,0.72) 87%, #000000 100%);"></div>
+      <div style="position: absolute; inset: 0; z-index: 15; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.05) 55%, rgba(0,0,0,0.72) 87%, #000000 100%);"></div>
     </div>
-    <div id="top" class="mobile-gutter" style="position: relative; z-index: 10; height: 100%; display: flex; align-items: flex-start; justify-content: center; padding: 16vh 24px 26px;">
-      <img src="images/hero-signature.svg" alt="Ayub Leon" style="width: min(280px, 55vw); height: auto; display: block; filter: drop-shadow(0 2px 14px rgba(0,0,0,0.5)); animation: alFade 1.1s cubic-bezier(.22,1,.36,1) .3s both;">
+    <div id="top" class="mobile-gutter" style="position: relative; z-index: 16; height: 100%; display: flex; align-items: flex-start; justify-content: center; padding: 16vh 24px 26px;">
+      <div data-hero-text style="display: flex; flex-direction: column; align-items: center; text-align: center; max-width: min(90%, 640px); animation: alFade 1.1s cubic-bezier(.22,1,.36,1) .3s both;">
+        <h1 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-weight: 800; letter-spacing: -0.04em; line-height: 0.98; font-size: clamp(2.2rem, 6vw, 3.6rem); color: #f4eeeb; text-shadow: 0 2px 14px rgba(0,0,0,0.5);">Ayub Leon</h1>
+        <span style="display: inline-block; margin-top: 14px; padding: 6px 12px; background: #0056FF; color: #ffffff; font-family: Poppins, Helvetica, sans-serif; font-size: 0.7812rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 0;">Product Designer</span>
+        <p style="margin: 16px 0 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(0.7812rem, 1.5vw, 0.9375rem); font-weight: 500; line-height: 1.6; letter-spacing: -0.015em; color: rgba(244,238,235,0.92); text-wrap: pretty; text-shadow: 0 2px 14px rgba(0,0,0,0.5);">4+ years designing products across TikTok Shop analytics, betting platforms, and the systems underneath them.</p>
+      </div>
     </div>
   </div>
 
@@ -370,24 +386,18 @@
   <div data-badge-mount="1"></div>
 
   <main>
-  <!-- sticky, not static: once this scrolls into view it pins at the top,
-       so the white #curiosity section right after it can slide up and
-       visually cover it — the same cover technique the hero used to use
-       before it was moved back to normal flow above. Sized by its own
-       content, not forced to a full viewport height like the hero — this
-       block doesn't need to read as its own standalone screen -->
-  <section id="philosophy" style="position: sticky; top: 0; z-index: 2; width: 100%; background: #000000;">
-    <div class="mobile-gutter" style="max-width: 1400px; margin: 0 auto; padding: 96px 40px;">
-      <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; margin: 0 auto;">
-        <h1 data-fit-heading style="margin: 0; white-space: nowrap; font-family: Poppins, Helvetica, sans-serif; font-weight: 700; font-size: 6.5rem; letter-spacing: -0.04em; line-height: 1; color: #f4eeeb;">Ayub Leon</h1>
-        <span style="display: inline-block; margin-top: 20px; padding: 6px 12px; background: #0056FF; color: #ffffff; font-family: Poppins, Helvetica, sans-serif; font-size: 0.7812rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 0;">Product Designer</span>
-        <p style="margin: 14px 0 0; max-width: 52ch; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.125rem, 1.9vw, 1.62rem); font-weight: 500; line-height: 1.65; letter-spacing: -0.022em; color: #f4eeeb; text-wrap: balance;">4+ years designing products across TikTok Shop analytics, betting platforms, and the systems underneath them.</p>
-      </div>
-    </div>
-  </section>
-
   <section id="curiosity" style="position: relative; z-index: 2; width: 100%; background: #000000; color: #0a0606;">
-    <div data-burn-runway style="width: 100%; height: calc(150vh * 4);">
+    <!-- svh, not vh: the sticky viewport pinned inside this runway (just
+         below) is already 100svh, and the scroll-progress math in
+         initBurnText() reads window.innerHeight (which tracks svh's live,
+         toolbar-aware value) as its own viewport figure. vh resolves
+         against a different, largely static baseline on mobile browsers
+         with a collapsing address bar, so the runway's actual height and
+         the JS's live viewport reading would drift apart as the toolbar
+         shows/hides mid-scroll — the cause of the stack animating
+         inconsistently (sometimes correctly, sometimes stuck or slow)
+         depending on whatever toolbar state happened to be in effect -->
+    <div data-burn-runway style="width: 100%; height: calc(150svh * 4);">
       <div data-burn-viewport style="position: sticky; top: 0; height: 100svh; width: 100%; overflow: hidden;">
         <div data-burn-block style="position: absolute; inset: max(24px, 14.64vh) max(24px, 14.64vw); display: flex; align-items: center; justify-content: center;">
           <p data-burn-text style="position: relative; margin: 0; max-width: min(60vw, 38rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.4vw, 1.62rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">Curiosity is what <span data-curiosity-flash>drives</span> how I work.</p>
@@ -1639,15 +1649,23 @@ class Component extends DCLogic {
   initSignatureClearance() {
     const monitor = document.querySelector('[data-hero-monitor]');
     const wrap = document.getElementById('top');
-    const sig = wrap ? wrap.querySelector('img') : null;
+    const text = wrap ? wrap.querySelector('[data-hero-text]') : null;
     const stage = document.querySelector('.al-hero-stage');
-    if (!monitor || !wrap || !sig) return;
+    if (!monitor || !wrap || !text) return;
     const GAP = 40;
     const MIN_TOP = 24;
     const DEFAULT_TOP_RATIO = 0.16;
     const apply = () => {
+      // the mobile breakpoint hides the monitor and centers #top by CSS
+      // instead — this padding-top override would only fight that
+      // centering, so it's cleared rather than computed whenever the
+      // monitor isn't actually on screen to clear in the first place
+      if (getComputedStyle(monitor).display === 'none') {
+        wrap.style.paddingTop = '';
+        return;
+      }
       const defaultTop = window.innerHeight * DEFAULT_TOP_RATIO;
-      const maxTop = monitor.getBoundingClientRect().top - GAP - sig.getBoundingClientRect().height;
+      const maxTop = monitor.getBoundingClientRect().top - GAP - text.getBoundingClientRect().height;
       wrap.style.paddingTop = Math.max(MIN_TOP, Math.min(defaultTop, maxTop)) + 'px';
     };
     // apply() re-runs every time AL.selfHeal calls this method (initial

@@ -6,7 +6,7 @@
   // on a flush, gapless edge. The portrait SVG is a near-identical 47:140,
   // so it fills the same face with an imperceptible sub-2% letterbox.
   var CSS = [
-    ".al-badge{position:fixed;top:28px;left:28px;z-index:45;perspective:900px;display:block;cursor:pointer;-webkit-tap-highlight-color:transparent;--face-h:130px;--face-w:43.03px;--r:21.51px;}",
+    ".al-badge{position:fixed;top:28px;left:28px;z-index:45;perspective:900px;display:block;cursor:pointer;-webkit-tap-highlight-color:transparent;--face-h:97.5px;--face-w:32.27px;--r:16.14px;}",
     ".al-badge-inner{position:relative;width:var(--face-w);height:var(--face-h);transform-style:preserve-3d;will-change:transform;transition:transform 1s cubic-bezier(.65,0,.35,1);}",
     ".al-badge-face{position:absolute;top:0;left:0;width:var(--face-w);height:var(--face-h);backface-visibility:hidden;}",
     ".al-badge-face svg{display:block;width:100%;height:100%;}",
@@ -14,7 +14,7 @@
     ".al-badge-face-right{transform:rotateY(90deg) translateZ(var(--r));}",
     ".al-badge-face-back{transform:rotateY(180deg) translateZ(var(--r));}",
     ".al-badge-face-left{transform:rotateY(270deg) translateZ(var(--r));}",
-    "@media (max-width:700px){.al-badge{top:18px;left:18px;--face-h:92px;--face-w:30.45px;--r:15.23px;}}",
+    "@media (max-width:700px){.al-badge{top:18px;left:18px;--face-h:69px;--face-w:22.84px;--r:11.42px;}}",
     "@media (prefers-reduced-motion: reduce){.al-badge-inner{transition:none;}}",
     "@media (max-width:1400px){.al-badge{display:none;}}"
   ].join('');
