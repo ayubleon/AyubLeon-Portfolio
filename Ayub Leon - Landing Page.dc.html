@@ -196,7 +196,22 @@
      last reads as a card arriving rather than a flat color swap, and an
      opaque background of its own since it has to fully cover whatever
      was under it, not blend into it the way a crossfade would */
-  [data-burn-block] { background: #FFFFFF; border-radius: 16px; box-shadow: 0 -30px 60px -40px rgba(0,0,0,0.35), 0 50px 100px -50px rgba(0,0,0,0.6); }
+  /* promotes each card to its own compositor layer up front, so the
+     transform update()  writes every scroll tick is a cheap GPU composite
+     instead of a synchronous repaint of the card's box-shadow clipped
+     against the viewport's overflow:hidden — that repaint cost is what
+     reads as the stack lagging behind a fast scroll, worst on quick
+     upward flicks where scroll deltas tend to be larger */
+  [data-burn-block] { border-radius: 16px; box-shadow: 0 -30px 60px -40px rgba(0,0,0,0.35), 0 50px 100px -50px rgba(0,0,0,0.6); will-change: transform; }
+  /* each card its own faint tint rather than flat white — all four sit
+     near the section's #0056FF accent without matching it outright, so
+     the stack reads as a related family of cards rather than one repeated
+     color. See the "Curiosity Card Tints" demo for the reasoning behind
+     each pick */
+  [data-burn-block]:nth-of-type(1) { background: #F3F6FF; }
+  [data-burn-block]:nth-of-type(2) { background: #FAF6F1; }
+  [data-burn-block]:nth-of-type(3) { background: #F1F0FB; }
+  [data-burn-block]:nth-of-type(4) { background: #EEF5F7; }
   .burn-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(10,6,6,0.2); transition: background .3s cubic-bezier(.22,1,.36,1), transform .3s cubic-bezier(.22,1,.36,1); }
   .burn-dot.is-active { background: #0a0606; transform: scale(1.3); }
   /* the block-4 curiosity cat: five drawn poses (looking up, arm low →
@@ -372,7 +387,7 @@
   </section>
 
   <section id="curiosity" style="position: relative; z-index: 2; width: 100%; background: #000000; color: #0a0606;">
-    <div data-burn-runway style="width: 100%; height: calc(170vh * 4);">
+    <div data-burn-runway style="width: 100%; height: calc(150vh * 4);">
       <div data-burn-viewport style="position: sticky; top: 0; height: 100svh; width: 100%; overflow: hidden;">
         <div data-burn-block style="position: absolute; inset: max(24px, 14.64vh) max(24px, 14.64vw); display: flex; align-items: center; justify-content: center;">
           <p data-burn-text style="position: relative; margin: 0; max-width: min(60vw, 38rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.4vw, 1.62rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">Curiosity is what <span data-curiosity-flash>drives</span> how I work.</p>
