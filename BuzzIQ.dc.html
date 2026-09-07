@@ -55,6 +55,7 @@
      after the throw silently never registered, leaving the page's JS-driven
      content (headings, reveals, scroll-scrub, shaders) dead with no retry -->
 <script src="shared.js" defer></script>
+<script src="lightbox.js" defer></script>
 <script src="./support.js" defer></script>
 <script src="project-viewer.js" defer></script>
 <script src="footer.js" defer></script>
@@ -151,9 +152,62 @@
         <p class="case-section-label">Overview</p>
       </div>
       <div style="display: flex; flex-direction: column; gap: 20px; max-width: 68ch;">
-        <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.125rem; font-weight: 500; line-height: 1.65; letter-spacing: -0.015em; color: #000000; text-wrap: pretty;">BuzzIQ helps TikTok Shop creators find trending products and the videos driving them, so they know what to sell and what content angles are already working.</p>
+        <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.125rem; font-weight: 500; line-height: 1.65; letter-spacing: -0.015em; color: #000000; text-wrap: pretty;">BuzzIQ is a statistics product for TikTok Shop creators, covering video discovery, AI-assisted content creation, and product intelligence in one place.</p>
         <p class="case-body-text">IGNITEAMZ needed it built and shipped, with no design system in place and no other designer. My team at PackCommerce took it on, and they brought me in as sole designer off a quick look at past work, even though some of it was under NDA and I couldn't show them the full picture. The build had to cover mobile, tablet, and web from day one.</p>
+        <p class="case-body-text">My contract ran its full agreed term and was then extended. I completed the designs and handed off with production underway, and the product shipped after my engagement ended. It has since been rebranded to BrandBeacon (brandbeacon.io) with a broader scope than what I designed, indexing TikTok more widely rather than focusing on TikTok Shop trending products and creators.</p>
       </div>
+    </div>
+
+    <div class="case-label-grid" style="display: grid; grid-template-columns: minmax(0, 0.3fr) minmax(0, 1fr); gap: 40px 72px; margin: 96px 0 0;">
+      <div style="align-self: start;">
+        <p class="case-section-label">What it did</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 32px; max-width: 68ch;">
+        <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.125rem; font-weight: 500; line-height: 1.65; letter-spacing: -0.015em; color: #000000;">More than a trending list</h2>
+
+        <div>
+          <p style="margin: 0 0 12px; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; font-weight: 500; letter-spacing: -0.015em; color: #000000;">Video discovery</p>
+          <p class="case-body-text">The home feed surfaced the fastest-growing videos by view velocity rather than by raw view count, so creators could catch videos still climbing instead of ones that had already peaked. Trending products and trending creators were capped at the top 20 each; the rapidly-growing videos were not capped.</p>
+        </div>
+        <div>
+          <p style="margin: 0 0 12px; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; font-weight: 500; letter-spacing: -0.015em; color: #000000;">BuzzAI</p>
+          <p class="case-body-text">A button under each video opened the BuzzAI popup with material generated for that specific video: a transcript, hooks, a suggested script, ready-to-use captions with a regenerate option, hashtag suggestions, CTAs, and product details. It had to deliver all of that without pulling the user out of the feed they were browsing.</p>
+        </div>
+        <div>
+          <p style="margin: 0 0 12px; font-family: Poppins, Helvetica, sans-serif; font-size: 0.9375rem; font-weight: 500; letter-spacing: -0.015em; color: #000000;">Product intelligence</p>
+          <p class="case-body-text">A detail view for each product covered pricing changes over time, units sold, remaining TikTok Shop inventory, the number of creators promoting it, the commission available to a creator, and revenue broken out separately across posted videos and live videos. It was the densest information design problem on the project, and it had to work responsively from web down to mobile.</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 56px; margin: 96px 0 0;">
+      <figure style="margin: 0; display: flex; flex-direction: column; gap: 12px; flex: 1 1 200px; max-width: 260px;">
+        <img data-lightbox src="images/buzziq-mockup-homepage.png" alt="BuzzIQ home feed ranking videos by view velocity" loading="lazy" style="width: 100%; height: auto; display: block;">
+        <figcaption class="case-figcaption">01 — The home feed, ranking videos by view velocity with BuzzAI and Buzz Stats actions on each card.</figcaption>
+      </figure>
+      <figure style="margin: 0; display: flex; flex-direction: column; gap: 12px; flex: 1 1 200px; max-width: 260px;">
+        <img data-lightbox src="images/buzziq-mockup-buzzai.png" alt="BuzzAI popup with transcript, hooks, script, captions, hashtags, and CTAs" loading="lazy" style="width: 100%; height: auto; display: block;">
+        <figcaption class="case-figcaption">02 — The BuzzAI popup, opened from a video card without leaving the feed.</figcaption>
+      </figure>
+      <figure style="margin: 0; display: flex; flex-direction: column; gap: 12px; flex: 1 1 200px; max-width: 260px;">
+        <img data-lightbox src="images/buzziq-mockup-creator-details.png" alt="BuzzIQ creator details screen with follower demographics and revenue" loading="lazy" style="width: 100%; height: auto; display: block;">
+        <figcaption class="case-figcaption">03 — Creator details, covering follower demographics, engagement, and revenue.</figcaption>
+      </figure>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; margin: 96px 0 0;">
+      <figure style="margin: 0; display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 420px;">
+        <div style="border-radius: 12px; overflow: hidden; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.07);">
+          <img data-lightbox src="images/buzziq-creator-stats.png" alt="Creator stats view for a trending creator" loading="lazy" style="width: 100%; height: auto; display: block;">
+        </div>
+        <figcaption class="case-figcaption">04 — The creator stats view, showing performance for a trending creator.</figcaption>
+      </figure>
+      <figure style="margin: 0; display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 420px;">
+        <div style="border-radius: 12px; overflow: hidden; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.07);">
+          <img data-lightbox src="images/buzziq-product-stats.png" alt="Product stats view showing pricing, inventory, and revenue" loading="lazy" style="width: 100%; height: auto; display: block;">
+        </div>
+        <figcaption class="case-figcaption">05 — The product stats view, covering pricing history, units sold, remaining inventory, and revenue split between posted and live videos.</figcaption>
+      </figure>
     </div>
 
     <div class="case-label-grid" style="display: grid; grid-template-columns: minmax(0, 0.3fr) minmax(0, 1fr); gap: 40px 72px; margin: 96px 0 0;">
@@ -170,7 +224,7 @@
           </div>
         </div>
 
-        <p style="margin: 0; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: clamp(1.35rem, 2.2vw, 1.944rem); line-height: 1.35; letter-spacing: -0.01em; color: #0A84FF; text-wrap: pretty;">Made most design decisions independently first, working across a Kenya/US time zone gap, then brought them to directors and developers to review and align on before moving forward.</p>
+        <p style="margin: 0; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 500; font-size: clamp(1.35rem, 2.2vw, 1.944rem); line-height: 1.35; letter-spacing: -0.01em; color: #0A84FF; text-wrap: pretty;">Made most design decisions independently first, working across a Kenya/US time zone gap, then brought them to directors and developers to review and align on before moving forward.</p>
 
         <div style="display: flex; flex-direction: column; gap: 20px;">
           <p class="case-bullet-item" style="margin: 0; padding-left: 20px; border-left: 4px solid #0A84FF;">Brought in a design system I'd already built on my own and reshaped it to fit what BuzzIQ actually needed, since there was nothing in place to start from.</p>
@@ -182,15 +236,15 @@
     <div class="case-figure-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin: 96px 0 0;">
       <figure style="margin: 0; display: flex; flex-direction: column; gap: 12px;">
         <div style="position: relative; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.07);">
-          <img src="images/buzziq-figma-file.png" alt="BuzzIQ Figma file with prototype and full design screen rows" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+          <img data-lightbox src="images/buzziq-figma-file.png" alt="BuzzIQ Figma file with prototype and full design screen rows" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
         </div>
-        <figcaption class="case-figcaption">01 — Inside the Figma file: screens arranged in parallel prototype and full-design rows.</figcaption>
+        <figcaption class="case-figcaption">06 — Inside the Figma file: screens arranged in parallel prototype and full-design rows.</figcaption>
       </figure>
       <figure style="margin: 0; display: flex; flex-direction: column; gap: 12px;">
         <div style="position: relative; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.07);">
-          <img src="images/buzziq-popup-modes.png" alt="Onboarding popup component in dark and light mode" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+          <img data-lightbox src="images/buzziq-popup-modes.png" alt="Onboarding popup component on web and phone, with the web version in light and dark mode" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
         </div>
-        <figcaption class="case-figcaption">02 — One popup component in dark and light mode, both drawn from the design system.</figcaption>
+        <figcaption class="case-figcaption">07 — The onboarding popup component on web and phone, with the web version shown in both light and dark mode.</figcaption>
       </figure>
     </div>
 
@@ -220,7 +274,7 @@
       <div style="position: relative; aspect-ratio: 1600 / 1144; border-radius: 8px; overflow: hidden; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.07);">
         <video src="images/buzziq-prototype.mp4" poster="images/buzziq-prototype-poster.jpg" title="Prototype" autoplay playsinline preload="metadata" aria-label="Prototype for BuzzIQ" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block;"></video>
       </div>
-      <figcaption class="case-figcaption">03 — Prototype for BuzzIQ.</figcaption>
+      <figcaption class="case-figcaption">08 — Prototype for BuzzIQ.</figcaption>
     </figure>
 
     <div class="case-label-grid" style="display: grid; grid-template-columns: minmax(0, 0.3fr) minmax(0, 1fr); gap: 40px 72px; margin: 96px 0 0;">
@@ -232,7 +286,7 @@
         <p class="case-body-text">Every screen got weighed against both sides, what the business needed and what users needed, before it was final.</p>
         <p class="case-body-text">Once designs were handed off, the dev team flagged anything hard to build so we could fix it before it slowed anyone down.</p>
         <p class="case-body-text">We had a working prototype before development started, which meant a lot of the guesswork and back-and-forth that usually eats into a build never happened.</p>
-        <p style="margin: 24px 0 0; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: clamp(1.35rem, 2.2vw, 1.944rem); line-height: 1.35; letter-spacing: -0.01em; color: #0A84FF; text-wrap: pretty;">That back and forth is what let a solo designer keep pace with a moving team.</p>
+        <p style="margin: 24px 0 0; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 500; font-size: clamp(1.35rem, 2.2vw, 1.944rem); line-height: 1.35; letter-spacing: -0.01em; color: #0A84FF; text-wrap: pretty;">That back and forth is what let a solo designer keep pace with a moving team.</p>
       </div>
     </div>
   </section>

@@ -55,6 +55,7 @@
      after the throw silently never registered, leaving the page's JS-driven
      content (headings, reveals, scroll-scrub, shaders) dead with no retry -->
 <script src="shared.js" defer></script>
+<script src="lightbox.js" defer></script>
 <script src="./support.js" defer></script>
 <script src="project-viewer.js" defer></script>
 <script src="footer.js" defer></script>
@@ -191,7 +192,7 @@
     <div class="case-figure-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 20px; margin: 96px 0 0;">
       <figure style="margin: 0; display: flex; flex-direction: column; gap: 12px;">
         <div style="position: relative; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.07);">
-          <img src="images/banking-first-draft.png" alt="First draft screen inventory of the redesigned banking app" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+          <img data-lightbox src="images/banking-first-draft.png" alt="First draft screen inventory of the redesigned banking app" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
         </div>
         <figcaption class="case-figcaption">01 — The very first draft of the redesigned banking app, grouped by flow.</figcaption>
       </figure>

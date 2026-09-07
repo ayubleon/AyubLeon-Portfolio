@@ -696,6 +696,7 @@
       rebuildMoreWork(inner, href);
       fixMediaCrops(inner);
       fixCaseStudyLinkLayout(inner);
+      AL.wireLightboxIn(inner);
       // the reveal: content starts at opacity 0 (see .al-pv-card-inner)
       // and fades in once it's actually ready, rather than popping in the
       // instant the fetch resolves — a rAF tick so the class addition
@@ -815,6 +816,7 @@
   }
 
   function onKeydown(e) {
+    if (AL.isLightboxOpen && AL.isLightboxOpen()) return;
     if (e.key === 'Escape') { requestClose(); return; }
     if (e.key === 'ArrowLeft') { go(-1); return; }
     if (e.key === 'ArrowRight') { go(1); return; }

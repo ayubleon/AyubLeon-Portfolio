@@ -58,6 +58,7 @@
      after the throw silently never registered, leaving the page's JS-driven
      content (headings, reveals, scroll-scrub, shaders) dead with no retry -->
 <script src="shared.js" defer></script>
+<script src="lightbox.js" defer></script>
 <script src="./support.js" defer></script>
 <script src="project-viewer.js" defer></script>
 <script src="footer.js" defer></script>
@@ -110,34 +111,6 @@
     100% { transform: translate3d(10%, 8%, 0) scale(1.1); }
   }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation-duration: .01ms !important; transition: none !important; } }
-  /* desktop/tablet only — initImageLightbox() itself re-checks the same
-     700px cutoff at click time before ever opening, so a touch device
-     tapping one of these (which still fires a click event) is a no-op
-     there too; this cursor is just the visual hint for the pointer that
-     can actually hover it */
-  [data-lightbox] { cursor: zoom-in; }
-  .al-lightbox { position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center; padding: 40px; opacity: 0; pointer-events: none; transition: opacity .3s ease; }
-  .al-lightbox.is-open { opacity: 1; pointer-events: auto; }
-  .al-lightbox-backdrop { position: absolute; inset: 0; background: rgba(10,6,6,0.78); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); }
-  .al-lightbox-img { position: relative; z-index: 1; max-width: min(88vw, 1400px); max-height: 88vh; width: auto; height: auto; display: block; object-fit: contain; border-radius: 12px; box-shadow: 0 40px 100px -30px rgba(0,0,0,0.7); transform: scale(0.96); transition: transform .35s cubic-bezier(.22,1,.36,1); }
-  .al-lightbox.is-open .al-lightbox-img { transform: scale(1); }
-  /* frosted glass, not the site's usual solid-fill close buttons — the
-     backdrop behind it is already the darkest, busiest part of the page,
-     so a solid button would just read as another opaque block on top of
-     it; the blur lets it sit as a control floating over the image itself */
-  /* border matches the nav dock's own (.site-nav-dock in nav.js) —
-     var(--al-border) with the identical fallback — rather than a new
-     color invented just for this button */
-  .al-lightbox-close { position: fixed; top: 24px; right: 24px; z-index: 2; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--al-border,rgba(255,255,255,0.13)); background: rgba(255,255,255,0.1); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); color: #f4eeeb; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .25s ease, transform .3s cubic-bezier(.22,1,.36,1); }
-  .al-lightbox-close:hover { background: rgba(255,255,255,0.2); }
-  /* outline:none only, no added ring color of its own — the button's
-     always-visible border above is treated as enough of a focus
-     indicator here, rather than inventing a separate highlight color */
-  .al-lightbox-close:focus-visible { outline: none; }
-  .al-lightbox-close-stroke { transform-origin: 7px 7px; transition: transform .3s cubic-bezier(.22,1,.36,1); }
-  .al-lightbox-close:hover .al-lightbox-close-stroke:first-child { transform: rotate(90deg); }
-  .al-lightbox-close:hover .al-lightbox-close-stroke:last-child { transform: rotate(-90deg); }
-  @media (max-width: 700px) { .al-lightbox { display: none; } }
   .photo-stack-card { cursor: grab; will-change: transform; backface-visibility: hidden; }
   .photo-stack-card:active { cursor: grabbing; }
   .photo-stack-wrap { display: none; }
@@ -408,78 +381,6 @@ class Component extends DCLogic {
     trigger.addEventListener('click', this.onContactTipLeave);
   }
 
-  // desktop/tablet only, per the brief — the 700px cutoff matches the
-  // site's own mobile breakpoint used everywhere else on this page. The
-  // overlay itself lives outside <main> (appended straight to <body>), so
-  // support.js's rebuild waves never touch it; only the per-image click
-  // wiring needs the usual re-run guard
-  initImageLightbox() {
-    const imgs = Array.from(document.querySelectorAll('[data-lightbox]'));
-    if (!imgs.length) return;
-    if (this.lightboxBound && imgs.every((img) => img.__lightboxWired)) return;
-    this.lightboxBound = true;
-    imgs.forEach((img) => { img.__lightboxWired = true; });
-
-    const MOBILE_MAX_WIDTH = 700;
-
-    let overlay = document.querySelector('[data-lightbox-overlay]');
-    if (!overlay) {
-      overlay = document.createElement('div');
-      overlay.className = 'al-lightbox';
-      overlay.setAttribute('data-lightbox-overlay', '');
-      overlay.setAttribute('aria-hidden', 'true');
-      overlay.innerHTML =
-        '<div class="al-lightbox-backdrop" data-lightbox-backdrop></div>' +
-        '<img class="al-lightbox-img" data-lightbox-img alt="">' +
-        '<button type="button" class="al-lightbox-close" data-lightbox-close aria-label="Close">' +
-          '<svg width="14" height="14" viewBox="0 0 14 14" fill="none">' +
-            '<path class="al-lightbox-close-stroke" d="M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
-            '<path class="al-lightbox-close-stroke" d="M1 1L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
-          '</svg>' +
-        '</button>';
-      document.body.appendChild(overlay);
-
-      const backdrop = overlay.querySelector('[data-lightbox-backdrop]');
-      const lightboxImg = overlay.querySelector('[data-lightbox-img]');
-      const closeBtn = overlay.querySelector('[data-lightbox-close]');
-      let lastFocused = null;
-
-      const onKeydown = (e) => { if (e.key === 'Escape') close(); };
-      const close = () => {
-        overlay.classList.remove('is-open');
-        overlay.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-        document.removeEventListener('keydown', onKeydown);
-        window.removeEventListener('resize', onResize);
-        if (lastFocused && lastFocused.focus) lastFocused.focus();
-      };
-      // resizing down to mobile mid-view would otherwise leave the page
-      // scroll-locked forever — the CSS hides the overlay itself at this
-      // width already, this just releases the scroll lock along with it
-      const onResize = () => { if (window.innerWidth < MOBILE_MAX_WIDTH) close(); };
-      this.openLightbox = (sourceImg) => {
-        lastFocused = sourceImg;
-        lightboxImg.src = sourceImg.src;
-        lightboxImg.alt = sourceImg.alt || '';
-        overlay.classList.add('is-open');
-        overlay.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-        closeBtn.focus();
-        document.addEventListener('keydown', onKeydown);
-        window.addEventListener('resize', onResize);
-      };
-      backdrop.addEventListener('click', close);
-      closeBtn.addEventListener('click', close);
-    }
-
-    imgs.forEach((img) => {
-      img.addEventListener('click', () => {
-        if (window.innerWidth < MOBILE_MAX_WIDTH) return;
-        this.openLightbox(img);
-      });
-    });
-  }
-
   // guarded by an instance property AND a per-card marker together (like
   // initBurnText/initReveals elsewhere in this file) so repeated calls
   // (see componentDidMount, which wraps this in AL.selfHeal) skip cards
@@ -613,7 +514,6 @@ class Component extends DCLogic {
     AL.selfHeal(() => this.initBehanceTooltip(), 5000);
     AL.selfHeal(() => this.initFriendHoverSound(), 5000);
     AL.selfHeal(() => this.initContactSend(), 5000);
-    AL.selfHeal(() => this.initImageLightbox(), 5000);
     // wrapped like initPhotoStack above (not called once): these two also
     // touch nodes inside the same rebuildable <main>, and calling them
     // once left the hero/story/photo-trio images with no scroll-reveal or
