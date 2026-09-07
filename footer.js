@@ -94,8 +94,17 @@
     ctx.font = fontWeight + ' ' + fontSizePx + 'px ' + fontFamily;
     return ctx.measureText(text).width;
   }
+  // the wordmark sits inside its own clipping stage (data-wordmark-stage)
+  // pushed down by this fraction of its own font-size, so the stage's
+  // overflow:hidden bottom edge slices through the letterforms instead of
+  // sitting below them — the name reads as caught mid-exit rather than
+  // laid out in full. 0.55 leaves just over half the glyph height above
+  // the crop, enough to still read as "ayubleon" at a glance
+  var WORDMARK_VISIBLE_RATIO = 0.55;
+
   function sizeWordmark(el) {
-    var container = el.parentElement;
+    var stage = el.parentElement;
+    var container = stage && stage.parentElement;
     if (!container) return;
     var baseline = 200;
     // weight is part of the measurement since Poppins' bolder cuts run
@@ -104,7 +113,10 @@
     var natural = measureTextWidth(el.textContent, baseline, 'Poppins, Helvetica, sans-serif', '600');
     if (!natural) return;
     var target = container.getBoundingClientRect().width * 0.8;
-    el.style.fontSize = (baseline * (target / natural)) + 'px';
+    var fontSizePx = baseline * (target / natural);
+    el.style.fontSize = fontSizePx + 'px';
+    el.style.bottom = (-(1 - WORDMARK_VISIBLE_RATIO) * fontSizePx) + 'px';
+    stage.style.height = (WORDMARK_VISIBLE_RATIO * fontSizePx) + 'px';
     el.style.opacity = '1';
   }
 
@@ -238,8 +250,10 @@
               footerKeyboardHTML(links) +
             '</div>' +
           '</div>' +
-          '<p data-wordmark style="margin:56px 0 0;text-align:center;opacity:0;white-space:nowrap;font-family:Poppins,Helvetica,sans-serif;font-weight:700;line-height:1;color:rgba(244,238,235,0.12);">ayubleon</p>' +
-          '<p style="margin:40px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size: 0.651rem;line-height:1.6;color:rgba(244,238,235,0.3);">©2026<br>Designed in Figma, Built with Claude</p>' +
+          '<div data-wordmark-stage style="position:relative;margin:56px 0 0;overflow:hidden;">' +
+            '<p data-wordmark style="margin:0;position:absolute;left:50%;bottom:0;transform:translateX(-50%);text-align:center;opacity:0;white-space:nowrap;font-family:Poppins,Helvetica,sans-serif;font-weight:700;line-height:1;color:rgba(244,238,235,0.12);">ayubleon</p>' +
+          '</div>' +
+          '<p style="margin:40px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size: 0.651rem;line-height:1.6;color:rgba(244,238,235,0.2);">©2026<br>Designed in Figma, Built with Claude</p>' +
         '</div>' +
       '</footer>' +
       '<span data-figma-tooltip aria-hidden="true" style="' + CURSOR_TOOLTIP_CSS + '">Website breakdown</span>' +

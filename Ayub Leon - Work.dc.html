@@ -166,7 +166,21 @@
 class Component extends DCLogic {
   renderVals() { return {}; }
 
-  componentDidMount() {}
+  componentDidMount() {
+    // same hover sound the nav dock's own links use (AL.playSwitch,
+    // switch.mp3) — gated to real hover support and a genuine mousemove
+    // since load, matching nav.js's playSwitchOnRealHover, so touch taps
+    // and any phantom mouseenter on load never double up with it
+    var supportsHover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (!supportsHover) return;
+    var mouseHasMoved = false;
+    window.addEventListener('mousemove', function () { mouseHasMoved = true; }, { once: true, passive: true });
+    document.querySelectorAll('.al-index-card').forEach(function (card) {
+      card.addEventListener('mouseenter', function () {
+        if (mouseHasMoved) AL.playSwitch();
+      });
+    });
+  }
   componentWillUnmount() {}
 }
 
