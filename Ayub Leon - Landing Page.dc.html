@@ -2,12 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ayub Leon | Product Designer</title>
 <meta name="description" content="Portfolio of Ayub Leon, a product designer with 4+ years of experience building TikTok Shop platforms, Crash betting games, Banking apps, and Design systems">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="alternate icon" href="favicon.png">
 <meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <meta property="og:title" content="Ayub Leon | Product Designer">
 <meta property="og:description" content="Portfolio of Ayub Leon, a product designer with 4+ years of experience building TikTok Shop platforms, Crash betting games, Banking apps, and Design systems">
 <meta property="og:type" content="website">
@@ -97,7 +99,7 @@
 <div data-settle-veil aria-hidden="true"></div>
 <x-dc>
 <helmet>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=Instrument+Serif:ital@0;1&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
@@ -1460,13 +1462,22 @@ class Component extends DCLogic {
     if (flashWord) {
       flashWord.getAnimations().forEach((a) => a.cancel());
       const baseColor = getComputedStyle(flashWord).color;
+      // textShadow isn't a compositor property, so the browser has to
+      // repaint this element on every frame the animation is actually
+      // running — riding it along the wrap animation's full 2800ms (as a
+      // flat no-op color/shadow for most of that span, just to land the
+      // pulse at the right offset) meant paying that repaint cost for the
+      // whole 2800ms window on mobile, right as the cards above are also
+      // transforming. A separate, short animation delayed to start where
+      // the pulse used to begin (and lasting only as long as the pulse
+      // itself, offsets .65-.86 of 2800ms) gets the identical visual
+      // timing while only forcing repaint for the ~588ms the flash is
+      // actually visible
       flashWord.animate([
         { color: baseColor, textShadow: '0 0 0 rgba(239,68,24,0)', offset: 0 },
-        { color: baseColor, textShadow: '0 0 0 rgba(239,68,24,0)', offset: 0.65 },
-        { color: '#EF4418', textShadow: '0 0 14px rgba(239,68,24,0.85)', offset: 0.72 },
-        { color: baseColor, textShadow: '0 0 0 rgba(239,68,24,0)', offset: 0.86 },
+        { color: '#EF4418', textShadow: '0 0 14px rgba(239,68,24,0.85)', offset: 0.333 },
         { color: baseColor, textShadow: '0 0 0 rgba(239,68,24,0)', offset: 1 }
-      ], { duration: DURATION, fill: 'forwards' });
+      ], { duration: 588, delay: 1820, fill: 'forwards' });
     }
 
   }
