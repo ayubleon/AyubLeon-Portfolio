@@ -7,21 +7,65 @@
     // can actually hover it
     "[data-lightbox]{cursor:zoom-in;}",
     ".al-lightbox{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:40px;opacity:0;pointer-events:none;transition:opacity .3s ease;}",
+    // the image is centered in whatever space this padding leaves, so
+    // reserving extra room at the bottom (rather than just relying on the
+    // image's own max-height below) is what actually guarantees a real,
+    // comfortable gap above the now fixed-position filmstrip row instead
+    // of the two only sometimes ending up close together depending on the
+    // current image's own height. 128px = the filmstrip row's own ~56px
+    // height, plus the 40px it sits above the viewport's bottom edge,
+    // plus a further 32px of breathing room above that
+    ".al-lightbox.has-filmstrip{padding-bottom:128px;}",
     ".al-lightbox.is-open{opacity:1;pointer-events:auto;}",
-    ".al-lightbox-backdrop{position:absolute;inset:0;background:rgba(10,6,6,0.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}",
-    ".al-lightbox-stage{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:20px;max-width:min(88vw,1400px);}",
-    ".al-lightbox-imgwrap{display:flex;align-items:center;justify-content:center;max-width:100%;}",
-    // the reserved 88px below (only subtracted once a filmstrip is
-    // actually showing — see .has-filmstrip) is the filmstrip's own
-    // 48px thumb height plus its 4px*2 padding and this stage's 20px
-    // gap, so the two together never exceed the 88vh budget
+    ".al-lightbox-backdrop{position:absolute;inset:0;background:rgba(10,6,6,0.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}",
+    // a row rather than a column — when the navigator is showing (see
+    // below), it's a flex sibling of the imgwrap right here, so centering
+    // this row centers the image+navigator pair as a single unit. A
+    // version that instead computed the navigator's own fixed screen
+    // position from the image's box left the pair off-center as a whole
+    // (the image landed dead-center same as always, but the navigator
+    // then had to extend further right of that, with nothing making room
+    // for it — it just ran past the image's own share of screen width,
+    // reading as the whole thing pushed off toward the right edge).
+    // Letting flexbox center them together, with the image's own zoomed
+    // width shrunk to leave the navigator real room (see .is-zoomed
+    // below), is what actually keeps the pair centered as a whole
+    ".al-lightbox-stage{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:20px;max-width:min(88vw,1400px);}",
+    // overflow:hidden is load-bearing once zoom is in play — the plain,
+    // unzoomed image never exceeds this box (it's already sized to fit
+    // via max-width/max-height + object-fit:contain), but a zoomed image
+    // is deliberately scaled past it, and without this the scaled content
+    // just renders past the wrap's own edges in every direction instead
+    // of being cropped to the reserved viewing area it's meant to stay
+    // inside — which is exactly what "not cropped, spilling past the
+    // screen's own top/bottom" looks like
+    ".al-lightbox-imgwrap{display:flex;align-items:center;justify-content:center;max-width:100%;overflow:hidden;}",
     ".al-lightbox-img{max-width:min(88vw,1400px);max-height:88vh;width:auto;height:auto;display:block;object-fit:contain;border-radius:12px;box-shadow:0 40px 100px -30px rgba(0,0,0,0.7);transform:scale(0.96);transition:transform .35s cubic-bezier(.22,1,.36,1);}",
-    ".al-lightbox.has-filmstrip .al-lightbox-img{max-height:calc(88vh - 88px);}",
+    // matches the padding-bottom override above exactly (100vh minus the
+    // 40px top padding minus the 128px bottom padding) rather than the
+    // rougher 88vh-based guess this used before that decoupling the
+    // filmstrip from the image's own layout made inexact — without this,
+    // an image tall enough to want the full 88vh could still overflow
+    // into the padding this reserves for the filmstrip
+    ".al-lightbox.has-filmstrip .al-lightbox-img{max-height:calc(100vh - 168px);}",
     ".al-lightbox.is-open .al-lightbox-img{transform:scale(1);}",
-    // only rendered/shown when a case study has more than one lightbox
+    // pinned to a fixed spot on screen rather than flowing directly under
+    // the image inside the stage — different images in the same gallery
+    // vary in height, and stacking the strip right after the image meant
+    // the whole row (prev/next buttons included) shifted up or down every
+    // time the image changed, forcing the cursor to chase the next button
+    // to a new position on every click. Anchored to the overlay itself
+    // (position:fixed, covers the whole viewport) rather than the stage,
+    // so this stays exactly where it is no matter what the image does.
+    // Only rendered/shown when a case study has more than one lightbox
     // image on the page (see renderFilmstrip) — a single-image gallery
-    // never gets an empty row of controls taking up space under it
-    ".al-lightbox-filmstrip-row{display:none;align-items:center;gap:10px;max-width:100%;}",
+    // never gets an empty row of controls taking up space at the bottom
+    // width left to shrink-wrap its own content (prev button + thumbnails
+    // + next button) rather than stretching to max-width — a `width:100%`
+    // here let the filmstrip's own flex:1 (below) expand to fill all that
+    // extra space, dragging the next button out to the row's far right
+    // edge instead of sitting right next to the last thumbnail
+    ".al-lightbox-filmstrip-row{display:none;position:absolute;left:50%;bottom:40px;transform:translateX(-50%);z-index:2;align-items:center;gap:10px;max-width:min(88vw,1400px);}",
     ".al-lightbox.has-filmstrip .al-lightbox-filmstrip-row{display:flex;}",
     // min-width:0 is load-bearing here — without it a flex child with
     // overflow-x:auto refuses to shrink below its content width, which
@@ -59,6 +103,56 @@
     ".al-lightbox-close:hover .al-lightbox-close-stroke:first-child{transform:rotate(90deg);}",
     ".al-lightbox-close:hover .al-lightbox-close-stroke:last-child{transform:rotate(-90deg);}",
     "@media (max-width:700px){.al-lightbox{display:none;}}",
+    // zoom, scoped per-image via data-lightbox-zoom (see gallery's own
+    // `zoomable` flag in openGalleryFor) — most gallery images just open
+    // at fit-to-screen size, but a couple of dense dashboard screenshots
+    // also support clicking to zoom to full resolution and panning
+    // through them. Zoomed gets its own, more generous margins than plain
+    // browsing does (see enterZoom/exitZoom toggling is-zoom-active) — a
+    // real comfortable gap above the filmstrip and below the viewport's
+    // top edge, not just enough to avoid the two ever touching
+    ".al-lightbox.is-zoom-active{padding-top:64px;}",
+    ".al-lightbox.is-zoom-active.has-filmstrip{padding-bottom:160px;}",
+    ".al-lightbox.is-zoom-active .al-lightbox-stage{gap:40px;}",
+    // the wrap claims the full width that leaves (minus room for the
+    // navigator beside it, 182px — its own 140px image, ~2px border, and
+    // the stage's 40px gap above, rounded up) rather than staying pinned
+    // to whatever footprint the image happened to render at pre-zoom —
+    // enterZoom's own comment covers why. Height matches the padding
+    // above exactly: 100vh minus the 64px top and 160px bottom margins
+    ".al-lightbox-imgwrap.is-zoomable{cursor:zoom-in;}",
+    // flush to the top-left corner rather than the base rule's centering
+    // — enterZoom's whole translateY/scale math assumes the image's own
+    // un-transformed top-left sits exactly at the wrap's own (0,0).
+    // Centered (the default), a narrower-than-wrap image starts partway
+    // in from the left; scaling it up from THAT position pushed its right
+    // edge out past the wrap's own right edge by the same amount the left
+    // side was originally inset — overflow:hidden then clipped that
+    // overflow, cropping the image's right side rather than showing it
+    // in full
+    ".al-lightbox-imgwrap.is-zoomed{cursor:grab;width:calc(min(88vw,1400px) - 182px);height:calc(100vh - 224px);justify-content:flex-start;align-items:flex-start;}",
+    ".al-lightbox-imgwrap.is-panning{cursor:grabbing;}",
+    ".al-lightbox-imgwrap.is-panning .al-lightbox-img{transition:none;}",
+    // square corners while zoomed — the rounding reads as an odd inset
+    // frame once the image is filling the reserved viewing area edge to
+    // edge rather than sitting smaller within visible page padding
+    ".al-lightbox-imgwrap.is-zoomed .al-lightbox-img{border-radius:0;}",
+    // a flex sibling of the imgwrap in the stage (see the stage comment
+    // above) rather than independently positioned — display:none when
+    // not showing so it takes up no row space at all the rest of the
+    // time, which matters even for non-zoomable images sharing this same
+    // stage: if this took up space whether visible or not, every image's
+    // own centering would shift to make room for an invisible navigator
+    // it'll never actually use
+    ".al-lightbox-navigator{display:none;position:relative;z-index:2;border-radius:10px;overflow:hidden;box-shadow:0 16px 34px -16px rgba(0,0,0,0.7);border:1px solid var(--al-border,rgba(255,255,255,0.13));background:var(--al-card,#1C1C1E);opacity:0;transition:opacity .25s ease;}",
+    ".al-lightbox-navigator.is-visible{display:block;opacity:1;}",
+    ".al-lightbox-navigator img{display:block;width:140px;height:auto;user-select:none;-webkit-user-drag:none;}",
+    // full width always, no horizontal drag — see updateNavBox. Left/right
+    // arrow keys stay reserved for stepping between images (step()); up/
+    // down move this box instead, which only ever needs to move
+    // vertically since it always spans the navigator's own full width
+    ".al-lightbox-navbox{position:absolute;left:0;width:100%;border:2px solid #ffd60a;background:rgba(255,214,10,0.14);cursor:grab;box-sizing:border-box;}",
+    ".al-lightbox-navbox.is-dragging{cursor:grabbing;}",
     // acts like a toast morphing out of the popup's own close button
     // rather than a bar laid over the image — it never actually travels
     // down to the image at all (an earlier version did, and sliding a
@@ -124,26 +218,129 @@
 
   var overlay = null;
   var imgEl = null;
+  var imgWrapEl = null;
   var filmstripEl = null;
   var closeBtn = null;
   var backdrop = null;
+  var navigatorEl = null;
+  var navImgEl = null;
+  var navBoxEl = null;
   var gallery = [];
   var currentIndex = 0;
   var lastFocused = null;
 
+  // zoom state — always reset by exitZoom whenever the gallery moves to a
+  // different image (see show()), so none of this persists across images
+  var zoomActive = false;
+  var zoomRatio = 1;
+  var panY = 0;
+  var zoomImgRect = null;
+  var zoomWrapRect = null;
+  var zoomDragging = false;
+
   function close() {
+    exitZoom();
     overlay.classList.remove('is-open');
     overlay.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
     if (lastFocused && lastFocused.focus) lastFocused.focus();
   }
 
+  function clampZoomPan() {
+    var scaledH = zoomImgRect.height * zoomRatio;
+    var minY = Math.min(0, zoomWrapRect.height - scaledH);
+    panY = Math.max(minY, Math.min(0, panY));
+  }
+
+  // the yellow box only ever needs a vertical position/height — it always
+  // spans the navigator's full width by design (see the CSS), since
+  // zoomRatio itself is chosen so the image's scaled width exactly fills
+  // the wrap with nothing left over on either side (see enterZoom)
+  function updateNavBox() {
+    if (!zoomActive) return;
+    var scaledH = zoomImgRect.height * zoomRatio;
+    var visFracY = zoomWrapRect.height / scaledH;
+    var offsetFracY = -panY / scaledH;
+    var navH = navImgEl.getBoundingClientRect().height;
+    navBoxEl.style.top = (offsetFracY * navH) + 'px';
+    navBoxEl.style.height = (visFracY * navH) + 'px';
+  }
+
+  function applyZoomTransform() {
+    imgEl.style.transform = 'translateY(' + panY + 'px) scale(' + zoomRatio + ')';
+    updateNavBox();
+  }
+
+  // a single discrete step, e.g. from an arrow key — reuses is-panning's
+  // transition:none (see the CSS and the navBoxEl drag handler) for the
+  // same reason a drag needs it: without it, this step would animate over
+  // the image's own open/close pop-in transition instead of moving
+  // instantly, reading as a sluggish delay rather than a direct nudge.
+  // Removed on the next frame rather than the same tick, since a class
+  // removed before the browser has actually resolved styles with it
+  // applied doesn't reliably suppress the transition
+  function panZoomBy(deltaY) {
+    imgWrapEl.classList.add('is-panning');
+    panY += deltaY;
+    clampZoomPan();
+    applyZoomTransform();
+    requestAnimationFrame(function () { imgWrapEl.classList.remove('is-panning'); });
+  }
+
+  function enterZoom() {
+    // adds the zoomed view's own more generous margins (see the CSS
+    // comment on .is-zoom-active) and switches the wrap to flush
+    // top-left alignment (see .is-zoomed) before anything is measured —
+    // both the image's on-screen position and the wrap's own size change
+    // once these go on, so measuring either before this point would
+    // capture stale, pre-zoom geometry
+    overlay.classList.add('is-zoom-active');
+    imgWrapEl.classList.add('is-zoomed');
+    void imgWrapEl.offsetWidth; // commit the changes above before measuring them next
+    zoomImgRect = imgEl.getBoundingClientRect();
+    zoomWrapRect = imgWrapEl.getBoundingClientRect();
+    // fit-width, not native resolution — scales the image up just enough
+    // to exactly fill the zoomed wrap's own width, with nothing left over
+    // on either side. That's what guarantees the box on the navigator
+    // always spans edge to edge and moving through the image is a purely
+    // vertical motion, leaving the left/right arrow keys free to mean
+    // "next/previous image" instead of horizontal pan
+    zoomRatio = Math.max(1, zoomWrapRect.width / zoomImgRect.width);
+    // always starts at the very top of the image, regardless of where it
+    // was clicked to get here — a version that instead centered the zoom
+    // on the click point could look like it was "remembering" a previous
+    // scroll position whenever a click happened to land in a similar
+    // spot, when it was really just coincidence. Always landing at the
+    // top makes every zoom-in predictable: it never depends on anything
+    // from a previous visit to this image, panned or not
+    panY = 0;
+    zoomActive = true;
+    clampZoomPan();
+    imgEl.style.transformOrigin = '0 0';
+    navImgEl.src = imgEl.src;
+    navigatorEl.classList.add('is-visible');
+    applyZoomTransform();
+  }
+
+  function exitZoom() {
+    if (!zoomActive) return;
+    zoomActive = false;
+    panY = 0;
+    overlay.classList.remove('is-zoom-active');
+    imgWrapEl.classList.remove('is-zoomed', 'is-panning');
+    navigatorEl.classList.remove('is-visible');
+    imgEl.style.transform = '';
+    imgEl.style.transformOrigin = '';
+  }
+
   function show(index) {
+    exitZoom();
     currentIndex = index;
     var item = gallery[index];
     if (!item) return;
     imgEl.src = item.src;
     imgEl.alt = item.alt || '';
+    imgWrapEl.classList.toggle('is-zoomable', !!item.zoomable);
     Array.prototype.forEach.call(filmstripEl.children, function (thumb, i) {
       thumb.classList.toggle('is-active', i === index);
     });
@@ -189,20 +386,28 @@
     overlay.innerHTML =
       '<div class="al-lightbox-backdrop" data-lightbox-backdrop></div>' +
       '<div class="al-lightbox-stage">' +
-        '<div class="al-lightbox-imgwrap"><img class="al-lightbox-img" data-lightbox-img alt=""></div>' +
-        '<div class="al-lightbox-filmstrip-row">' +
-          '<button type="button" class="al-lightbox-filmstrip-nav" data-lightbox-prev aria-label="Previous image">' + PREV_SVG + '</button>' +
-          '<div class="al-lightbox-filmstrip" data-lightbox-filmstrip></div>' +
-          '<button type="button" class="al-lightbox-filmstrip-nav" data-lightbox-next aria-label="Next image">' + NEXT_SVG + '</button>' +
+        '<div class="al-lightbox-imgwrap" data-lightbox-imgwrap><img class="al-lightbox-img" data-lightbox-img alt=""></div>' +
+        '<div class="al-lightbox-navigator" data-lightbox-navigator>' +
+          '<img data-lightbox-navimg alt="">' +
+          '<div class="al-lightbox-navbox" data-lightbox-navbox></div>' +
         '</div>' +
+      '</div>' +
+      '<div class="al-lightbox-filmstrip-row">' +
+        '<button type="button" class="al-lightbox-filmstrip-nav" data-lightbox-prev aria-label="Previous image">' + PREV_SVG + '</button>' +
+        '<div class="al-lightbox-filmstrip" data-lightbox-filmstrip></div>' +
+        '<button type="button" class="al-lightbox-filmstrip-nav" data-lightbox-next aria-label="Next image">' + NEXT_SVG + '</button>' +
       '</div>' +
       '<button type="button" class="al-lightbox-close" data-lightbox-close aria-label="Close">' + CLOSE_SVG + '</button>';
     document.body.appendChild(overlay);
 
     backdrop = overlay.querySelector('[data-lightbox-backdrop]');
     imgEl = overlay.querySelector('[data-lightbox-img]');
+    imgWrapEl = overlay.querySelector('[data-lightbox-imgwrap]');
     filmstripEl = overlay.querySelector('[data-lightbox-filmstrip]');
     closeBtn = overlay.querySelector('[data-lightbox-close]');
+    navigatorEl = overlay.querySelector('[data-lightbox-navigator]');
+    navImgEl = overlay.querySelector('[data-lightbox-navimg]');
+    navBoxEl = overlay.querySelector('[data-lightbox-navbox]');
     var prevBtn = overlay.querySelector('[data-lightbox-prev]');
     var nextBtn = overlay.querySelector('[data-lightbox-next]');
 
@@ -211,19 +416,98 @@
     prevBtn.addEventListener('click', function () { step(-1); });
     nextBtn.addEventListener('click', function () { step(1); });
 
+    // click toggles zoom, but only for an image tagged data-lightbox-zoom
+    // (see gallery's own `zoomable` flag) — everything else in the
+    // gallery just opens at its regular fit-to-screen size, with no
+    // click behavior of its own on the image itself
+    imgWrapEl.addEventListener('click', function () {
+      if (zoomDragging) return; // a real drag shouldn't also toggle zoom on release
+      var item = gallery[currentIndex];
+      if (!item || !item.zoomable) return;
+      if (!zoomActive) enterZoom();
+      else exitZoom();
+    });
+    imgWrapEl.addEventListener('mousedown', function (e) {
+      if (!zoomActive) return;
+      zoomDragging = false;
+      var dragStartY = e.clientY;
+      var dragStartPanY = panY;
+      function onMove(e2) {
+        var dy = e2.clientY - dragStartY;
+        if (Math.abs(dy) > 3) { zoomDragging = true; imgWrapEl.classList.add('is-panning'); }
+        panY = dragStartPanY + dy;
+        clampZoomPan();
+        applyZoomTransform();
+      }
+      function onUp() {
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', onUp);
+        imgWrapEl.classList.remove('is-panning');
+        setTimeout(function () { zoomDragging = false; }, 0);
+      }
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
+    });
+    // dragging the yellow box pans the big view — moving the box down on
+    // the thumbnail should reveal content further down in the zoomed
+    // view, which means panning the actual image up, the inverse of the
+    // box's own movement
+    navBoxEl.addEventListener('mousedown', function (e) {
+      e.stopPropagation();
+      var startY = e.clientY;
+      var startPanY = panY;
+      var navH = navImgEl.getBoundingClientRect().height;
+      var scaledH = zoomImgRect.height * zoomRatio;
+      navBoxEl.classList.add('is-dragging');
+      // reuses is-panning's own transition:none (see the CSS) — without
+      // it, this fights the image's open/close pop-in transition on the
+      // same transform property, and every drag update ends up chasing a
+      // constantly-moving 350ms animation target instead of tracking the
+      // cursor directly, reading as laggy and mushy rather than responsive
+      imgWrapEl.classList.add('is-panning');
+      function onMove(e2) {
+        var dy = e2.clientY - startY;
+        panY = startPanY - dy * (scaledH / navH);
+        clampZoomPan();
+        applyZoomTransform();
+      }
+      function onUp() {
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', onUp);
+        navBoxEl.classList.remove('is-dragging');
+        imgWrapEl.classList.remove('is-panning');
+      }
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
+    });
+
     // one persistent listener rather than adding/removing per open — it's
     // a no-op whenever the overlay isn't actually open
+    var ZOOM_PAN_STEP = 60;
     document.addEventListener('keydown', function (e) {
       if (!overlay.classList.contains('is-open')) return;
-      if (e.key === 'Escape') { close(); return; }
+      if (e.key === 'Escape') { if (zoomActive) exitZoom(); else close(); return; }
       if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); return; }
       if (e.key === 'ArrowRight') { e.preventDefault(); step(1); return; }
+      // reserved for moving the yellow box while zoomed, rather than the
+      // page or anything else reacting to them — left/right above already
+      // means "next/previous image" regardless of zoom state, so up/down
+      // is what's left for panning through the currently zoomed one
+      if (!zoomActive) return;
+      if (e.key === 'ArrowUp') { e.preventDefault(); panZoomBy(ZOOM_PAN_STEP); return; }
+      if (e.key === 'ArrowDown') { e.preventDefault(); panZoomBy(-ZOOM_PAN_STEP); return; }
     });
     // resizing down to mobile mid-view would otherwise leave the page
     // scroll-locked forever — the CSS hides the overlay itself at this
     // width already, this just releases the scroll lock along with it
     window.addEventListener('resize', function () {
-      if (overlay.classList.contains('is-open') && window.innerWidth < MOBILE_MAX_WIDTH) close();
+      if (overlay.classList.contains('is-open') && window.innerWidth < MOBILE_MAX_WIDTH) { close(); return; }
+      // zoomImgRect/zoomWrapRect were measured once, at zoom-in time —
+      // a resize invalidates both, and there's nothing worth trying to
+      // preserve across a resize the visitor didn't do to navigate the
+      // image, so this just drops back to the plain fit-to-screen view
+      // rather than panning/clamping against now-stale geometry
+      exitZoom();
     });
   }
 
@@ -462,7 +746,7 @@
     ensureOverlay();
     var scopeRoot = img.closest('[data-pv-inner]') || img.closest('main') || document;
     var imgs = Array.prototype.slice.call(scopeRoot.querySelectorAll('[data-lightbox]'));
-    gallery = imgs.map(function (el) { return { src: el.currentSrc || el.src, alt: el.alt || '' }; });
+    gallery = imgs.map(function (el) { return { src: el.currentSrc || el.src, alt: el.alt || '', zoomable: el.hasAttribute('data-lightbox-zoom') }; });
     var index = imgs.indexOf(img);
     lastFocused = img;
     renderFilmstrip();
