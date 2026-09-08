@@ -59,26 +59,54 @@
     ".al-lightbox-close:hover .al-lightbox-close-stroke:first-child{transform:rotate(90deg);}",
     ".al-lightbox-close:hover .al-lightbox-close-stroke:last-child{transform:rotate(-90deg);}",
     "@media (max-width:700px){.al-lightbox{display:none;}}",
-    // anchored to the first clickable image itself (see maybeScheduleHint
-    // below) rather than a corner of the screen — a disconnected toast
-    // was easy to miss entirely, since nobody's looking at the bottom of
-    // the screen the instant a page loads. This sits right where the
-    // visitor's eyes already are
-    ".al-lightbox-hint{position:fixed;z-index:250;transform:translate(-50%,8px);opacity:0;pointer-events:none;transition:opacity .35s ease,transform .35s cubic-bezier(.22,1,.36,1);}",
-    ".al-lightbox-hint.is-visible{opacity:1;transform:translate(-50%,0);}",
-    ".al-lightbox-hint.arrow-up{transform:translate(-50%,-8px);}",
-    ".al-lightbox-hint.arrow-up.is-visible{transform:translate(-50%,0);}",
-    ".al-lightbox-hint-pill{position:relative;display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:var(--al-card,#1C1C1E);color:#f4eeeb;font-family:'Schibsted Grotesk',Helvetica,sans-serif;font-size: 0.8125rem;letter-spacing:-0.005em;white-space:nowrap;box-shadow:0 16px 34px -16px rgba(0,0,0,0.7);}",
-    // default: hint sits above the image, arrow at the pill's own bottom
-    // edge pointing down at it
-    ".al-lightbox-hint-pill::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--al-card,#1C1C1E);}",
-    // too close to the top of the viewport for that — hint sits below the
-    // image instead, so the arrow flips to the pill's top edge pointing up
-    ".al-lightbox-hint.arrow-up .al-lightbox-hint-pill::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:var(--al-card,#1C1C1E);}"
+    // acts like a toast morphing out of the popup's own close button
+    // rather than a bar laid over the image — it never actually travels
+    // down to the image at all (an earlier version did, and sliding a
+    // shape diagonally down across the photo on the way there just looked
+    // like it was dragging over the content). Anchored via `right`/`top`
+    // rather than `left` so it can grow leftward, out from under the
+    // button, while that anchor edge itself never moves — the button
+    // stays exactly where it is the whole time, this just reveals and
+    // retracts from it.
+    //
+    // Its real width is measured once (see maybeScheduleHint) and never
+    // changes again — the grow/shrink is done entirely with clip-path,
+    // not by animating width itself. width (and padding, which used to
+    // animate alongside it) are layout properties: changing either forces
+    // the browser to recompute the page's layout on every single frame,
+    // which is exactly what was reading as jagged rather than smooth.
+    // clip-path only affects what's painted, never triggers layout, so
+    // the same reveal reads as genuinely smooth.
+    //
+    // clip-path itself isn't left to a CSS transition here — animateHintShape
+    // below drives it frame-by-frame instead, because the corner rounding
+    // needs to shrink in direct proportion to how much is revealed at
+    // every instant (round = revealed-width/2, easing toward 0 as it
+    // finishes) rather than as a separate step once the reveal is done.
+    // Two independent CSS transitions (reveal, then a delayed border-radius)
+    // read as two separate motions glued together; a single JS-driven
+    // value where the corner IS a function of the current reveal width
+    // is what actually reads as one continuous, unforced-looking motion
+    ".al-lightbox-hint{box-sizing:border-box;position:fixed;z-index:250;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 10px 10px 16px;background:#0A84FF;color:#fff;font-family:'Schibsted Grotesk',Helvetica,sans-serif;font-size: 0.8125rem;letter-spacing:-0.005em;box-shadow:0 16px 34px -16px rgba(0,0,0,0.4);opacity:0;pointer-events:none;transition:opacity .3s ease;}",
+    ".al-lightbox-hint.is-visible{opacity:1;pointer-events:auto;}",
+    ".al-lightbox-hint-text{white-space:nowrap;}",
+    ".al-lightbox-hint-text,.al-lightbox-hint-close{transition:opacity .16s ease;}",
+    // a manual close rather than relying only on the timeout/scroll/click
+    // dismissal in maybeScheduleHint — that auto-dismiss is a judgment
+    // call about when the visitor's likely done reading it, and this is
+    // the guaranteed way out if that judgment call is wrong for them
+    ".al-lightbox-hint-close{flex:0 0 auto;width:22px;height:22px;border:0;border-radius:50%;background:rgba(255,255,255,0.14);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s ease;}",
+    ".al-lightbox-hint-close:hover{background:rgba(255,255,255,0.26);}",
+    ".al-lightbox-hint-close:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(255,255,255,0.5);}"
   ].join('');
   var styleTag = document.createElement('style');
   styleTag.textContent = CSS;
   document.head.appendChild(styleTag);
+
+  var HINT_CLOSE_SVG = '<svg width="10" height="10" viewBox="0 0 14 14" fill="none">' +
+    '<path d="M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
+    '<path d="M1 1L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
+  '</svg>';
 
   var CLOSE_SVG = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none">' +
     '<path class="al-lightbox-close-stroke" d="M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
@@ -201,64 +229,123 @@
 
   // click-to-enlarge isn't a pattern visitors expect by default on a
   // portfolio site, so the cursor:zoom-in hover cue alone is easy to miss
-  // entirely. This surfaces it once, the very first time this browser
-  // ever sees a lightbox image, then never again — localStorage rather
-  // than sessionStorage, since the point is teaching the pattern once for
-  // good, not re-reminding on every return visit.
+  // entirely. Shown fresh on every page load that has a lightbox image
+  // (not just the visitor's first ever visit) — hintDone below only stops
+  // it from firing more than once per page view, e.g. after the visitor
+  // has already opened the gallery or dismissed it
   //
   // First version of this used the site's shared bottom-of-screen toast —
-  // technically fired correctly (verified via the localStorage flag
-  // flipping), but a disconnected pill next to the nav dock is exactly
-  // where nobody is looking the instant a page loads, and it was gone in
-  // 3.2s. This anchors directly to the first clickable image itself, so
-  // it sits right where the visitor's eyes already are
-  var HINT_KEY = 'al-lightbox-hint-seen';
+  // technically fired correctly, but a disconnected pill next to the nav
+  // dock is exactly where nobody is looking the instant a page loads, and
+  // it was gone in 3.2s. A version after that anchored a bar directly over
+  // the first clickable image instead, but that meant recomputing its
+  // position against a moving target (the image scrolls, the popup's
+  // slide-transitions resize things) and a wrong measurement there just
+  // showed the bar floating over nothing in particular. This instead lives
+  // as a toast morphing out of the popup's own close button — a fixed
+  // point that isn't going anywhere — timed to when a lightbox image
+  // actually scrolls into view, with its own close button rather than
+  // relying only on the timeout/scroll/click dismissal below to clear it
   var hintTimer = null;
   var hintDone = false;
   var hintEl = null;
-  function hintAlreadySeen() {
-    try { return localStorage.getItem(HINT_KEY) === '1'; } catch (e) { return false; }
+  var hintAnimFrame = null;
+  // the anchor button's actual size at the moment the hint appeared, and
+  // the bar's own full natural width (text + button + padding) measured
+  // the same moment — hideHint reveals/hides between these two rather
+  // than re-measuring either, since by the time it's dismissed the popup
+  // could plausibly be mid slide-transition or gone altogether
+  var hintCollapsedSize = 36;
+  var hintFullWidth = 0;
+  function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+  // drives the whole reveal/hide as one continuous value rather than two
+  // separate CSS transitions (a plain reveal, then a delayed border-radius
+  // change) — those read as two glued-together motions even once each was
+  // individually smooth. Here the corner radius is calculated as a direct
+  // function of how much is currently revealed (roughly revealedWidth/2,
+  // eased toward 0 as the motion finishes rather than lingering at a full
+  // pill until the reveal is done) — since it's derived from the actual
+  // revealed width at every frame instead of animating on its own
+  // schedule, it can never end up rounder than that width would allow,
+  // so there's nothing to visibly snap once the true shape catches up to
+  // the declared radius. `growing` true reveals collapsed->full and eases
+  // the roundness out from full to 0; false runs the same motion in
+  // reverse for hideHint
+  function animateHintShape(el, growing, durationMs, onDone) {
+    cancelAnimationFrame(hintAnimFrame);
+    var from = growing ? hintCollapsedSize : hintFullWidth;
+    var to = growing ? hintFullWidth : hintCollapsedSize;
+    var start = null;
+    function frame(ts) {
+      if (start === null) start = ts;
+      var raw = Math.min((ts - start) / durationMs, 1);
+      var eased = easeOutCubic(raw);
+      var revealed = from + (to - from) * eased;
+      // 1 at the collapsed circle end of this motion, 0 at the full-bar
+      // end, regardless of which direction is playing
+      var roundness = growing ? (1 - eased) : eased;
+      var hidden = Math.max(hintFullWidth - revealed, 0);
+      el.style.clipPath = 'inset(0 0 0 ' + hidden + 'px round ' + (revealed / 2 * roundness) + 'px)';
+      if (raw < 1) {
+        hintAnimFrame = requestAnimationFrame(frame);
+      } else if (onDone) {
+        onDone();
+      }
+    }
+    hintAnimFrame = requestAnimationFrame(frame);
   }
   function ensureHintEl() {
     if (hintEl) return hintEl;
     var el = document.createElement('div');
     el.className = 'al-lightbox-hint';
     el.setAttribute('aria-hidden', 'true');
-    el.innerHTML = '<div class="al-lightbox-hint-pill">Click to view full size</div>';
+    el.innerHTML = '<span class="al-lightbox-hint-text">Click an image to view full size</span>' +
+      '<button type="button" class="al-lightbox-hint-close" aria-label="Dismiss">' + HINT_CLOSE_SVG + '</button>';
+    el.querySelector('.al-lightbox-hint-close').addEventListener('click', function (e) {
+      e.stopPropagation();
+      hideHint();
+    });
     document.body.appendChild(el);
     hintEl = el;
     return el;
   }
-  // dismissal only (fading it back out) — separate from markHintSeen
-  // below, which is about the "teach once, ever" bookkeeping and fires
-  // the moment the hint is shown, not only once it's gone again
+  // dismissal — separate from stopScheduling below, which is the "don't
+  // try to show this again this page view" bookkeeping and fires the
+  // moment the hint is shown, not only once it's gone again. Retracts back
+  // into the close button it grew out of rather than just fading out in
+  // place — is-visible only comes off once that shape change has actually
+  // finished, so the fade-out starts from the collapsed pill rather than
+  // cutting the retraction short
+  var HINT_HIDE_MS = 320;
   function hideHint() {
-    if (!hintEl) return;
-    hintEl.classList.remove('is-visible');
+    if (!hintEl || !hintEl.classList.contains('is-visible') || hintEl.classList.contains('is-collapsing')) return;
     window.removeEventListener('scroll', hideHint);
     document.removeEventListener('click', hideHint, true);
+    hintEl.classList.add('is-collapsing');
+    hintEl.querySelector('.al-lightbox-hint-text').style.opacity = '0';
+    hintEl.querySelector('.al-lightbox-hint-close').style.opacity = '0';
+    animateHintShape(hintEl, false, HINT_HIDE_MS, function () {
+      hintEl.classList.remove('is-visible', 'is-collapsing');
+    });
   }
-  function markHintSeen() {
+  function stopScheduling() {
     hintDone = true;
     clearTimeout(hintTimer);
-    try { localStorage.setItem(HINT_KEY, '1'); } catch (e) {}
   }
-  function positionHint(img) {
-    var el = ensureHintEl();
-    var rect = img.getBoundingClientRect();
-    el.style.left = (rect.left + rect.width / 2) + 'px';
-    if (rect.top > 60) {
-      // sits above the image, arrow pointing down at it
-      el.classList.remove('arrow-up');
-      el.style.top = 'auto';
-      el.style.bottom = (window.innerHeight - rect.top + 12) + 'px';
-    } else {
-      // too close to the top of the viewport for that — sits below the
-      // image instead, arrow flipped to point up at it
-      el.classList.add('arrow-up');
-      el.style.bottom = 'auto';
-      el.style.top = (rect.bottom + 12) + 'px';
+  // the fixed point this toast lives at for its whole life — the project
+  // popup's own close button when one is open (getBoundingClientRect
+  // gives viewport coordinates regardless of that button's own
+  // position:absolute), or a fixed top-right point matching the site's
+  // other floating close buttons' own convention (see .al-lightbox-close)
+  // for a standalone case-study page, which has no popup close button to
+  // anchor to at all
+  function hintAnchorRect() {
+    var closeBtn = document.querySelector('.al-pv-close');
+    if (closeBtn) {
+      var r = closeBtn.getBoundingClientRect();
+      if (r.width > 0) return { top: r.top, right: r.right, size: r.width };
     }
+    return { top: 24, right: window.innerWidth - 24, size: 44 };
   }
   // held back so it reads as a considered tip rather than firing the
   // instant an image scrolls into the DOM. Deliberately doesn't close
@@ -281,10 +368,15 @@
   // [data-lightbox] image belonging to a different (hidden or off-screen)
   // card instead of the one actually visible in the open popup, pointing
   // the hint at nothing the visitor could see
+  // requires the image's own top edge to be on screen, not just some
+  // fraction of the image somewhere — this is the "has the visitor
+  // actually scrolled to it yet" signal the toast waits for, even though
+  // the toast itself always appears anchored to the close button rather
+  // than the image (see hintAnchorRect)
   function isInViewport(el) {
     var r = el.getBoundingClientRect();
-    return r.width > 0 && r.height > 0 && r.top < window.innerHeight && r.bottom > 0 &&
-      r.left < window.innerWidth && r.right > 0;
+    if (r.width <= 0 || r.height <= 0 || r.left >= window.innerWidth || r.right <= 0) return false;
+    return r.top >= 0 && r.top < window.innerHeight - 40;
   }
   // the first DOM match isn't necessarily the right one to point at — a
   // case study's first lightbox image can sit well down the page (or, in
@@ -306,10 +398,9 @@
   var HINT_RETRY_MS = 600;
   var HINT_MAX_ATTEMPTS = 20;
   function maybeScheduleHint(scopeRoot) {
-    if (hintDone || hintTimer || hintAlreadySeen()) return;
+    if (hintDone || hintTimer) return;
     var attempts = 0;
     var fire = function () {
-      if (hintAlreadySeen()) { hintTimer = null; return; }
       var freshImg = firstVisibleLightboxImg(scopeRoot);
       attempts++;
       if (!freshImg) {
@@ -318,10 +409,39 @@
         return;
       }
       hintTimer = null;
-      markHintSeen();
-      positionHint(freshImg);
+      hintDone = true;
+      // freshImg only gated WHEN this fires (an image has to actually be
+      // on screen) — WHERE the toast appears doesn't depend on it at all,
+      // it always anchors to the close button (see hintAnchorRect)
       var el = ensureHintEl();
-      requestAnimationFrame(function () { el.classList.add('is-visible'); });
+      var textEl = el.querySelector('.al-lightbox-hint-text');
+      var closeBtn = el.querySelector('.al-lightbox-hint-close');
+      var anchor = hintAnchorRect();
+      hintCollapsedSize = anchor.size;
+      el.style.left = 'auto';
+      el.style.right = (window.innerWidth - anchor.right) + 'px';
+      el.style.top = anchor.top + 'px';
+      // the bar's real width is measured once here and fixed for the rest
+      // of its life — width can't transition to/from "auto" anyway, and
+      // more importantly this box never needs to change size again: the
+      // whole reveal/hide from here on is done with clip-path (see the
+      // CSS comment above and animateHintShape), which paints without
+      // ever touching layout
+      el.style.transition = 'none';
+      el.style.clipPath = 'none';
+      el.style.width = '';
+      void el.offsetWidth;
+      hintFullWidth = el.getBoundingClientRect().width;
+      el.style.width = hintFullWidth + 'px';
+      textEl.style.opacity = '0';
+      closeBtn.style.opacity = '0';
+      void el.offsetWidth; // commit the width/opacity above before anything transitions
+      el.style.transition = '';
+      el.classList.add('is-visible');
+      animateHintShape(el, true, 420, function () {
+        textEl.style.opacity = '';
+        closeBtn.style.opacity = '';
+      });
       window.addEventListener('scroll', hideHint, { passive: true, once: true });
       document.addEventListener('click', hideHint, { capture: true, once: true });
       setTimeout(hideHint, 4500);
@@ -337,8 +457,8 @@
   function openGalleryFor(img) {
     // clicking an image is itself proof the visitor already found the
     // feature — cancels the hint if it hasn't fired yet, and skips it for
-    // good either way
-    markHintSeen();
+    // the rest of this page view either way
+    stopScheduling();
     ensureOverlay();
     var scopeRoot = img.closest('[data-pv-inner]') || img.closest('main') || document;
     var imgs = Array.prototype.slice.call(scopeRoot.querySelectorAll('[data-lightbox]'));
