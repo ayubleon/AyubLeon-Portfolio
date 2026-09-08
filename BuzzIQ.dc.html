@@ -61,6 +61,9 @@
 <script src="footer.js" defer></script>
 <script src="nav.js" defer></script>
 <script src="more-work-cards.js" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600&amp;family=Playfair+Display:ital,wght@1,500&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
 </head>
 <body>
 <!-- sits outside <x-dc> so boot()'s dc.replaceWith swap (see the
@@ -269,12 +272,37 @@
       </div>
     </div>
 
+    <div class="case-label-grid" style="display: grid; grid-template-columns: minmax(0, 0.3fr) minmax(0, 1fr); gap: 40px 72px; margin: 96px 0 0;">
+      <div style="align-self: start;">
+        <p class="case-section-label">User feedback</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 32px; max-width: 68ch;">
+        <h2 style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: 1.125rem; font-weight: 500; line-height: 1.65; letter-spacing: -0.015em; color: #000000;">Surfacing hidden filters</h2>
+        <p class="case-body-text">IGNITEAMZ ran user testing and found people weren't noticing the filters at all. They sat behind a plain icon in the navbar, and some users had been browsing the whole platform without ever knowing filters existed. So I moved them straight onto the screen instead of hiding them behind a click, and added a quick-access onboarding icon to the navbar so anyone could go back and check what a button did.</p>
+      </div>
+    </div>
+
+    <div class="case-figure-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin: 48px 0 0;">
+      <figure style="margin: 0; display: flex; flex-direction: column; gap: 12px;">
+        <div style="border-radius: 12px; overflow: hidden; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.07);">
+          <img data-lightbox src="images/buzziq-homepage-before-filters.png" alt="Home feed before the redesign, with filters hidden behind an icon in the navbar" loading="lazy" style="width: 100%; height: auto; display: block;">
+        </div>
+        <figcaption class="case-figcaption">08 — Before: filters sat behind a plain icon in the navbar, easy to miss.</figcaption>
+      </figure>
+      <figure style="margin: 0; display: flex; flex-direction: column; gap: 12px;">
+        <div style="border-radius: 12px; overflow: hidden; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.07);">
+          <img data-lightbox src="images/buzziq-homepage-after-filters.png" alt="Home feed after the redesign, with filters shown directly on screen and an onboarding icon added to the navbar" loading="lazy" style="width: 100%; height: auto; display: block;">
+        </div>
+        <figcaption class="case-figcaption">09 — After: filters moved directly onto the screen, with a quick-access onboarding icon added to the navbar.</figcaption>
+      </figure>
+    </div>
+
     <p class="case-section-label" style="margin: 96px 0 20px;">Prototype</p>
     <figure class="case-prototype-figure" style="margin: 0 auto; max-width: 700px; display: flex; flex-direction: column; gap: 12px;">
       <div style="position: relative; aspect-ratio: 1600 / 1144; border-radius: 8px; overflow: hidden; background: #FFFFFF; border: 1px solid rgba(0,0,0,0.07);">
         <video src="images/buzziq-prototype.mp4" poster="images/buzziq-prototype-poster.jpg" title="Prototype" autoplay playsinline preload="metadata" aria-label="Prototype for BuzzIQ" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block;"></video>
       </div>
-      <figcaption class="case-figcaption">08 — Prototype for BuzzIQ.</figcaption>
+      <figcaption class="case-figcaption">10 — Prototype for BuzzIQ.</figcaption>
     </figure>
 
     <div class="case-label-grid" style="display: grid; grid-template-columns: minmax(0, 0.3fr) minmax(0, 1fr); gap: 40px 72px; margin: 96px 0 0;">
