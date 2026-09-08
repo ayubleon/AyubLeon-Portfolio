@@ -265,6 +265,50 @@
     setTimeout(reveal, MAX_WAIT_MS);
   })();
 
+  // a small, dismissible heads-up on phones only — this site's mobile
+  // experience already degrades gracefully (the pinned Curiosity blocks
+  // fall back to a plain static stack, images stop being clickable below
+  // 700px) rather than breaking, so this informs without gatekeeping:
+  // never a blocking modal, and gone for good once dismissed this tab.
+  // Same 700px cutoff the rest of the site's own mobile breakpoint uses
+  (function installMobileNotice() {
+    var MOBILE_MAX_WIDTH = 700;
+    if (window.innerWidth >= MOBILE_MAX_WIDTH) return;
+    try {
+      if (sessionStorage.getItem('al-mobile-notice-seen') === '1') return;
+    } catch (e) {}
+    var bar = document.createElement('div');
+    bar.setAttribute('role', 'status');
+    bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9998;padding:calc(12px + env(safe-area-inset-top)) 44px 12px 16px;background:var(--al-card,#1C1C1E);color:#f4eeeb;font-family:\'Schibsted Grotesk\',Helvetica,sans-serif;font-size: 0.8125rem;line-height:1.4;letter-spacing:-0.005em;box-shadow:0 12px 30px -14px rgba(0,0,0,0.7);transform:translateY(-100%);transition:transform .45s cubic-bezier(.22,1,.36,1);';
+    bar.innerHTML =
+      '<span>This site has small details and microinteractions that shine best on desktop.</span>' +
+      '<button type="button" aria-label="Dismiss" style="position:absolute;top:calc(10px + env(safe-area-inset-top));right:12px;width:28px;height:28px;border:0;background:none;color:#8E8D8E;display:flex;align-items:center;justify-content:center;cursor:pointer;">' +
+        '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M1 1L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>' +
+      '</button>';
+    document.body.appendChild(bar);
+
+    function dismiss() {
+      bar.style.transform = 'translateY(-100%)';
+      try { sessionStorage.setItem('al-mobile-notice-seen', '1'); } catch (e) {}
+      bar.addEventListener('transitionend', function () { bar.remove(); }, { once: true });
+      window.removeEventListener('resize', onResize);
+    }
+    // a tablet rotation or an in-page zoom-out crossing back above the
+    // breakpoint dismisses it too, rather than leaving a "this is a phone"
+    // notice sitting over a now-wide viewport
+    function onResize() {
+      if (window.innerWidth >= MOBILE_MAX_WIDTH) dismiss();
+    }
+    window.addEventListener('resize', onResize);
+    bar.querySelector('button').addEventListener('click', dismiss);
+
+    // held back a beat so it doesn't compete with the settle veil's own
+    // reveal and whatever's animating in right at load
+    setTimeout(function () {
+      bar.style.transform = 'translateY(0)';
+    }, 700);
+  })();
+
   // clipboard copy with a document.execCommand fallback for contexts
   // without navigator.clipboard (older Safari, non-secure origins).
   // execCommand can fail silently (returns false) as well as throw, so
@@ -320,7 +364,11 @@
   var toastTimer;
   // `opts.glow` (default true) toggles the spinning conic-gradient border —
   // off for error messages, since that shimmer reads as a celebratory
-  // "success" cue and would be misleading on a failure toast
+  // "success" cue and would be misleading on a failure toast.
+  // `opts.duration` (default 2000ms) overrides how long it stays up — a
+  // quick action confirmation (Copied to Clipboard) reads fine at 2s, but
+  // an unprompted hint the visitor wasn't expecting (see lightbox.js's
+  // "click any image" tip) needs longer to actually be read
   AL.showToast = function (msg, opts) {
     var wrap = ensureToast();
     var textEl = wrap.querySelector('[data-toast-text]');
@@ -333,7 +381,7 @@
     toastTimer = setTimeout(function () {
       wrap.style.opacity = '0';
       wrap.style.transform = 'translate(-50%, 18px)';
-    }, 2000);
+    }, (opts && opts.duration) || 2000);
   };
 
   // page-context nav targets, shared by nav.js and footer.js — footer

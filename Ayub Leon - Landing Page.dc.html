@@ -989,7 +989,6 @@ class Component extends DCLogic {
 
     let index = 0; // 0 = block 1 ... count-1 = the last block
     let animating = false;
-    let settleTimer = null;
     // the blocks that carry their own arrival animation, by 0-based index:
     // block 1's bulb-and-car, block 2's multiplayer cursor and block 3's
     // inline AI icon. Landing on one of these, from either direction, is
@@ -1029,12 +1028,51 @@ class Component extends DCLogic {
     const settle = () => {
       animating = false;
       window.removeEventListener('scrollend', settle);
-      clearTimeout(settleTimer);
+      clearInterval(settlePoll);
+      settlePoll = null;
       if (pendingArrival) {
         const play = pendingArrival;
         pendingArrival = null;
         play();
       }
+    };
+    // scrollend isn't supported on every browser this still has to run on
+    // (notably older iOS Safari), so this poll is the real fallback rather
+    // than a decoration on top of it — a fixed-duration timer here would be
+    // guessing how long the native smooth-scroll actually takes, and that
+    // scales with how far this step travels (taller phones/larger steps
+    // take longer). Measured live: even a single step landed right on the
+    // edge of a flat 900ms guess in a fast desktop browser, meaning real
+    // phone hardware plausibly finishes AFTER a blind timer like that fires
+    // — which flips `animating` false while the page is still mid-scroll,
+    // letting the next swipe interrupt and retarget it (needing an extra
+    // swipe to actually land) and measuring the arrival animation's layout
+    // before the block has actually finished settling into place (the
+    // process icon flying in from the wrong spot, or not visibly at all).
+    // Polling actual scroll position only calls settle() once the page has
+    // genuinely stopped moving, regardless of device speed or step
+    // distance, with a hard cap so a scroll that's stuck for some unrelated
+    // reason still can't wedge the section shut forever
+    const SETTLE_POLL_MS = 80;
+    const SETTLE_HARD_CAP_MS = 2500;
+    let settlePoll = null;
+    const startSettlePoll = () => {
+      clearInterval(settlePoll);
+      let lastY = window.scrollY;
+      let stableTicks = 0;
+      const pollStart = performance.now();
+      settlePoll = setInterval(() => {
+        const y = window.scrollY;
+        if (y === lastY) {
+          stableTicks++;
+        } else {
+          stableTicks = 0;
+          lastY = y;
+        }
+        if (stableTicks >= 2 || performance.now() - pollStart > SETTLE_HARD_CAP_MS) {
+          settle();
+        }
+      }, SETTLE_POLL_MS);
     };
     const goTo = (i) => {
       const nextIndex = Math.max(0, Math.min(count - 1, i));
@@ -1045,8 +1083,7 @@ class Component extends DCLogic {
       animating = true;
       window.scrollTo({ top: targetFor(index), behavior: 'smooth' });
       window.addEventListener('scrollend', settle, { once: true });
-      clearTimeout(settleTimer);
-      settleTimer = setTimeout(settle, 900);
+      startSettlePoll();
     };
 
     // a hard/fast trackpad swipe doesn't fire one wheel event — it fires a
