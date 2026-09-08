@@ -20,7 +20,9 @@
 <meta name="twitter:image" content="https://ayubleon.vercel.app/images/work-banking.png">
 <style>html, body { background: #FDFBF8; margin: 0; }
   @view-transition { navigation: auto; }
-  [data-settle-veil] { position: fixed; inset: 0; z-index: 9999; background: #FDFBF8; opacity: 1; transition: opacity .35s ease; }</style>
+  [data-settle-veil] { position: fixed; inset: 0; z-index: 9999; background: #FDFBF8; opacity: 1; transition: opacity .35s ease; }
+  /* self-hosted, not loaded from Google Fonts: needed here even though this page's own body copy never uses Playfair, because the sliding project popup (project-viewer.js) injects a case study's body HTML into THIS document without carrying over that page's own <head> — so BuzzIQ/Danadana's pull-quotes need this face already registered on every page that can open their popup, or they silently fall back to Georgia with no way to recover short of reloading the case study's own URL directly */
+  @font-face { font-family: 'Playfair Display'; font-style: italic; font-weight: 100 900; font-display: block; src: url('fonts/playfair-display-italic-variable.woff2') format('woff2-variations'); }</style>
 <!-- the settle veil is opaque black until shared.js fades it, so anything
      that renders this page without running the scripts — a crawler, an AI
      fetcher, a reader with JS off — sees a black screen over the whole

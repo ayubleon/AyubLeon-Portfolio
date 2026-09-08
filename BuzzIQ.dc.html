@@ -21,13 +21,14 @@
 <style>html, body { background: #FDFBF8; margin: 0; }
   @view-transition { navigation: auto; }
   [data-settle-veil] { position: fixed; inset: 0; z-index: 9999; background: #FDFBF8; opacity: 1; transition: opacity .35s ease; }
-  /* self-hosted rather than loaded from Google Fonts like the rest of the
-     type stack: this is the only face on the page with just one narrow
-     weight/style loaded, so it was the one most exposed to any delay or
-     failure fetching a third-party stylesheet before the browser ever
-     requests the actual font file — moving it to a same-origin file
-     removes that dependency entirely instead of just tuning its timing */
-  @font-face { font-family: 'Playfair Display'; font-style: italic; font-weight: 500; font-display: block; src: url('fonts/playfair-display-italic-500.woff2') format('woff2'); }</style>
+  /* self-hosted variable font (wght 400-900), not loaded from Google Fonts:
+     the web-served Playfair Display at fonts.googleapis.com strips the
+     italic's discretionary-ligature glyphs (the connected, hand-lettered
+     swashes the design calls for) down to a 312-glyph subset to cut file
+     size, so no font-feature-settings value could ever turn on a feature
+     the file simply doesn't contain. This copy is pulled from Google's own
+     font source repo instead, which keeps the full 1101-glyph set */
+  @font-face { font-family: 'Playfair Display'; font-style: italic; font-weight: 100 900; font-display: block; src: url('fonts/playfair-display-italic-variable.woff2') format('woff2-variations'); }</style>
 <!-- the settle veil is opaque black until shared.js fades it, so anything
      that renders this page without running the scripts — a crawler, an AI
      fetcher, a reader with JS off — sees a black screen over the whole
@@ -234,7 +235,7 @@
           </div>
         </div>
 
-        <p style="margin: 0; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 500; font-size: clamp(1.35rem, 2.2vw, 1.944rem); line-height: 1.35; letter-spacing: -0.01em; color: #0A84FF; text-wrap: pretty;">Made most design decisions independently first, working across a Kenya/US time zone gap, then brought them to directors and developers to review and align on before moving forward.</p>
+        <p style="margin: 0; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 500; font-size: clamp(1.35rem, 2.2vw, 1.944rem); line-height: 1.35; letter-spacing: -0.01em; color: #0A84FF; font-feature-settings: 'dlig' 1; text-wrap: pretty;">Made most design decisions independently first, working across a Kenya/US time zone gap, then brought them to directors and developers to review and align on before moving forward.</p>
 
         <div style="display: flex; flex-direction: column; gap: 20px;">
           <p class="case-bullet-item" style="margin: 0; padding-left: 20px; border-left: 4px solid #0A84FF;">Brought in a design system I'd already built on my own and reshaped it to fit what BuzzIQ actually needed, since there was nothing in place to start from.</p>
@@ -321,7 +322,7 @@
         <p class="case-body-text">Every screen got weighed against both sides, what the business needed and what users needed, before it was final.</p>
         <p class="case-body-text">Once designs were handed off, the dev team flagged anything hard to build so we could fix it before it slowed anyone down.</p>
         <p class="case-body-text">We had a working prototype before development started, which meant a lot of the guesswork and back-and-forth that usually eats into a build never happened.</p>
-        <p style="margin: 24px 0 0; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 500; font-size: clamp(1.35rem, 2.2vw, 1.944rem); line-height: 1.35; letter-spacing: -0.01em; color: #0A84FF; text-wrap: pretty;">That back and forth is what let a solo designer keep pace with a moving team.</p>
+        <p style="margin: 24px 0 0; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 500; font-size: clamp(1.35rem, 2.2vw, 1.944rem); line-height: 1.35; letter-spacing: -0.01em; color: #0A84FF; font-feature-settings: 'dlig' 1; text-wrap: pretty;">That back and forth is what let a solo designer keep pace with a moving team.</p>
       </div>
     </div>
   </section>
