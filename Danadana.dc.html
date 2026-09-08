@@ -20,7 +20,14 @@
 <meta name="twitter:image" content="https://ayubleon.vercel.app/images/work-danadana-cover.png">
 <style>html, body { background: #FDFBF8; margin: 0; }
   @view-transition { navigation: auto; }
-  [data-settle-veil] { position: fixed; inset: 0; z-index: 9999; background: #FDFBF8; opacity: 1; transition: opacity .35s ease; }</style>
+  [data-settle-veil] { position: fixed; inset: 0; z-index: 9999; background: #FDFBF8; opacity: 1; transition: opacity .35s ease; }
+  /* self-hosted rather than loaded from Google Fonts like the rest of the
+     type stack: this is the only face on the page with just one narrow
+     weight/style loaded, so it was the one most exposed to any delay or
+     failure fetching a third-party stylesheet before the browser ever
+     requests the actual font file — moving it to a same-origin file
+     removes that dependency entirely instead of just tuning its timing */
+  @font-face { font-family: 'Playfair Display'; font-style: italic; font-weight: 500; font-display: block; src: url('fonts/playfair-display-italic-500.woff2') format('woff2'); }</style>
 <!-- the settle veil is opaque black until shared.js fades it, so anything
      that renders this page without running the scripts — a crawler, an AI
      fetcher, a reader with JS off — sees a black screen over the whole
@@ -64,7 +71,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,500&amp;display=block" rel="stylesheet">
 </head>
 <body>
 <!-- sits outside <x-dc> so boot()'s dc.replaceWith swap (see the
@@ -78,7 +84,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,500&amp;display=block" rel="stylesheet">
 <style>
   html, body { margin: 0; padding: 0; background: #FDFBF8; }
   body { -webkit-font-smoothing: antialiased; }
