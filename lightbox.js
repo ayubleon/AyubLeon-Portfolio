@@ -32,7 +32,14 @@
     // than a broken, sudden pop the moment the browser gets to it
     ".al-lightbox-backdrop{position:absolute;inset:0;background:rgba(10,6,6,0.55);opacity:0;transition:opacity .3s ease;}",
     ".al-lightbox.is-open .al-lightbox-backdrop{opacity:1;}",
-    ".al-lightbox-blur{position:absolute;inset:0;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:0;pointer-events:none;transition:opacity 1.4s ease-out;}",
+    // the delay is the important part here, not the duration — opacity
+    // starting to rise before the blur itself has actually finished
+    // computing exposes a brief flash of the plain, unblurred backdrop at
+    // low opacity, then it "resolves" once the real blur catches up. This
+    // holds the reveal at 0 opacity (invisible either way, so nothing to
+    // see) for a beat first, giving the blur a hidden head start to
+    // finish computing before it's ever asked to actually show anything
+    ".al-lightbox-blur{position:absolute;inset:0;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);opacity:0;pointer-events:none;transition:opacity .5s ease-out .2s;}",
     ".al-lightbox.is-open .al-lightbox-blur{opacity:1;}",
     // a row rather than a column — when the navigator is showing (see
     // below), it's a flex sibling of the imgwrap right here, so centering
