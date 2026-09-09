@@ -39,8 +39,17 @@
     // of being cropped to the reserved viewing area it's meant to stay
     // inside — which is exactly what "not cropped, spilling past the
     // screen's own top/bottom" looks like
-    ".al-lightbox-imgwrap{display:flex;align-items:center;justify-content:center;max-width:100%;overflow:hidden;}",
-    ".al-lightbox-img{max-width:min(88vw,1400px);max-height:88vh;width:auto;height:auto;display:block;object-fit:contain;border-radius:12px;box-shadow:0 40px 100px -30px rgba(0,0,0,0.7);transform:scale(0.96);transition:transform .35s cubic-bezier(.22,1,.36,1);}",
+    // the transform transition here is only ever used for the enterZoom
+    // FLIP entrance (see its comment) — the wrap's width/height jump to
+    // their zoomed values instantly (never transitioned) so the pan/zoom
+    // math always measures true final geometry, and a transform on top
+    // fakes the resize as a smooth animation instead: enterZoom snaps the
+    // wrap to its real final size, then visually re-poses it back to its
+    // pre-zoom size/position with an inverse transform and immediately
+    // releases it, so this transition eases it back to identity — a
+    // compositor-only resize animation with no per-frame layout reflow
+    ".al-lightbox-imgwrap{position:relative;display:flex;align-items:center;justify-content:center;max-width:100%;overflow:hidden;transition:transform 420ms cubic-bezier(.22,1,.36,1);}",
+    ".al-lightbox-img{max-width:min(88vw,1400px);max-height:88vh;width:auto;height:auto;display:block;object-fit:contain;border-radius:12px;box-shadow:0 40px 100px -30px rgba(0,0,0,0.7);transform:scale(0.96);transition:transform 420ms cubic-bezier(.22,1,.36,1);}",
     // matches the padding-bottom override above exactly (100vh minus the
     // 40px top padding minus the 128px bottom padding) rather than the
     // rougher 88vh-based guess this used before that decoupling the
@@ -121,6 +130,13 @@
     // enterZoom's own comment covers why. Height matches the padding
     // above exactly: 100vh minus the 64px top and 160px bottom margins
     ".al-lightbox-imgwrap.is-zoomable{cursor:zoom-in;}",
+    ".al-lightbox-zoom-hint{display:none;position:absolute;top:20px;right:20px;z-index:1;align-items:center;gap:6px;background:rgba(10,6,6,0.72);color:#fff;font-family:'Schibsted Grotesk',Helvetica,sans-serif;font-size:0.75rem;font-weight:500;padding:6px 12px 6px 10px;border-radius:999px;pointer-events:none;backdrop-filter:blur(6px);}",
+    ".al-lightbox-zoom-hint svg{width:13px;height:13px;flex-shrink:0;}",
+    // shown for the whole time the image sits zoomable (not on hover
+    // only) since hover discovery isn't guaranteed, and a visitor
+    // scanning the popup should see this without probing for it
+    ".al-lightbox-imgwrap.is-zoomable .al-lightbox-zoom-hint{display:flex;}",
+    ".al-lightbox-imgwrap.is-zoomed .al-lightbox-zoom-hint{display:none;}",
     // flush to the top-left corner rather than the base rule's centering
     // — enterZoom's whole translateY/scale math assumes the image's own
     // un-transformed top-left sits exactly at the wrap's own (0,0).
@@ -144,15 +160,32 @@
     // stage: if this took up space whether visible or not, every image's
     // own centering would shift to make room for an invisible navigator
     // it'll never actually use
-    ".al-lightbox-navigator{display:none;position:relative;z-index:2;border-radius:10px;overflow:hidden;box-shadow:0 16px 34px -16px rgba(0,0,0,0.7);border:1px solid var(--al-border,rgba(255,255,255,0.13));background:var(--al-card,#1C1C1E);opacity:0;transition:opacity .25s ease;}",
-    ".al-lightbox-navigator.is-visible{display:block;opacity:1;}",
-    ".al-lightbox-navigator img{display:block;width:140px;height:auto;user-select:none;-webkit-user-drag:none;}",
+    // opacity/transform live on the base rule (not gated behind
+    // .is-visible) so enter can commit display:block on its own frame
+    // first, then trigger this transition on a separate frame after —
+    // toggling display and opacity in the very same class application
+    // gives the browser no prior rendered frame to transition from, so
+    // it would otherwise just pop straight to the end state (see the
+    // two-step is-visible/is-revealed toggle in enterZoom)
+    // overflow isn't hidden here (the nav image gets its own border-radius
+    // below instead) so the drag-hint arrow can sit just outside the
+    // panel's own right edge without being clipped
+    ".al-lightbox-navigator{display:none;position:relative;z-index:2;border-radius:10px;box-shadow:0 16px 34px -16px rgba(0,0,0,0.7);border:1px solid var(--al-border,rgba(255,255,255,0.13));background:var(--al-card,#1C1C1E);opacity:0;transform:translateX(14px);transition:opacity 420ms cubic-bezier(.22,1,.36,1),transform 420ms cubic-bezier(.22,1,.36,1);}",
+    ".al-lightbox-navigator.is-visible{display:block;}",
+    ".al-lightbox-navigator.is-revealed{opacity:1;transform:translateX(0);}",
+    ".al-lightbox-navigator img{display:block;width:140px;height:auto;border-radius:10px;user-select:none;-webkit-user-drag:none;}",
     // full width always, no horizontal drag — see updateNavBox. Left/right
     // arrow keys stay reserved for stepping between images (step()); up/
     // down move this box instead, which only ever needs to move
     // vertically since it always spans the navigator's own full width
     ".al-lightbox-navbox{position:absolute;left:0;width:100%;border:2px solid #ffd60a;background:rgba(255,214,10,0.14);cursor:grab;box-sizing:border-box;}",
     ".al-lightbox-navbox.is-dragging{cursor:grabbing;}",
+    // sits just outside the navigator panel rather than on top of the
+    // thumbnail — overlapping the little image would compete with the
+    // yellow box it's trying to explain, right where a visitor is meant
+    // to look
+    ".al-lightbox-navigator-hint{position:absolute;top:50%;right:-34px;transform:translateY(-50%);z-index:1;display:flex;align-items:center;justify-content:center;width:22px;height:44px;border-radius:999px;background:rgba(10,6,6,0.72);color:#fff;backdrop-filter:blur(6px);pointer-events:none;}",
+    ".al-lightbox-navigator-hint svg{width:14px;height:14px;}",
     // acts like a toast morphing out of the popup's own close button
     // rather than a bar laid over the image — it never actually travels
     // down to the image at all (an earlier version did, and sliding a
@@ -288,6 +321,11 @@
   }
 
   function enterZoom() {
+    // captured before any zoom class goes on — this is the wrap's plain,
+    // centered, pre-zoom box, used below as the FLIP entrance's start
+    // point (see the comment further down)
+    var startRect = imgWrapEl.getBoundingClientRect();
+
     // adds the zoomed view's own more generous margins (see the CSS
     // comment on .is-zoom-active) and switches the wrap to flush
     // top-left alignment (see .is-zoomed) before anything is measured —
@@ -299,6 +337,27 @@
     void imgWrapEl.offsetWidth; // commit the changes above before measuring them next
     zoomImgRect = imgEl.getBoundingClientRect();
     zoomWrapRect = imgWrapEl.getBoundingClientRect();
+
+    // FLIP entrance: the wrap is already at its true final (zoomed) size
+    // at this point — width/height themselves are never transitioned, so
+    // the pan/zoom math above always measures real, settled geometry
+    // instead of a value mid-animation. To still make the resize itself
+    // look smooth, re-pose the wrap back to look like its pre-zoom
+    // startRect with an inverse transform (instant, no transition), then
+    // clear that transform on the very next frame so the CSS transition
+    // on .al-lightbox-imgwrap eases it back to identity — a cheap,
+    // compositor-only animation standing in for animating width/height
+    // directly, which would force a layout reflow on every frame
+    var scaleX = startRect.width / zoomWrapRect.width;
+    var scaleY = startRect.height / zoomWrapRect.height;
+    var dx = startRect.left - zoomWrapRect.left;
+    var dy = startRect.top - zoomWrapRect.top;
+    imgWrapEl.style.transition = 'none';
+    imgWrapEl.style.transformOrigin = '0 0';
+    imgWrapEl.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + scaleX + ',' + scaleY + ')';
+    void imgWrapEl.offsetWidth;
+    imgWrapEl.style.transition = '';
+    imgWrapEl.style.transform = '';
     // fit-width, not native resolution — scales the image up just enough
     // to exactly fill the zoomed wrap's own width, with nothing left over
     // on either side. That's what guarantees the box on the navigator
@@ -318,7 +377,12 @@
     clampZoomPan();
     imgEl.style.transformOrigin = '0 0';
     navImgEl.src = imgEl.src;
+    // two-step reveal — see the CSS comment on .al-lightbox-navigator for
+    // why this can't just be one class toggling display and opacity
+    // together
     navigatorEl.classList.add('is-visible');
+    void navigatorEl.offsetWidth;
+    navigatorEl.classList.add('is-revealed');
     applyZoomTransform();
   }
 
@@ -328,7 +392,7 @@
     panY = 0;
     overlay.classList.remove('is-zoom-active');
     imgWrapEl.classList.remove('is-zoomed', 'is-panning');
-    navigatorEl.classList.remove('is-visible');
+    navigatorEl.classList.remove('is-visible', 'is-revealed');
     imgEl.style.transform = '';
     imgEl.style.transformOrigin = '';
   }
@@ -386,10 +450,13 @@
     overlay.innerHTML =
       '<div class="al-lightbox-backdrop" data-lightbox-backdrop></div>' +
       '<div class="al-lightbox-stage">' +
-        '<div class="al-lightbox-imgwrap" data-lightbox-imgwrap><img class="al-lightbox-img" data-lightbox-img alt=""></div>' +
+        '<div class="al-lightbox-imgwrap" data-lightbox-imgwrap><img class="al-lightbox-img" data-lightbox-img alt="">' +
+          '<span class="al-lightbox-zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>Click to zoom</span>' +
+        '</div>' +
         '<div class="al-lightbox-navigator" data-lightbox-navigator>' +
           '<img data-lightbox-navimg alt="">' +
           '<div class="al-lightbox-navbox" data-lightbox-navbox></div>' +
+          '<span class="al-lightbox-navigator-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="4" x2="12" y2="20"></line><polyline points="8 8 12 4 16 8"></polyline><polyline points="8 16 12 20 16 16"></polyline></svg></span>' +
         '</div>' +
       '</div>' +
       '<div class="al-lightbox-filmstrip-row">' +
