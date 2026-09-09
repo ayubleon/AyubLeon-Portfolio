@@ -17,7 +17,20 @@
     // plus a further 32px of breathing room above that
     ".al-lightbox.has-filmstrip{padding-bottom:128px;}",
     ".al-lightbox.is-open{opacity:1;pointer-events:auto;}",
-    ".al-lightbox-backdrop{position:absolute;inset:0;background:rgba(10,6,6,0.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}",
+    // split into a plain color tint (this) and a separate blur-only layer
+    // below (.al-lightbox-blur) rather than one element doing both — a
+    // full-viewport backdrop-filter is too expensive to recompute at
+    // every frame of an opacity transition, so animating it directly
+    // dropped frames and only really finished rendering near the end,
+    // reading as the plain image appearing instantly while the blur
+    // caught up a beat later. This tint is cheap and animates smoothly on
+    // its own; the blur layer instead just snaps fully on the instant
+    // is-open is added (see its own rule, no transition), which is a
+    // single one-time render rather than a stretched-out one
+    ".al-lightbox-backdrop{position:absolute;inset:0;background:rgba(10,6,6,0.55);opacity:0;transition:opacity .3s ease;}",
+    ".al-lightbox.is-open .al-lightbox-backdrop{opacity:1;}",
+    ".al-lightbox-blur{position:absolute;inset:0;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);opacity:0;pointer-events:none;}",
+    ".al-lightbox.is-open .al-lightbox-blur{opacity:1;}",
     // a row rather than a column — when the navigator is showing (see
     // below), it's a flex sibling of the imgwrap right here, so centering
     // this row centers the image+navigator pair as a single unit. A
@@ -466,6 +479,7 @@
     overlay.setAttribute('aria-hidden', 'true');
     overlay.innerHTML =
       '<div class="al-lightbox-backdrop" data-lightbox-backdrop></div>' +
+      '<div class="al-lightbox-blur"></div>' +
       '<div class="al-lightbox-stage">' +
         '<div class="al-lightbox-imgwrap" data-lightbox-imgwrap><img class="al-lightbox-img" data-lightbox-img alt="">' +
           '<span class="al-lightbox-zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>Click to zoom</span>' +
@@ -835,10 +849,20 @@
     lastFocused = img;
     renderFilmstrip();
     show(index === -1 ? 0 : index);
-    overlay.classList.add('is-open');
     overlay.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    closeBtn.focus();
+    // is-open held back two frames (one to let the browser paint the
+    // overlay as it stands right now, still hidden; one more before this
+    // actually reveals it) gives the blur layer a small head start on
+    // existing before it's asked to render — see .al-lightbox-blur for
+    // the bigger part of this fix (why it's a separate, non-transitioning
+    // layer rather than animated together with the tint)
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        overlay.classList.add('is-open');
+        closeBtn.focus();
+      });
+    });
   }
 
   // exposed so project-viewer.js can re-run this against a popup card's
