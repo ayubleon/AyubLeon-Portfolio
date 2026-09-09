@@ -18,18 +18,21 @@
     ".al-lightbox.has-filmstrip{padding-bottom:128px;}",
     ".al-lightbox.is-open{opacity:1;pointer-events:auto;}",
     // split into a plain color tint (this) and a separate blur-only layer
-    // below (.al-lightbox-blur) rather than one element doing both — a
-    // full-viewport backdrop-filter is too expensive to recompute at
-    // every frame of an opacity transition, so animating it directly
-    // dropped frames and only really finished rendering near the end,
-    // reading as the plain image appearing instantly while the blur
-    // caught up a beat later. This tint is cheap and animates smoothly on
-    // its own; the blur layer instead just snaps fully on the instant
-    // is-open is added (see its own rule, no transition), which is a
-    // single one-time render rather than a stretched-out one
+    // below (.al-lightbox-blur) rather than one element doing both —
+    // blurring the entire page behind this popup is genuinely expensive
+    // to compute the first time it's asked for, on the order of several
+    // hundred ms on a busy page like this one, and no amount of pre-
+    // warming (building the overlay early, will-change) closes that gap
+    // — it's real compute cost, not just a timing/ordering issue. Once
+    // that's accepted as a real delay rather than a bug to eliminate, the
+    // fix is to make the delayed arrival itself look deliberate: this
+    // tint fades in immediately and cheaply, while the blur layer (below)
+    // fades in on its own slower schedule whenever it actually finishes,
+    // so it reads as a graceful reveal arriving on its own beat rather
+    // than a broken, sudden pop the moment the browser gets to it
     ".al-lightbox-backdrop{position:absolute;inset:0;background:rgba(10,6,6,0.55);opacity:0;transition:opacity .3s ease;}",
     ".al-lightbox.is-open .al-lightbox-backdrop{opacity:1;}",
-    ".al-lightbox-blur{position:absolute;inset:0;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);opacity:0;pointer-events:none;}",
+    ".al-lightbox-blur{position:absolute;inset:0;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:0;pointer-events:none;transition:opacity 1.4s ease-out;}",
     ".al-lightbox.is-open .al-lightbox-blur{opacity:1;}",
     // a row rather than a column — when the navigator is showing (see
     // below), it's a flex sibling of the imgwrap right here, so centering
@@ -115,12 +118,24 @@
     // Border matches the nav dock's own (.site-nav-dock in nav.js) —
     // var(--al-border) with the identical fallback — rather than a new
     // color invented just for this button
-    ".al-lightbox-close{position:fixed;top:24px;right:24px;z-index:2;width:44px;height:44px;border-radius:50%;border:1px solid var(--al-border,rgba(255,255,255,0.13));background:rgba(255,255,255,0.1);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);color:#f4eeeb;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .25s ease,transform .3s cubic-bezier(.22,1,.36,1);}",
+    // appearance:none is load-bearing — without it some browsers render
+    // this as a native OS button (their own ~4px corner radius and
+    // padding baked in), which silently overrides the 50% radius below
+    // and paints as a rounded square instead of a circle
+    ".al-lightbox-close{appearance:none;-webkit-appearance:none;padding:0;position:fixed;top:24px;right:24px;z-index:2;width:44px;height:44px;border-radius:50%;border:1px solid var(--al-border,rgba(255,255,255,0.13));background:rgba(255,255,255,0.1);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);color:#f4eeeb;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .25s ease,transform .3s cubic-bezier(.22,1,.36,1);}",
     ".al-lightbox-close:hover{background:rgba(255,255,255,0.2);}",
     // outline:none only, no added ring color of its own — the button's
     // always-visible border above is treated as enough of a focus
     // indicator here, rather than inventing a separate highlight color
-    ".al-lightbox-close:focus-visible{outline:none;}",
+    // border-radius restated here, not just on the base rule above — this
+    // button is focused programmatically the instant the popup opens
+    // (see openGalleryFor), so it's always in :focus-visible, and the
+    // site's global `button:focus-visible{border-radius:4px}` outranks
+    // the base .al-lightbox-close rule on pure specificity (a type
+    // selector plus the same pseudo-class beats a plain class), squaring
+    // off this button's corners the moment it's focused unless repeated
+    // here at equal footing
+    ".al-lightbox-close:focus-visible{outline:none;border-radius:50%;}",
     ".al-lightbox-close-stroke{transform-origin:7px 7px;transition:transform .3s cubic-bezier(.22,1,.36,1);}",
     ".al-lightbox-close:hover .al-lightbox-close-stroke:first-child{transform:rotate(90deg);}",
     ".al-lightbox-close:hover .al-lightbox-close-stroke:last-child{transform:rotate(-90deg);}",
@@ -481,7 +496,7 @@
       '<div class="al-lightbox-backdrop" data-lightbox-backdrop></div>' +
       '<div class="al-lightbox-blur"></div>' +
       '<div class="al-lightbox-stage">' +
-        '<div class="al-lightbox-imgwrap" data-lightbox-imgwrap><img class="al-lightbox-img" data-lightbox-img alt="">' +
+        '<div class="al-lightbox-imgwrap" data-lightbox-imgwrap><img class="al-lightbox-img" data-lightbox-img decoding="async" alt="">' +
           '<span class="al-lightbox-zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>Click to zoom</span>' +
         '</div>' +
         '<div class="al-lightbox-navigator" data-lightbox-navigator>' +
@@ -872,7 +887,18 @@
   // get wired up
   function wireIn(root) {
     var imgs = Array.prototype.slice.call((root || document).querySelectorAll('[data-lightbox]'));
-    if (imgs.length && window.innerWidth >= MOBILE_MAX_WIDTH) maybeScheduleHint(root);
+    // built now rather than waiting for the first click — a full-viewport
+    // backdrop-filter blur is expensive to actually produce the very
+    // first time a browser has to render one, and giving it the rest of
+    // the page's idle time to do that (instead of zero notice, in the
+    // same tick the fade-in starts) is what actually closes the gap
+    // between the image appearing and the blur catching up. An earlier
+    // version paired this with will-change, which is what broke the blur
+    // outright in real testing — this is the same idea without that
+    if (imgs.length && window.innerWidth >= MOBILE_MAX_WIDTH) {
+      ensureOverlay();
+      maybeScheduleHint(root);
+    }
     imgs.forEach(function (img) {
       if (img.__lightboxWired) return;
       img.__lightboxWired = true;
