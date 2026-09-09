@@ -6,7 +6,7 @@
     // there too; this cursor is just the visual hint for the pointer that
     // can actually hover it
     "[data-lightbox]{cursor:zoom-in;}",
-    ".al-lightbox{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:40px;opacity:0;pointer-events:none;transition:opacity .3s ease;will-change:opacity;}",
+    ".al-lightbox{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:40px;opacity:0;pointer-events:none;transition:opacity .3s ease;}",
     // the image is centered in whatever space this padding leaves, so
     // reserving extra room at the bottom (rather than just relying on the
     // image's own max-height below) is what actually guarantees a real,
@@ -17,13 +17,7 @@
     // plus a further 32px of breathing room above that
     ".al-lightbox.has-filmstrip{padding-bottom:128px;}",
     ".al-lightbox.is-open{opacity:1;pointer-events:auto;}",
-    // will-change keeps this on its own compositor layer, blur already
-    // computed, at all times — this element sits at opacity 0 rather than
-    // display:none while closed (see .al-lightbox), and without this hint
-    // browsers tend to only start doing the expensive backdrop-filter
-    // work once the fade-in actually begins, so the plain color shows
-    // immediately while the blur itself visibly catches up a beat later
-    ".al-lightbox-backdrop{position:absolute;inset:0;background:rgba(10,6,6,0.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);will-change:backdrop-filter;}",
+    ".al-lightbox-backdrop{position:absolute;inset:0;background:rgba(10,6,6,0.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);}",
     // a row rather than a column — when the navigator is showing (see
     // below), it's a flex sibling of the imgwrap right here, so centering
     // this row centers the image+navigator pair as a single unit. A
