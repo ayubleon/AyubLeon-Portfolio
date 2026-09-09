@@ -130,7 +130,7 @@
     // enterZoom's own comment covers why. Height matches the padding
     // above exactly: 100vh minus the 64px top and 160px bottom margins
     ".al-lightbox-imgwrap.is-zoomable{cursor:zoom-in;}",
-    ".al-lightbox-zoom-hint{display:none;position:absolute;top:20px;right:20px;z-index:1;align-items:center;gap:6px;background:rgba(10,6,6,0.72);color:#fff;font-family:'Schibsted Grotesk',Helvetica,sans-serif;font-size:0.75rem;font-weight:500;padding:6px 12px 6px 10px;border-radius:999px;pointer-events:none;backdrop-filter:blur(6px);}",
+    ".al-lightbox-zoom-hint{display:none;position:absolute;top:20px;right:20px;z-index:1;align-items:center;gap:6px;background:#0A84FF;color:#fff;font-family:'Schibsted Grotesk',Helvetica,sans-serif;font-size:0.75rem;font-weight:500;padding:6px 12px 6px 10px;border-radius:999px;box-shadow:0 10px 22px -10px rgba(10,132,255,0.6);pointer-events:none;}",
     ".al-lightbox-zoom-hint svg{width:13px;height:13px;flex-shrink:0;}",
     // shown for the whole time the image sits zoomable (not on hover
     // only) since hover discovery isn't guaranteed, and a visitor
@@ -248,6 +248,9 @@
   '</svg>';
 
   var MOBILE_MAX_WIDTH = 700;
+  // matches .al-lightbox's own opacity transition (.3s) plus a small
+  // buffer — see close()
+  var CLOSE_FADE_MS = 340;
 
   var overlay = null;
   var imgEl = null;
@@ -272,11 +275,25 @@
   var zoomDragging = false;
 
   function close() {
-    exitZoom();
+    // exitZoom is normally instant everywhere else it's called (see its
+    // own comment) — deliberate, since navigating away should always
+    // reset without lingering motion. Closing is the one exception: if
+    // the image is zoomed in when this fires, resetting first would snap
+    // the whole layout back to its small, un-zoomed size right before the
+    // fade even starts, so the visitor would see an abrupt jump followed
+    // by a fade rather than one clean motion. Deferring the reset until
+    // after the fade finishes instead lets whatever's currently on
+    // screen — zoomed or not — fade out exactly as it looks
+    var wasZoomed = zoomActive;
     overlay.classList.remove('is-open');
     overlay.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
     if (lastFocused && lastFocused.focus) lastFocused.focus();
+    if (wasZoomed) {
+      setTimeout(exitZoom, CLOSE_FADE_MS);
+    } else {
+      exitZoom();
+    }
   }
 
   function clampZoomPan() {
