@@ -1016,6 +1016,32 @@ class Component extends DCLogic {
     let queued = false;
     this.onBurnScroll = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
     this.onBurnResize = update;
+    let __dbgLastVh = window.innerHeight;
+    window.addEventListener('resize', () => {
+      const newVh = window.innerHeight;
+      console.log('[dbg] resize event: innerHeight ' + __dbgLastVh + ' -> ' + newVh + ', scrollY=' + window.scrollY);
+      __dbgLastVh = newVh;
+    });
+    // catches any scrollY movement not caused by this file's own goTo()/
+    // animateScrollTo() — including native momentum, rubber-banding, or a
+    // layout shift from something else on the page changing height while
+    // the toolbar is mid-transition — logged whenever it moves the WRONG
+    // way (backward) or by a large jump, so this doesn't flood the
+    // console during an intentional forward swipe
+    let __dbgLastY = window.scrollY;
+    let __dbgLastYTime = performance.now();
+    const __dbgWatchScroll = () => {
+      const y = window.scrollY;
+      const now = performance.now();
+      const dy = y - __dbgLastY;
+      if (dy < -5) {
+        console.log('[dbg] UNEXPECTED backward scroll: ' + __dbgLastY.toFixed(0) + ' -> ' + y.toFixed(0) + ' (' + dy.toFixed(0) + 'px) over ' + (now - __dbgLastYTime).toFixed(0) + 'ms, innerHeight=' + window.innerHeight);
+      }
+      __dbgLastY = y;
+      __dbgLastYTime = now;
+      requestAnimationFrame(__dbgWatchScroll);
+    };
+    requestAnimationFrame(__dbgWatchScroll);
     this.initBurnSwipe(runway, count, update);
 
     update();
