@@ -1092,6 +1092,7 @@ class Component extends DCLogic {
     // playPitchCursor or playProcessIcon measures anything
     let pendingArrival = null;
     const settle = () => {
+      console.log('[dbg] settle() called, hadPendingArrival=' + !!pendingArrival);
       animating = false;
       if (pendingArrival) {
         const play = pendingArrival;
@@ -1123,10 +1124,21 @@ class Component extends DCLogic {
     const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
     let scrollAnimId = null;
     const animateScrollTo = (i) => {
-      if (scrollAnimId) cancelAnimationFrame(scrollAnimId);
+      if (scrollAnimId) {
+        console.log('[dbg] animateScrollTo(' + i + ') cancelling a still-running previous animation');
+        cancelAnimationFrame(scrollAnimId);
+      }
       const startY = window.scrollY;
       const startTime = performance.now();
+      let frameCount = 0;
+      let lastFrameTime = startTime;
+      let maxFrameGap = 0;
+      console.log('[dbg] animateScrollTo(' + i + ') starting, startY=' + startY.toFixed(0) + ' target=' + targetFor(i).toFixed(0));
       const step = (now) => {
+        frameCount++;
+        const gap = now - lastFrameTime;
+        if (gap > maxFrameGap) maxFrameGap = gap;
+        lastFrameTime = now;
         const t = Math.min(1, (now - startTime) / SCROLL_DURATION_MS);
         const target = targetFor(i);
         window.scrollTo(0, startY + (target - startY) * easeOutCubic(t));
@@ -1134,12 +1146,14 @@ class Component extends DCLogic {
           scrollAnimId = requestAnimationFrame(step);
         } else {
           scrollAnimId = null;
+          console.log('[dbg] animateScrollTo(' + i + ') finished: ' + frameCount + ' frames, ' + (now - startTime).toFixed(0) + 'ms wall time, largest gap between frames ' + maxFrameGap.toFixed(0) + 'ms, finalTarget=' + target.toFixed(0));
           settle();
         }
       };
       scrollAnimId = requestAnimationFrame(step);
     };
     const goTo = (i) => {
+      console.log('[dbg] goTo(' + i + ') called, current index=' + index + ' animating=' + animating);
       const nextIndex = Math.max(0, Math.min(count - 1, i));
       if (ARRIVAL_ANIMATIONS[nextIndex] && nextIndex !== index) {
         pendingArrival = ARRIVAL_ANIMATIONS[nextIndex];
