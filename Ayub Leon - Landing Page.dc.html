@@ -23,6 +23,21 @@
 <meta name="twitter:image" content="https://ayubleon.vercel.app/images/link-preview.png">
 <style>html, body { background: #000000; margin: 0; }
   @view-transition { navigation: auto; }
+  /* iOS Safari's rubber-band overscroll can pull the page past its own
+     top/bottom edge and briefly reveal the browser's blank canvas beyond
+     the document's own painted bounds — that shows as a flash of white
+     regardless of html/body's own background-color, since that revealed
+     strip is outside what background-color actually paints during the
+     bounce. overscroll-behavior-y:none (below) was an earlier attempt at
+     stopping the bounce itself, but that property is well known to be
+     unreliably honored by Safari on iOS specifically for top-level page
+     scroll. Rather than depend on suppressing the bounce, this oversized
+     fixed layer just makes sure there's black wherever it lands: fixed
+     positioning repaints relative to the viewport rather than the
+     document, so it stays put through any bounce offset, and the 60vh/
+     60vw overhang in every direction covers any realistic bounce
+     distance a flick could produce */
+  [data-bounce-guard] { position: fixed; inset: -60vh -60vw; z-index: -1; background: #000000; pointer-events: none; }
   /* the Curiosity blocks and the hero h1 start hidden because JS reveals
      them — but held here behind .js rather than inline on the elements.
      Inline visibility:hidden/opacity:0 is exactly what Readability-class
@@ -98,6 +113,12 @@
      it — see installSettleVeil in shared.js for why this exists and
      how it decides when to fade out -->
 <div data-settle-veil aria-hidden="true"></div>
+<!-- kept outside <x-dc> for the same reason as the settle veil just
+     above — this needs to survive boot()'s replaceWith untouched, since
+     it exists purely to paint black behind whatever a rubber-band
+     overscroll bounce reveals (see the [data-bounce-guard] rule in
+     <head>), and that can happen at any time, not just before boot -->
+<div data-bounce-guard aria-hidden="true"></div>
 <x-dc>
 <helmet>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -111,6 +132,10 @@
      hero's own rounded frame before it snaps back — this stops that
      bounce so the hero's top edge stays put */
   html, body { margin: 0; padding: 0; background: #000000; overscroll-behavior-y: none; }
+  /* see the matching comment on this same rule in the static <head>
+     above — kept in sync here since that copy is what the page's own
+     runtime actually manages once it boots */
+  [data-bounce-guard] { position: fixed; inset: -60vh -60vw; z-index: -1; background: #000000; pointer-events: none; }
   body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
