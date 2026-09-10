@@ -1169,7 +1169,7 @@ class Component extends DCLogic {
     // settle detection entirely: with a self-timed animation there's no
     // need to guess when the browser's own scroll finished, since this
     // one calls settle() the instant it's actually done
-    const SCROLL_DURATION_MS = 420;
+    const SCROLL_DURATION_MS = 280;
     // measured live on a real iPhone (Safari remote inspector): the instant
     // this animation stopped actively setting the scroll position, the
     // page kept drifting backward on its own for several more frames — a
