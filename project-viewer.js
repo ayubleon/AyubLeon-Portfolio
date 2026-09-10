@@ -401,7 +401,7 @@
     // detaches from whatever's animating in. Faded out for the move and
     // back in once the new card has settled (see go()) rather than left
     // on-screen the whole time
-    ".al-pv-header{position:absolute;top:0;left:0;right:0;height:96px;z-index:3;pointer-events:none;background:rgba(253,251,248,0.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 45%,rgba(0,0,0,0) 100%);mask-image:linear-gradient(180deg,#000 0%,#000 45%,rgba(0,0,0,0) 100%);border-radius:24px 24px 0 0;opacity:1;transition:opacity .18s ease;}",
+    ".al-pv-header{position:absolute;top:0;left:0;right:0;height:96px;z-index:3;pointer-events:none;background:rgba(253,251,248,0.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 20%,rgba(0,0,0,0.75) 40%,rgba(0,0,0,0.4) 60%,rgba(0,0,0,0.12) 80%,rgba(0,0,0,0) 100%);mask-image:linear-gradient(180deg,#000 0%,#000 20%,rgba(0,0,0,0.75) 40%,rgba(0,0,0,0.4) 60%,rgba(0,0,0,0.12) 80%,rgba(0,0,0,0) 100%);border-radius:24px 24px 0 0;opacity:1;transition:opacity .18s ease;}",
     // backdrop-filter behind a transformed ancestor (this whole carousel)
     // can leave a stale, frozen blur rendered through an opacity fade
     // instead of cleanly disappearing with it — turning the filter off
@@ -894,7 +894,8 @@
   // a card the reader stepped Forward into, and the deep-link boot below,
   // where the URL already names this exact project
   function open(href, skipUrl) {
-    if (!overlay) build();
+    var firstBuild = !overlay;
+    if (firstBuild) build();
     var idx = ORDER.indexOf(href);
     currentIndex = idx === -1 ? 0 : idx;
     if (!skipUrl) syncUrl(href);
@@ -911,6 +912,24 @@
       // is still an in-flight fetch at this exact point
       var closeBtn = overlay.querySelector('[data-pv-close]');
       if (closeBtn) closeBtn.focus();
+      // on this overlay's very first build, the header's mask-image can
+      // lose the race against its own dynamically-inserted <style> tag and
+      // paint once as a flat, unmasked blur (a hard-edged bar instead of
+      // the fade) — the same class of backdrop-filter/masking flake the
+      // hidden-state comment above already works around. Forcing the
+      // filter off then back on right after this first paint discards
+      // whatever compositing layer that bad first frame produced, so the
+      // very next frame recomposites clean with the mask actually applied
+      if (firstBuild) {
+        var header = overlay.querySelector('.al-pv-header');
+        if (header) {
+          header.style.backdropFilter = 'none';
+          header.style.webkitBackdropFilter = 'none';
+          void header.offsetHeight;
+          header.style.backdropFilter = '';
+          header.style.webkitBackdropFilter = '';
+        }
+      }
     });
   }
 
