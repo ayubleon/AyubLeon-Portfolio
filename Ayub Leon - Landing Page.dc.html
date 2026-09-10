@@ -1681,9 +1681,16 @@ class Component extends DCLogic {
   // which is what actually sells "squeezing into the gap and wobbling to
   // a rest" without competing against the flight's own motion
   playProcessIcon() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    console.log('[dbg] playProcessIcon() called');
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      console.log('[dbg] playProcessIcon() bailing: prefers-reduced-motion is on');
+      return;
+    }
     const icon = document.querySelector('[data-burn-icon]');
-    if (!icon) return;
+    if (!icon) {
+      console.log('[dbg] playProcessIcon() bailing: [data-burn-icon] not found in DOM');
+      return;
+    }
     icon.getAnimations().forEach((a) => a.cancel());
     // sits opacity:0 by default (see the reduced-motion override in
     // <style> above, which forces it back to visible for anyone who never
@@ -1712,6 +1719,7 @@ class Component extends DCLogic {
 
     const flight = 'cubic-bezier(.32,.09,.32,1)';
     const land = 'cubic-bezier(.34,1.56,.64,1)';
+    console.log('[dbg] playProcessIcon() animating: originFound=' + !!origin + ' iconRect=' + JSON.stringify({ x: iconRect.x, y: iconRect.y, w: iconRect.width, h: iconRect.height }) + ' dx=' + dx.toFixed(1) + ' dy=' + dy.toFixed(1) + ' iconOpacity=' + getComputedStyle(icon).opacity);
     icon.animate([
       { transform: at(dx, dy) + ' scale(1.5) rotate(0deg)', offset: 0, easing: flight },
       { transform: at(dx * 0.32, peakY) + ' scale(1.05) rotate(190deg)', offset: 0.45, easing: flight },
