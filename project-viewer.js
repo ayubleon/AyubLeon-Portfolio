@@ -355,7 +355,7 @@
     // block clicks through to whatever card is underneath it, but without
     // the .al-pv-open gate this alone would re-enable the button even
     // while the overlay is closed and invisible
-    ".al-pv-close{position:absolute;top:20px;right:20px;z-index:4;width:36px;height:36px;border-radius:50%;border:0;padding:0;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .3s cubic-bezier(.22,1,.36,1);}",
+    ".al-pv-close{position:absolute;top:9px;right:20px;z-index:4;width:36px;height:36px;border-radius:50%;border:0;padding:0;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .3s cubic-bezier(.22,1,.36,1);}",
     ".al-pv-overlay.al-pv-open .al-pv-close{pointer-events:auto;}",
     // every page's own base stylesheet has a blanket
     // `button:focus-visible { border-radius: 4px }` (for square-ish
@@ -387,21 +387,29 @@
     ".al-pv-close-stroke{transform-origin:7px 7px;transition:transform .3s cubic-bezier(.22,1,.36,1);}",
     ".al-pv-close:hover .al-pv-close-stroke:first-child{transform:rotate(90deg);}",
     ".al-pv-close:hover .al-pv-close-stroke:last-child{transform:rotate(-90deg);}",
-    // frosted glass: a translucent tint + backdrop-filter blur, masked so
-    // the blur itself fades out toward the bottom edge instead of cutting
-    // off in a hard line. backdrop-filter behind a transformed ancestor
-    // (this overlay's whole slot-shift carousel is built on transformed
-    // cards) is a known cross-browser trouble spot, Safari especially —
-    // untested there, so if it renders wrong or stays frozen on an actual
-    // iOS/macOS Safari, that's the first thing to suspect and the plain
-    // gradient-fade version (solid-to-transparent, no blur) is the fallback.
+    // frosted glass: a translucent tint + backdrop-filter blur, cut with a
+    // flat edge rather than faded to transparent — a masked fade tried
+    // here earlier could only ever cross-fade this blur's CONSTANT radius
+    // against the sharp content behind it via opacity, and at low opacity
+    // that blend is already visually indistinguishable from 0% over
+    // detailed content, so the "fade" read as an inconsistent, content-
+    // dependent hard cutoff anyway rather than the seamless dissolve it
+    // was going for. A flat edge is what real OS toolbars (iOS/macOS) use
+    // too — it reads as a deliberate boundary rather than an unfinished
+    // one, and renders identically regardless of what's scrolled behind
+    // it.
+    // backdrop-filter behind a transformed ancestor (this overlay's whole
+    // slot-shift carousel is built on transformed cards) is a known
+    // cross-browser trouble spot, Safari especially — untested there, so
+    // if it renders wrong or stays frozen on an actual iOS/macOS Safari,
+    // that's the first thing to suspect.
     // The header lives in the close-anchor, fixed at the center slot's
     // final position/size — during the slide it just sits there statically
     // while the actual cards scale/translate underneath it, so it visibly
     // detaches from whatever's animating in. Faded out for the move and
     // back in once the new card has settled (see go()) rather than left
     // on-screen the whole time
-    ".al-pv-header{position:absolute;top:0;left:0;right:0;height:96px;z-index:3;pointer-events:none;background:rgba(253,251,248,0.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 20%,rgba(0,0,0,0.75) 40%,rgba(0,0,0,0.4) 60%,rgba(0,0,0,0.12) 80%,rgba(0,0,0,0) 100%);mask-image:linear-gradient(180deg,#000 0%,#000 20%,rgba(0,0,0,0.75) 40%,rgba(0,0,0,0.4) 60%,rgba(0,0,0,0.12) 80%,rgba(0,0,0,0) 100%);border-radius:24px 24px 0 0;opacity:1;transition:opacity .18s ease;}",
+    ".al-pv-header{position:absolute;top:0;left:0;right:0;height:68px;z-index:3;pointer-events:none;background:rgba(253,251,248,0.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:24px 24px 0 0;opacity:1;transition:opacity .18s ease;}",
     // backdrop-filter behind a transformed ancestor (this whole carousel)
     // can leave a stale, frozen blur rendered through an opacity fade
     // instead of cleanly disappearing with it — turning the filter off
