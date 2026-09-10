@@ -959,6 +959,28 @@ class Component extends DCLogic {
     // touch, keyboard, or a programmatic scrollTo), so this is the one
     // place that reliably catches the exact frame engagement begins
     this.curiosityIconArmed = true;
+    // pitch cursor (block 1) and the AI-process icon (block 2) used to
+    // only fire from goTo()'s own pendingArrival bookkeeping — reliable
+    // for a swipe that actually completes a goTo() step, but silent for
+    // any arrival that gets here some other way (plain continuous
+    // scrolling, a browser/OS interaction that lets native scroll through
+    // instead of this file's own touchmove handling intercepting it — a
+    // real, confirmed case on an actual iPhone, not a hypothetical).
+    // Armed the same way curiosityIconArmed already proves out just
+    // above: watched directly here in update(), which runs on every
+    // scroll tick regardless of what caused it, so an arrival fires no
+    // matter how the visitor actually got to that card
+    this.pitchCursorArmed = true;
+    this.processIconArmed = true;
+    // how close `t` needs to be to a whole block index before treating it
+    // as "arrived" — deliberately tighter than the dot indicator's own
+    // Math.round(t) below. Both playPitchCursor and playProcessIcon
+    // measure the real on-screen position of elements inside the card via
+    // getBoundingClientRect() to compute their flight paths; firing at
+    // the dot's own halfway-point rounding would measure a card still
+    // mid-rise, producing a path aimed at wherever things happened to be
+    // sitting mid-transition rather than their actual resting spot
+    const ARRIVAL_EPSILON = 0.03;
 
     const update = () => {
       queued = false;
@@ -973,6 +995,22 @@ class Component extends DCLogic {
       }
       const p = clamp01(-rect.top / (rect.height - vh || 1));
       const t = START_AT + p * (count - 1);
+      if (Math.abs(t - 1) < ARRIVAL_EPSILON) {
+        if (this.pitchCursorArmed) {
+          this.pitchCursorArmed = false;
+          this.playPitchCursor();
+        }
+      } else {
+        this.pitchCursorArmed = true;
+      }
+      if (Math.abs(t - 2) < ARRIVAL_EPSILON) {
+        if (this.processIconArmed) {
+          this.processIconArmed = false;
+          this.playProcessIcon();
+        }
+      } else {
+        this.processIconArmed = true;
+      }
       // nearest whole card to the current scroll position, not "the last
       // one whose reveal threshold was crossed" — during the brief window
       // where two cards visually overlap mid-transition, rounding is what
@@ -1086,24 +1124,17 @@ class Component extends DCLogic {
 
     let index = 0; // 0 = block 1 ... count-1 = the last block
     let animating = false;
-    // the blocks that carry their own arrival animation, by 0-based index:
-    // block 1's bulb-and-car, block 2's multiplayer cursor and block 3's
-    // inline AI icon. Landing on one of these, from either direction, is
-    // what cues it — kept as a map rather than a flag per animation so
-    // adding one to another block is just another entry here.
-    //
-    // Block 1 is listed here as well as in initBurnText's engagement check
-    // above, and the two cover different arrivals. That check catches the
-    // section being pinned for the first time, when no goTo has run; this
-    // catches scrolling back up to block 1 from a later one, where the
-    // runway never disengages — so the check above stays disarmed for the
-    // whole trip and the bulb would otherwise sit there already spent
-    const ARRIVAL_ANIMATIONS = {
-      0: () => this.playCuriosityIcon(),
-      1: () => this.playPitchCursor(),
-      2: () => this.playProcessIcon()
-    };
-
+    // every card's own arrival animation (block 0's bulb-and-car, block
+    // 1's pitch cursor, block 2's AI-process icon) is now armed and fired
+    // straight from initBurnText's update() — see ARRIVAL_EPSILON there —
+    // which runs on every scroll tick regardless of what caused it, not
+    // just a goTo() step. This used to live here instead, gated behind
+    // settle() so a still-mid-transition card's layout wasn't measured
+    // too early, but that only ever fired for a swipe that completed a
+    // full goTo() step, going silent for any arrival that got here some
+    // other way — confirmed on a real iPhone, where a swipe visually
+    // advanced the cards via update()'s own scroll-reactive positioning
+    // without ever calling goTo() at all
     const engaged = () => {
       const rect = runway.getBoundingClientRect();
       return rect.top <= 1 && rect.bottom >= window.innerHeight - 1;
@@ -1114,23 +1145,9 @@ class Component extends DCLogic {
       const scrollable = rect.height - window.innerHeight;
       return runwayTop + (i / (count - 1)) * scrollable;
     };
-    // the arrival animation the transition currently settling should play,
-    // held here rather than fired straight from goTo(): mid-transition the
-    // block is still scaling/fading in (see the depth-lens transform in
-    // update()), so measuring its layout that early would start the
-    // animation from the wrong spot. Waiting for settle() means the block
-    // is already at its resting size and position before either
-    // playPitchCursor or playProcessIcon measures anything
-    let pendingArrival = null;
     const settle = () => {
-      console.log('[dbg] settle() called, hadPendingArrival=' + !!pendingArrival);
       animating = false;
       this.__curiosityScrollActive = false;
-      if (pendingArrival) {
-        const play = pendingArrival;
-        pendingArrival = null;
-        play();
-      }
     };
     // hand-driven rather than window.scrollTo({behavior:'smooth'}): a real
     // iPhone measured via Safari's remote inspector showed the native
@@ -1221,9 +1238,6 @@ class Component extends DCLogic {
     const goTo = (i) => {
       console.log('[dbg] goTo(' + i + ') called, current index=' + index + ' animating=' + animating);
       const nextIndex = Math.max(0, Math.min(count - 1, i));
-      if (ARRIVAL_ANIMATIONS[nextIndex] && nextIndex !== index) {
-        pendingArrival = ARRIVAL_ANIMATIONS[nextIndex];
-      }
       index = nextIndex;
       animating = true;
       animateScrollTo(index);
