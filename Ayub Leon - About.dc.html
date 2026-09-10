@@ -100,6 +100,24 @@
      other link on the page keeps the muted treatment */
   [data-behance-trigger] a { color: inherit; }
   [data-behance-trigger] a:hover { color: #fff8f4; }
+  /* periodic nudge so the icon reads as clickable even before anyone
+     hovers it — pops up in size, shakes while enlarged, then settles back
+     down. z-index lifts it above the surrounding text for the moment it's
+     bigger than its own inline box, so it overlaps the words either side
+     rather than pushing them apart; timing (see initBehanceShake) keeps
+     this rare enough that it reads as a hint, not a distraction */
+  [data-behance-icon] { position: relative; }
+  [data-behance-icon].is-shaking { animation: behanceZoomShake 1.5s cubic-bezier(.34,1.2,.34,1); z-index: 5; }
+  @keyframes behanceZoomShake {
+    0%   { transform: scale(1) rotate(0deg); }
+    22%  { transform: scale(1.5) rotate(0deg); }
+    38%  { transform: scale(1.5) rotate(-10deg); }
+    48%  { transform: scale(1.5) rotate(9deg); }
+    58%  { transform: scale(1.5) rotate(-7deg); }
+    68%  { transform: scale(1.5) rotate(5deg); }
+    78%  { transform: scale(1.5) rotate(-2deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
   a:focus-visible, button:focus-visible { outline: 2px solid #EF4418; outline-offset: 3px; border-radius: 4px; }
   a:active, button:active { opacity: 0.7; }
   ::selection { background: #54A9FF; color: #0a0606; }
@@ -202,7 +220,7 @@
     <div class="story-grid-2" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px 72px; margin-top: 84px; align-items: start;">
       <div data-reveal="1">
         <h2 style="margin: 0 0 12px; font-family: Poppins, Helvetica, sans-serif; font-size: 1.125rem; font-weight: 500; line-height: 1.65; letter-spacing: -0.015em; color: #f4eeeb;">Off the Clock or When I Close Figma</h2>
-        <p style="margin: 0; max-width: 58ch; font-size: 0.9375rem; line-height: 1.78; color: rgba(244,238,235,0.86); text-wrap: pretty;">Outside of work, I&#39;m usually messing around with some other form of <span data-behance-trigger style="cursor: pointer;"><a href="https://www.behance.net/ayubleon" target="_blank" rel="noopener noreferrer" aria-label="Ayub Leon on Behance">design</a><a href="https://www.behance.net/ayubleon" target="_blank" rel="noopener noreferrer" aria-label="Ayub Leon on Behance" style="display: inline-block; vertical-align: -4px; margin: 0 6px;"><img src="images/behance-logo.svg" alt="Behance" style="width: 20px; height: 20px; border-radius: 5px; display: block;"></a></span>.</p><p style="margin: 16px 0 0; max-width: 58ch; font-size: 0.9375rem; line-height: 1.78; color: rgba(244,238,235,0.86); text-wrap: pretty;">I also tend to fall down rabbit holes. A YouTube video about a car build can turn into an evening of tech reviews, science, DIY projects, or whatever else catches my attention. Gaming and pool have stuck around too. If you&#39;re not too serious about work, hit me up and let&#39;s play a round sometime.</p><p style="margin: 16px 0 0; max-width: 58ch; font-size: 0.9375rem; line-height: 1.78; color: rgba(244,238,235,0.86); text-wrap: pretty;">I&#39;ve always liked making things, taking them apart, and figuring out how they work. Design is just what ended up becoming my work.</p>
+        <p style="margin: 0; max-width: 58ch; font-size: 0.9375rem; line-height: 1.78; color: rgba(244,238,235,0.86); text-wrap: pretty;">Outside of work, I&#39;m usually messing around with some other form of <span data-behance-trigger style="cursor: pointer;"><a href="https://www.behance.net/ayubleon" target="_blank" rel="noopener noreferrer" aria-label="Ayub Leon on Behance">design</a><a href="https://www.behance.net/ayubleon" target="_blank" rel="noopener noreferrer" aria-label="Ayub Leon on Behance" style="display: inline-block; vertical-align: -4px; margin: 0 6px;"><img data-behance-icon src="images/behance-logo.svg" alt="Behance" style="width: 20px; height: 20px; border-radius: 5px; display: block;"></a></span>.</p><p style="margin: 16px 0 0; max-width: 58ch; font-size: 0.9375rem; line-height: 1.78; color: rgba(244,238,235,0.86); text-wrap: pretty;">I also tend to fall down rabbit holes. A YouTube video about a car build can turn into an evening of tech reviews, science, DIY projects, or whatever else catches my attention. Gaming and pool have stuck around too. If you&#39;re not too serious about work, hit me up and let&#39;s play a round sometime.</p><p style="margin: 16px 0 0; max-width: 58ch; font-size: 0.9375rem; line-height: 1.78; color: rgba(244,238,235,0.86); text-wrap: pretty;">I&#39;ve always liked making things, taking them apart, and figuring out how they work. Design is just what ended up becoming my work.</p>
         <span data-behance-tooltip aria-hidden="true" style="position: fixed; top: 0; left: 0; z-index: 9999; padding: 6px 12px; background: #0056FF; color: #ffffff; font-family: Poppins, Helvetica, sans-serif; font-size: 0.7812rem; font-weight: 500; white-space: nowrap; border-radius: 0; opacity: 0; pointer-events: none; transition: opacity .15s ease; transform: translate(-9999px, -9999px);">Let's have a look</span>
       </div>
       <div data-reveal="2">
@@ -315,6 +333,33 @@ class Component extends DCLogic {
     trigger.addEventListener('mouseenter', this.onBehanceEnter);
     trigger.addEventListener('mousemove', this.onBehanceMove);
     trigger.addEventListener('mouseleave', this.onBehanceLeave);
+  }
+
+  // nudges the Behance icon every so often so its clickability doesn't
+  // depend on a visitor hovering it first. Guarded the same way as
+  // initPhotoStack/initBehanceTooltip above — an instance property plus a
+  // marker on the icon itself, for the same support.js rebuild-wave
+  // reasons documented there
+  initBehanceShake() {
+    const icon = document.querySelector('[data-behance-icon]');
+    if (!icon) return;
+    if (this.shakeBound && icon.__shakeWired) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    this.shakeBound = true;
+    icon.__shakeWired = true;
+    this.behanceIcon = icon;
+    // removing then re-adding (rather than just adding, which is a no-op
+    // if the class is already present) is what lets a hover mid-animation
+    // restart it from the top instead of doing nothing
+    const trigger = () => {
+      icon.classList.remove('is-shaking');
+      void icon.offsetWidth;
+      icon.classList.add('is-shaking');
+    };
+    this.behanceShakeInterval = setInterval(trigger, 7000);
+    this.onBehanceIconEnter = trigger;
+    icon.addEventListener('mouseenter', this.onBehanceIconEnter);
+    icon.addEventListener('animationend', () => icon.classList.remove('is-shaking'));
   }
 
   // the same hover tick the nav dock's links play, on each "People I've
@@ -519,6 +564,7 @@ class Component extends DCLogic {
   componentDidMount() {
     AL.selfHeal(() => this.initPhotoStack(), 5000);
     AL.selfHeal(() => this.initBehanceTooltip(), 5000);
+    AL.selfHeal(() => this.initBehanceShake(), 5000);
     AL.selfHeal(() => this.initFriendHoverSound(), 5000);
     AL.selfHeal(() => this.initContactSend(), 5000);
     // wrapped like initPhotoStack above (not called once): these two also
@@ -621,6 +667,8 @@ class Component extends DCLogic {
       this.behanceTrigger.removeEventListener('mousemove', this.onBehanceMove);
       this.behanceTrigger.removeEventListener('mouseleave', this.onBehanceLeave);
     }
+    if (this.behanceShakeInterval) clearInterval(this.behanceShakeInterval);
+    if (this.behanceIcon && this.onBehanceIconEnter) this.behanceIcon.removeEventListener('mouseenter', this.onBehanceIconEnter);
     if (this.friendCells) {
       this.friendCells.forEach((cell) => {
         cell.removeEventListener('mouseenter', this.onFriendEnter);

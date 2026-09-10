@@ -352,17 +352,15 @@
 
     el.querySelectorAll('.site-nav-link').forEach(function (link) {
       if (supportsHover) link.addEventListener('mouseenter', playSwitchOnRealHover);
-      link.addEventListener('click', function (e) {
-        playClick();
-        var href = link.getAttribute('href') || '';
-        // in-page anchors (e.g. "#work") don't unload the document, so
-        // there's nothing to race — only links to another page need a
-        // brief hold so the click sound isn't cut off by the navigation
-        if (href.charAt(0) === '#') return;
-        if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-        e.preventDefault();
-        setTimeout(function () { window.location.href = href; }, 140);
-      });
+      // used to hold navigation for 140ms behind a setTimeout so the
+      // click sound wasn't cut off by the page unload — that's exactly
+      // the kind of gap that occasionally never fires (a bare setTimeout
+      // racing a real navigation, a stray second click, tab throttling),
+      // which read as the nav sometimes just not responding. The browser
+      // already navigates on its own the instant this returns without
+      // calling preventDefault; this just fires the sound alongside that
+      // instead of gating navigation behind it
+      link.addEventListener('click', playClick);
     });
 
     if (supportsHover) toggleBtn.addEventListener('mouseenter', playSwitchOnRealHover);

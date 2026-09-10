@@ -71,7 +71,12 @@
     // pre-zoom size/position with an inverse transform and immediately
     // releases it, so this transition eases it back to identity — a
     // compositor-only resize animation with no per-frame layout reflow
-    ".al-lightbox-imgwrap{position:relative;display:flex;align-items:center;justify-content:center;max-width:100%;overflow:hidden;transition:transform 420ms cubic-bezier(.22,1,.36,1);}",
+    // column, not row — a no-op for every ordinary image (still one
+    // centered child either way), but it's what lets the zoom hint below
+    // sit as a real row above the image instead of overlaid on top of it.
+    // display:none on the hint for non-zoomable images means it takes no
+    // part in this layout at all, so this costs nothing there
+    ".al-lightbox-imgwrap{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;max-width:100%;overflow:hidden;transition:transform 420ms cubic-bezier(.22,1,.36,1);}",
     ".al-lightbox-img{max-width:min(88vw,1400px);max-height:88vh;width:auto;height:auto;display:block;object-fit:contain;border-radius:12px;box-shadow:0 40px 100px -30px rgba(0,0,0,0.7);transform:scale(0.96);transition:transform 420ms cubic-bezier(.22,1,.36,1);}",
     // matches the padding-bottom override above exactly (100vh minus the
     // 40px top padding minus the 128px bottom padding) rather than the
@@ -80,6 +85,12 @@
     // an image tall enough to want the full 88vh could still overflow
     // into the padding this reserves for the filmstrip
     ".al-lightbox.has-filmstrip .al-lightbox-img{max-height:calc(100vh - 168px);}",
+    // shrinks the image just enough to leave room for the zoom hint's own
+    // row above it (its height plus the gap above) — scoped to zoomable
+    // images only, since a non-zoomable image never renders the hint and
+    // has nothing to make room for
+    ".al-lightbox-imgwrap.is-zoomable .al-lightbox-img{max-height:calc(88vh - 44px);}",
+    ".al-lightbox.has-filmstrip .al-lightbox-imgwrap.is-zoomable .al-lightbox-img{max-height:calc(100vh - 168px - 44px);}",
     ".al-lightbox.is-open .al-lightbox-img{transform:scale(1);}",
     // pinned to a fixed spot on screen rather than flowing directly under
     // the image inside the stage — different images in the same gallery
@@ -165,7 +176,11 @@
     // enterZoom's own comment covers why. Height matches the padding
     // above exactly: 100vh minus the 64px top and 160px bottom margins
     ".al-lightbox-imgwrap.is-zoomable{cursor:zoom-in;}",
-    ".al-lightbox-zoom-hint{display:none;position:absolute;top:20px;right:20px;z-index:1;align-items:center;gap:6px;background:#0A84FF;color:#fff;font-family:'Schibsted Grotesk',Helvetica,sans-serif;font-size:0.75rem;font-weight:500;padding:6px 12px 6px 10px;border-radius:999px;box-shadow:0 10px 22px -10px rgba(10,132,255,0.6);pointer-events:none;}",
+    // a row in the imgwrap's own column flow now (see .al-lightbox-imgwrap
+    // above), not an overlay pinned to the image's corner — flex-shrink:0
+    // keeps it at its natural size rather than being squeezed by the
+    // column's own height constraints
+    ".al-lightbox-zoom-hint{display:none;flex-shrink:0;align-items:center;gap:6px;background:#0A84FF;color:#fff;font-family:'Schibsted Grotesk',Helvetica,sans-serif;font-size:0.75rem;font-weight:500;padding:6px 12px 6px 10px;border-radius:999px;box-shadow:0 10px 22px -10px rgba(10,132,255,0.6);pointer-events:none;}",
     ".al-lightbox-zoom-hint svg{width:13px;height:13px;flex-shrink:0;}",
     // shown for the whole time the image sits zoomable (not on hover
     // only) since hover discovery isn't guaranteed, and a visitor
@@ -219,7 +234,7 @@
     // thumbnail — overlapping the little image would compete with the
     // yellow box it's trying to explain, right where a visitor is meant
     // to look
-    ".al-lightbox-navigator-hint{position:absolute;top:50%;right:-34px;transform:translateY(-50%);z-index:1;display:flex;align-items:center;justify-content:center;width:22px;height:44px;border-radius:999px;background:rgba(10,6,6,0.72);color:#fff;backdrop-filter:blur(6px);pointer-events:none;}",
+    ".al-lightbox-navigator-hint{position:absolute;top:50%;right:-34px;transform:translateY(-50%);z-index:1;display:flex;align-items:center;justify-content:center;width:22px;height:44px;border-radius:999px;background:#0A84FF;color:#fff;pointer-events:none;}",
     ".al-lightbox-navigator-hint svg{width:14px;height:14px;}",
     // acts like a toast morphing out of the popup's own close button
     // rather than a bar laid over the image — it never actually travels
@@ -503,8 +518,9 @@
       '<div class="al-lightbox-backdrop" data-lightbox-backdrop></div>' +
       '<div class="al-lightbox-blur"></div>' +
       '<div class="al-lightbox-stage">' +
-        '<div class="al-lightbox-imgwrap" data-lightbox-imgwrap><img class="al-lightbox-img" data-lightbox-img decoding="async" alt="">' +
+        '<div class="al-lightbox-imgwrap" data-lightbox-imgwrap>' +
           '<span class="al-lightbox-zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>Click to zoom</span>' +
+          '<img class="al-lightbox-img" data-lightbox-img decoding="async" alt="">' +
         '</div>' +
         '<div class="al-lightbox-navigator" data-lightbox-navigator>' +
           '<img data-lightbox-navimg alt="">' +

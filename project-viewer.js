@@ -40,6 +40,21 @@
   var pushedEntry = false;
   var canRoute = !!(window.history && window.history.pushState);
 
+  // set the one time this tab actually pushes a card's own entry — real,
+  // site-internal browsing, as opposed to a page freshly loaded with a
+  // project's path already in the bar. Read back in requestClose() below;
+  // see its own comment for why a reload mid-browsing needs this to tell
+  // the two apart. sessionStorage rather than a plain variable because a
+  // reload is exactly the case this exists for, and a reload wipes every
+  // in-memory variable this file has, pushedEntry included
+  var CAME_FROM_SITE_KEY = 'alPvCameFromSite';
+  function markCameFromSite() {
+    try { window.sessionStorage.setItem(CAME_FROM_SITE_KEY, '1'); } catch (e) {}
+  }
+  function cameFromSite() {
+    try { return window.sessionStorage.getItem(CAME_FROM_SITE_KEY) === '1'; } catch (e) { return false; }
+  }
+
   function syncUrl(href) {
     if (!canRoute) return;
     if (!pushedEntry && href === window.location.pathname) return;
@@ -49,6 +64,7 @@
     }
     window.history.pushState({ alProject: href }, '', href);
     pushedEntry = true;
+    markCameFromSite();
   }
 
   // every close the reader triggers routes through here rather than
@@ -60,6 +76,23 @@
     if (pushedEntry && canRoute) {
       pushedEntry = false;
       window.history.back();
+      return;
+    }
+    // pushedEntry is false here for two very different reasons that look
+    // identical to this fresh page load: a genuine deep link (someone
+    // shared /buzziq, this reader never was on /work) or a reload while
+    // the card was open (which re-requests the URL the card had pushed as
+    // a real page, so this project's own standalone page is now
+    // genuinely what's loaded, with no memory of /work left to pop back
+    // to). The first case is meant to just reveal that real page — see
+    // openFromUrl's own comment — but the second one left the reader
+    // stranded on it instead of back where they'd actually been browsing.
+    // cameFromSite() is what tells them apart: only real, in-session
+    // pushes (not the deep-link boot below, which skips syncUrl entirely)
+    // ever set it, so a reload can wipe every in-memory flag on this page
+    // without losing the distinction
+    if (cameFromSite() && canRoute) {
+      window.location.href = '/work';
       return;
     }
     close();
@@ -391,7 +424,18 @@
     // it shows through as a visible dark edge wherever the cover-fit image
     // doesn't fully hide it, and as an outright letterboxed bar around the
     // prototype video, which uses object-fit:contain instead of cover
-    ".al-pv-card [data-pv-inner] div:has(> img),.al-pv-card [data-pv-inner] div:has(> video){box-shadow:0 6px 24px -6px rgba(0,0,0,0.14);background:var(--al-card-light,#FDFBF8) !important;border:none !important;}",
+    //
+    // :only-child is load-bearing — a plain :has(> img) also matched a
+    // flex column that wraps a whole labeled block (a heading, a
+    // paragraph, AND the image as three siblings), not just a dedicated
+    // image wrapper, since the image still qualifies as "a direct child".
+    // That put the shadow/background/border treatment around the entire
+    // text+image block instead of the image alone — visible as a framed,
+    // drop-shadowed box around whole sections that were never meant to be
+    // boxed. Every genuine image/video wrapper in the source markup has
+    // the media as its one and only child, so restricting to that excludes
+    // the false match while still catching every real one
+    ".al-pv-card [data-pv-inner] div:has(> img:only-child),.al-pv-card [data-pv-inner] div:has(> video:only-child){box-shadow:0 6px 24px -6px rgba(0,0,0,0.14);background:var(--al-card-light,#FDFBF8) !important;border:none !important;}",
     // the label type itself comes from shared.js's .al-eyebrow rule, which
     // also matches both case-study label classes, so the markup this card
     // fetches from those pages is styled without needing a copy of it here.
