@@ -157,12 +157,12 @@
         // page's fixed nav bar sitting over it — this card has its own
         // close button instead, not a full nav, so that much clearance
         // just reads as a gap between it and the title. Matched to the
-        // frosted header's own 96px height (see .al-pv-header below) so
-        // its blur fade never overlaps the title itself — this used to be
-        // a mismatched 64px, letting the header's last ~32px of blur cut
-        // across the top of every project's heading
+        // frosted header's own 68px height (see .al-pv-header below) so
+        // it never overlaps the title itself — keep these two in sync if
+        // either changes, a mismatch either leaves a too-big gap or lets
+        // the header cut across the top of every project's heading
         var hero = main.querySelector('section');
-        if (hero) hero.style.paddingTop = '96px';
+        if (hero) hero.style.paddingTop = '68px';
 
         // the hero's black sentence and grey trailing clause come from the
         // page itself now. What's left here is this card's own layout: the
@@ -902,8 +902,7 @@
   // a card the reader stepped Forward into, and the deep-link boot below,
   // where the URL already names this exact project
   function open(href, skipUrl) {
-    var firstBuild = !overlay;
-    if (firstBuild) build();
+    if (!overlay) build();
     var idx = ORDER.indexOf(href);
     currentIndex = idx === -1 ? 0 : idx;
     if (!skipUrl) syncUrl(href);
@@ -920,24 +919,6 @@
       // is still an in-flight fetch at this exact point
       var closeBtn = overlay.querySelector('[data-pv-close]');
       if (closeBtn) closeBtn.focus();
-      // on this overlay's very first build, the header's mask-image can
-      // lose the race against its own dynamically-inserted <style> tag and
-      // paint once as a flat, unmasked blur (a hard-edged bar instead of
-      // the fade) — the same class of backdrop-filter/masking flake the
-      // hidden-state comment above already works around. Forcing the
-      // filter off then back on right after this first paint discards
-      // whatever compositing layer that bad first frame produced, so the
-      // very next frame recomposites clean with the mask actually applied
-      if (firstBuild) {
-        var header = overlay.querySelector('.al-pv-header');
-        if (header) {
-          header.style.backdropFilter = 'none';
-          header.style.webkitBackdropFilter = 'none';
-          void header.offsetHeight;
-          header.style.backdropFilter = '';
-          header.style.webkitBackdropFilter = '';
-        }
-      }
     });
   }
 
