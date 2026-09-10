@@ -21,8 +21,7 @@
 <style>html, body { background: #FDFBF8; margin: 0; }
   @view-transition { navigation: auto; }
   [data-settle-veil] { position: fixed; inset: 0; z-index: 9999; background: #FDFBF8; opacity: 1; transition: opacity .35s ease; }
-  /* self-hosted, not loaded from Google Fonts: needed here even though this page's own body copy never uses Playfair, because the sliding project popup (project-viewer.js) injects a case study's body HTML into THIS document without carrying over that page's own <head> — so BuzzIQ/Danadana's pull-quotes need this face already registered on every page that can open their popup, or they silently fall back to Georgia with no way to recover short of reloading the case study's own URL directly */
-  @font-face { font-family: 'Playfair Display'; font-style: italic; font-weight: 100 900; font-display: block; src: url('fonts/playfair-display-italic-variable.woff2') format('woff2-variations'); }</style>
+</style>
 <!-- the settle veil is opaque black until shared.js fades it, so anything
      that renders this page without running the scripts — a crawler, an AI
      fetcher, a reader with JS off — sees a black screen over the whole
@@ -65,7 +64,7 @@
 <script src="more-work-cards.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600&amp;family=Instrument+Serif:ital@0;1&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
 </head>
 <body>
 <!-- sits outside <x-dc> so boot()'s dc.replaceWith swap (see the
@@ -78,7 +77,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600&amp;family=Instrument+Serif:ital@0;1&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
 <style>
   html, body { margin: 0; padding: 0; background: #FDFBF8; }
   body { -webkit-font-smoothing: antialiased; }

@@ -21,14 +21,7 @@
 <style>html, body { background: #FDFBF8; margin: 0; }
   @view-transition { navigation: auto; }
   [data-settle-veil] { position: fixed; inset: 0; z-index: 9999; background: #FDFBF8; opacity: 1; transition: opacity .35s ease; }
-  /* self-hosted variable font (wght 400-900), not loaded from Google Fonts:
-     the web-served Playfair Display at fonts.googleapis.com strips the
-     italic's discretionary-ligature glyphs (the connected, hand-lettered
-     swashes the design calls for) down to a 312-glyph subset to cut file
-     size, so no font-feature-settings value could ever turn on a feature
-     the file simply doesn't contain. This copy is pulled from Google's own
-     font source repo instead, which keeps the full 1101-glyph set */
-  @font-face { font-family: 'Playfair Display'; font-style: italic; font-weight: 100 900; font-display: block; src: url('fonts/playfair-display-italic-variable.woff2') format('woff2-variations'); }</style>
+</style>
 <!-- the settle veil is opaque black until shared.js fades it, so anything
      that renders this page without running the scripts — a crawler, an AI
      fetcher, a reader with JS off — sees a black screen over the whole
@@ -71,7 +64,7 @@
 <script src="more-work-cards.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
 </head>
 <body>
 <!-- sits outside <x-dc> so boot()'s dc.replaceWith swap (see the
@@ -84,7 +77,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
 <style>
   html, body { margin: 0; padding: 0; background: #FDFBF8; }
   body { -webkit-font-smoothing: antialiased; }
@@ -235,7 +228,7 @@
           </div>
         </div>
 
-        <p style="margin: 0; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 500; font-size: clamp(1.35rem, 2.2vw, 1.944rem); line-height: 1.35; letter-spacing: -0.01em; color: #0A84FF; font-feature-settings: 'dlig' 1; text-wrap: pretty;">Made most design decisions independently first, working across a Kenya/US time zone gap, then brought them to directors and developers to review and align on before moving forward.</p>
+        <p style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-size: clamp(1.5rem, 2.4vw, 2.1rem); line-height: 1.4; letter-spacing: -0.01em; color: #0A84FF; text-wrap: pretty;">Made most design decisions independently first, working across a Kenya/US time zone gap, then brought them to directors and developers to review and align on before moving forward.</p>
 
         <div style="display: flex; flex-direction: column; gap: 20px;">
           <p class="case-bullet-item" style="margin: 0; padding-left: 20px; border-left: 4px solid #0A84FF;">Brought in a design system I'd already built on my own and reshaped it to fit what BuzzIQ actually needed, since there was nothing in place to start from.</p>
@@ -322,7 +315,7 @@
         <p class="case-body-text">Every screen got weighed against both sides, what the business needed and what users needed, before it was final.</p>
         <p class="case-body-text">Once designs were handed off, the dev team flagged anything hard to build so we could fix it before it slowed anyone down.</p>
         <p class="case-body-text">We had a working prototype before development started, which meant a lot of the guesswork and back-and-forth that usually eats into a build never happened.</p>
-        <p style="margin: 24px 0 0; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 500; font-size: clamp(1.35rem, 2.2vw, 1.944rem); line-height: 1.35; letter-spacing: -0.01em; color: #0A84FF; font-feature-settings: 'dlig' 1; text-wrap: pretty;">That back and forth is what let a solo designer keep pace with a moving team.</p>
+        <p style="margin: 24px 0 0; font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-size: clamp(1.5rem, 2.4vw, 2.1rem); line-height: 1.4; letter-spacing: -0.01em; color: #0A84FF; text-wrap: pretty;">That back and forth is what let a solo designer keep pace with a moving team.</p>
       </div>
     </div>
   </section>
