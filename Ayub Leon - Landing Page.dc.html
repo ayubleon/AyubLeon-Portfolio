@@ -1016,7 +1016,7 @@ class Component extends DCLogic {
     let queued = false;
     this.onBurnScroll = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
     this.onBurnResize = update;
-    this.initBurnSwipe(runway, count);
+    this.initBurnSwipe(runway, count, update);
 
     update();
     window.addEventListener('scroll', this.onBurnScroll, { passive: true });
@@ -1043,7 +1043,7 @@ class Component extends DCLogic {
   // bulb/car icon used to consume a reserved first swipe here instead of
   // advancing — TEST: it now plays automatically on arrival, from
   // initBurnText's update() above, so every swipe here just advances.)
-  initBurnSwipe(runway, count) {
+  initBurnSwipe(runway, count, update) {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     // guards against being bound twice: initBurnText() re-runs whenever
     // AL.selfHeal sees the DOM change, and its own guard only checks each
@@ -1142,6 +1142,20 @@ class Component extends DCLogic {
         const t = Math.min(1, (now - startTime) / SCROLL_DURATION_MS);
         const target = targetFor(i);
         window.scrollTo(0, startY + (target - startY) * easeOutCubic(t));
+        // the card's own rise/lift/scale (initBurnText's update(), passed
+        // in above) is normally driven by a 'scroll' event listener, which
+        // assumes the browser dispatches one every time scrollY changes.
+        // That held for native smooth-scroll, but calling scrollTo()
+        // manually every rAF tick isn't guaranteed the same treatment —
+        // some engines coalesce or delay 'scroll' dispatch for rapid
+        // programmatic scrolling, which left the visual reveal lagging
+        // behind the position this loop had already reached (cards
+        // reported as peeking partway, or snapping back before finishing,
+        // even though the scroll position itself was moving correctly).
+        // Calling it directly here puts the reveal in lockstep with the
+        // exact position just set, this same frame, with no dependency on
+        // however the browser chooses to schedule the native event
+        update();
         if (t < 1) {
           scrollAnimId = requestAnimationFrame(step);
         } else {
