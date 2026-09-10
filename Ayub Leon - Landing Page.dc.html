@@ -1022,19 +1022,24 @@ class Component extends DCLogic {
       console.log('[dbg] resize event: innerHeight ' + __dbgLastVh + ' -> ' + newVh + ', scrollY=' + window.scrollY);
       __dbgLastVh = newVh;
     });
-    // catches any scrollY movement not caused by this file's own goTo()/
-    // animateScrollTo() — including native momentum, rubber-banding, or a
-    // layout shift from something else on the page changing height while
-    // the toolbar is mid-transition — logged whenever it moves the WRONG
-    // way (backward) or by a large jump, so this doesn't flood the
-    // console during an intentional forward swipe
+    // catches any backward scrollY movement while this.__curiosityScrollActive
+    // is true — i.e. only during the window animateScrollTo() (below, in
+    // initBurnSwipe) is supposed to have exclusive control of the scroll
+    // position, from a swipe's goTo() through its post-arrival hold.
+    // Gated on that flag rather than logging any backward scroll anywhere:
+    // ordinary momentum from the visitor scrolling back up elsewhere on
+    // the page is normal and expected, not a bug, and an earlier
+    // ungated version of this logged that too, which read as the section
+    // being broken everywhere rather than the one specific window where
+    // a backward move actually means something fought this file's own
+    // scroll control
     let __dbgLastY = window.scrollY;
     let __dbgLastYTime = performance.now();
     const __dbgWatchScroll = () => {
       const y = window.scrollY;
       const now = performance.now();
       const dy = y - __dbgLastY;
-      if (dy < -5) {
+      if (dy < -5 && this.__curiosityScrollActive) {
         console.log('[dbg] UNEXPECTED backward scroll: ' + __dbgLastY.toFixed(0) + ' -> ' + y.toFixed(0) + ' (' + dy.toFixed(0) + 'px) over ' + (now - __dbgLastYTime).toFixed(0) + 'ms, innerHeight=' + window.innerHeight);
       }
       __dbgLastY = y;
@@ -1120,6 +1125,7 @@ class Component extends DCLogic {
     const settle = () => {
       console.log('[dbg] settle() called, hadPendingArrival=' + !!pendingArrival);
       animating = false;
+      this.__curiosityScrollActive = false;
       if (pendingArrival) {
         const play = pendingArrival;
         pendingArrival = null;
@@ -1163,6 +1169,7 @@ class Component extends DCLogic {
     const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
     let scrollAnimId = null;
     const animateScrollTo = (i) => {
+      this.__curiosityScrollActive = true;
       if (scrollAnimId) {
         console.log('[dbg] animateScrollTo(' + i + ') cancelling a still-running previous animation');
         cancelAnimationFrame(scrollAnimId);
