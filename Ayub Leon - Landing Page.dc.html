@@ -1147,6 +1147,19 @@ class Component extends DCLogic {
     // need to guess when the browser's own scroll finished, since this
     // one calls settle() the instant it's actually done
     const SCROLL_DURATION_MS = 420;
+    // measured live on a real iPhone (Safari remote inspector): the instant
+    // this animation stopped actively setting the scroll position, the
+    // page kept drifting backward on its own for several more frames — a
+    // steady ~8px/frame for ~150ms, the signature of native iOS scroll
+    // momentum the original touch queued, which e.preventDefault() on
+    // touchmove doesn't fully suppress once any of it has already been
+    // queued. That's what was undoing a just-settled card with no new
+    // touch input. Holding the position pinned at the target for a bit
+    // longer after the eased approach finishes — still actively calling
+    // scrollTo() every frame, just at a fixed value instead of an easing
+    // one — absorbs that trailing momentum instead of releasing control
+    // right as it starts
+    const SCROLL_HOLD_MS = 220;
     const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
     let scrollAnimId = null;
     const animateScrollTo = (i) => {
@@ -1159,13 +1172,15 @@ class Component extends DCLogic {
       let frameCount = 0;
       let lastFrameTime = startTime;
       let maxFrameGap = 0;
+      let loggedArrival = false;
       console.log('[dbg] animateScrollTo(' + i + ') starting, startY=' + startY.toFixed(0) + ' target=' + targetFor(i).toFixed(0));
       const step = (now) => {
         frameCount++;
         const gap = now - lastFrameTime;
         if (gap > maxFrameGap) maxFrameGap = gap;
         lastFrameTime = now;
-        const t = Math.min(1, (now - startTime) / SCROLL_DURATION_MS);
+        const elapsed = now - startTime;
+        const t = Math.min(1, elapsed / SCROLL_DURATION_MS);
         const target = targetFor(i);
         window.scrollTo(0, startY + (target - startY) * easeOutCubic(t));
         // the card's own rise/lift/scale (initBurnText's update(), passed
@@ -1182,11 +1197,15 @@ class Component extends DCLogic {
         // exact position just set, this same frame, with no dependency on
         // however the browser chooses to schedule the native event
         update();
-        if (t < 1) {
+        if (t >= 1 && !loggedArrival) {
+          loggedArrival = true;
+          console.log('[dbg] animateScrollTo(' + i + ') eased approach done at ' + elapsed.toFixed(0) + 'ms, holding for ' + SCROLL_HOLD_MS + 'ms to absorb any trailing momentum');
+        }
+        if (elapsed < SCROLL_DURATION_MS + SCROLL_HOLD_MS) {
           scrollAnimId = requestAnimationFrame(step);
         } else {
           scrollAnimId = null;
-          console.log('[dbg] animateScrollTo(' + i + ') finished: ' + frameCount + ' frames, ' + (now - startTime).toFixed(0) + 'ms wall time, largest gap between frames ' + maxFrameGap.toFixed(0) + 'ms, finalTarget=' + target.toFixed(0));
+          console.log('[dbg] animateScrollTo(' + i + ') finished: ' + frameCount + ' frames, ' + elapsed.toFixed(0) + 'ms wall time, largest gap between frames ' + maxFrameGap.toFixed(0) + 'ms, finalTarget=' + target.toFixed(0));
           settle();
         }
       };
