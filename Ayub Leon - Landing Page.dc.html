@@ -242,21 +242,22 @@
      this inner div is free to carry its own static tilt without that
      scroll transform ever overwriting it (update() only ever sets
      [data-burn-block]'s own inline transform, never reaches in here) */
-  .al-curiosity-card { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 -30px 60px -40px rgba(0,0,0,0.35), 0 50px 100px -50px rgba(0,0,0,0.6); background-repeat: repeat; }
+  /* --al-tint/--al-tilt are the only two things that vary per card (set
+     just below) — the gradient string, shadow, and every other property
+     are declared once here instead of repeated in each nth-of-type rule */
+  .al-curiosity-card { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 -30px 60px -40px rgba(0,0,0,0.35), 0 50px 100px -50px rgba(0,0,0,0.6); background-repeat: repeat; background: repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(10,6,6,0.06) 28px), var(--al-tint); transform: rotate(var(--al-tilt)); }
   /* each card its own faint tint rather than flat white — all four sit
      near the section's #0056FF accent without matching it outright, so
      the stack reads as a related family of cards rather than one repeated
      color. See the "Curiosity Card Tints" demo for the reasoning behind
-     each pick. The ruled lines are a second background layered UNDER that
-     tint (multiple backgrounds, image first) rather than replacing it —
-     additive index-card texture only. The tilt is what actually reads as
-     "pinned down" rather than just resting flat; alternating direction
-     per card is what keeps four of them side by side from looking like
-     one card copy-pasted four times */
-  [data-burn-block]:nth-of-type(1) .al-curiosity-card { background: repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(10,6,6,0.06) 28px), #F3F6FF; transform: rotate(-2deg); }
-  [data-burn-block]:nth-of-type(2) .al-curiosity-card { background: repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(10,6,6,0.06) 28px), #FAF6F1; transform: rotate(1.5deg); }
-  [data-burn-block]:nth-of-type(3) .al-curiosity-card { background: repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(10,6,6,0.06) 28px), #F1F0FB; transform: rotate(-1.5deg); }
-  [data-burn-block]:nth-of-type(4) .al-curiosity-card { background: repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(10,6,6,0.06) 28px), #EEF5F7; transform: rotate(2deg); }
+     each pick. The tilt is what actually reads as "pinned down" rather
+     than just resting flat; alternating direction per card is what keeps
+     four of them side by side from looking like one card copy-pasted
+     four times */
+  [data-burn-block]:nth-of-type(1) .al-curiosity-card { --al-tint: #F3F6FF; --al-tilt: -2deg; }
+  [data-burn-block]:nth-of-type(2) .al-curiosity-card { --al-tint: #FAF6F1; --al-tilt: 1.5deg; }
+  [data-burn-block]:nth-of-type(3) .al-curiosity-card { --al-tint: #F1F0FB; --al-tilt: -1.5deg; }
+  [data-burn-block]:nth-of-type(4) .al-curiosity-card { --al-tint: #EEF5F7; --al-tilt: 2deg; }
   /* the pin holding each card down — reuses the section's own #0056FF
      accent (see the tint comment above) rather than a new color, so it
      reads as part of the same family instead of a foreign addition. Sits
