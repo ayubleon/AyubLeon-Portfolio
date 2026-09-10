@@ -1093,52 +1093,51 @@ class Component extends DCLogic {
     let pendingArrival = null;
     const settle = () => {
       animating = false;
-      window.removeEventListener('scrollend', settle);
-      clearInterval(settlePoll);
-      settlePoll = null;
       if (pendingArrival) {
         const play = pendingArrival;
         pendingArrival = null;
         play();
       }
     };
-    // scrollend isn't supported on every browser this still has to run on
-    // (notably older iOS Safari), so this poll is the real fallback rather
-    // than a decoration on top of it — a fixed-duration timer here would be
-    // guessing how long the native smooth-scroll actually takes, and that
-    // scales with how far this step travels (taller phones/larger steps
-    // take longer). Measured live: even a single step landed right on the
-    // edge of a flat 900ms guess in a fast desktop browser, meaning real
-    // phone hardware plausibly finishes AFTER a blind timer like that fires
-    // — which flips `animating` false while the page is still mid-scroll,
-    // letting the next swipe interrupt and retarget it (needing an extra
-    // swipe to actually land) and measuring the arrival animation's layout
-    // before the block has actually finished settling into place (the
-    // process icon flying in from the wrong spot, or not visibly at all).
-    // Polling actual scroll position only calls settle() once the page has
-    // genuinely stopped moving, regardless of device speed or step
-    // distance, with a hard cap so a scroll that's stuck for some unrelated
-    // reason still can't wedge the section shut forever
-    const SETTLE_POLL_MS = 80;
-    const SETTLE_HARD_CAP_MS = 2500;
-    let settlePoll = null;
-    const startSettlePoll = () => {
-      clearInterval(settlePoll);
-      let lastY = window.scrollY;
-      let stableTicks = 0;
-      const pollStart = performance.now();
-      settlePoll = setInterval(() => {
-        const y = window.scrollY;
-        if (y === lastY) {
-          stableTicks++;
+    // hand-driven rather than window.scrollTo({behavior:'smooth'}): a real
+    // iPhone measured via Safari's remote inspector showed the native
+    // smooth-scroll occasionally taking 7+ SECONDS for the exact same
+    // one-step distance that normally takes ~300ms. The cause, confirmed
+    // in that same session: targetFor() is computed once against
+    // window.innerHeight, but the very first scroll of a page (and any
+    // later one where the visitor has scrolled back up far enough) is
+    // also exactly when iOS's own address bar collapses or expands,
+    // changing window.innerHeight out from under an already-in-flight
+    // native scroll — the browser is left reconciling a moving target,
+    // which is what actually cost the seconds, not scroll distance or
+    // device speed. Re-deriving the target every frame here instead of
+    // once up front means an innerHeight change mid-flight just nudges
+    // where this frame is heading rather than fighting a stale destination
+    // — and since this is the only thing moving the scroll position
+    // (no native smooth-scroll running in parallel), there's nothing left
+    // for it to fight. This also removes the old scrollend-or-poll
+    // settle detection entirely: with a self-timed animation there's no
+    // need to guess when the browser's own scroll finished, since this
+    // one calls settle() the instant it's actually done
+    const SCROLL_DURATION_MS = 420;
+    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+    let scrollAnimId = null;
+    const animateScrollTo = (i) => {
+      if (scrollAnimId) cancelAnimationFrame(scrollAnimId);
+      const startY = window.scrollY;
+      const startTime = performance.now();
+      const step = (now) => {
+        const t = Math.min(1, (now - startTime) / SCROLL_DURATION_MS);
+        const target = targetFor(i);
+        window.scrollTo(0, startY + (target - startY) * easeOutCubic(t));
+        if (t < 1) {
+          scrollAnimId = requestAnimationFrame(step);
         } else {
-          stableTicks = 0;
-          lastY = y;
-        }
-        if (stableTicks >= 2 || performance.now() - pollStart > SETTLE_HARD_CAP_MS) {
+          scrollAnimId = null;
           settle();
         }
-      }, SETTLE_POLL_MS);
+      };
+      scrollAnimId = requestAnimationFrame(step);
     };
     const goTo = (i) => {
       const nextIndex = Math.max(0, Math.min(count - 1, i));
@@ -1147,9 +1146,7 @@ class Component extends DCLogic {
       }
       index = nextIndex;
       animating = true;
-      window.scrollTo({ top: targetFor(index), behavior: 'smooth' });
-      window.addEventListener('scrollend', settle, { once: true });
-      startSettlePoll();
+      animateScrollTo(index);
     };
 
     // a hard/fast trackpad swipe doesn't fire one wheel event — it fires a
