@@ -33,8 +33,7 @@
   html.js [data-burn-block] { visibility: hidden; }
   html.js [data-fit-heading] { opacity: 0; }
   [data-settle-veil] { position: fixed; inset: 0; z-index: 9999; background: #000000; opacity: 1; transition: opacity .35s ease; }
-  /* self-hosted, not loaded from Google Fonts: needed here even though this page's own body copy never uses Playfair, because the sliding project popup (project-viewer.js) injects a case study's body HTML into THIS document without carrying over that page's own <head> — so BuzzIQ/Danadana's pull-quotes need this face already registered on every page that can open their popup, or they silently fall back to Georgia with no way to recover short of reloading the case study's own URL directly */
-  @font-face { font-family: 'Playfair Display'; font-style: italic; font-weight: 100 900; font-display: block; src: url('fonts/playfair-display-italic-variable.woff2') format('woff2-variations'); }</style>
+</style>
 <!-- the settle veil is opaque black until shared.js fades it, so anything
      that renders this page without running the scripts — a crawler, an AI
      fetcher, a reader with JS off — sees a black screen over the whole
@@ -50,7 +49,8 @@
   [data-burn-runway] { height: auto !important; }
   [data-burn-viewport] { position: static !important; height: auto !important; overflow: visible !important; padding: 32px 0; }
   [data-burn-block] { position: static !important; visibility: visible !important; opacity: 1 !important; transform: none !important; display: block !important; margin-bottom: 28px; }
-  [data-burn-grain], [data-pitch-cursor], [data-burn-dots] { display: none !important; }
+  .al-curiosity-card { position: static !important; transform: none !important; }
+  [data-burn-grain], [data-pitch-cursor], [data-burn-dots], .al-curiosity-pin { display: none !important; }
 </style></noscript><link rel="preload" as="script" href="./support.js">
 <!-- support.js's own boot() re-fetches this exact document a second time
      right after first paint (unless window.__resources is already set —
@@ -90,7 +90,7 @@
 <script src="badge.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=Instrument+Serif:ital@0;1&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=Instrument+Serif:ital@0;1&amp;family=Gochi+Hand&amp;display=swap" rel="stylesheet">
 </head>
 <body>
 <!-- sits outside <x-dc> so boot()'s dc.replaceWith swap (see the
@@ -103,7 +103,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=Instrument+Serif:ital@0;1&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=Instrument+Serif:ital@0;1&amp;family=Gochi+Hand&amp;display=swap" rel="stylesheet">
 <style>
   /* overscroll-behavior-y: without it, a trackpad flick or an
      upward scroll past the very top rubber-bands the whole page
@@ -182,6 +182,21 @@
      than chasing an exact collision threshold that shifts with however
      the text happens to wrap at a given width; the border and corner
      handles alone still read as a Figma selection without it */
+  /* handwritten pen font for the pinned index cards — !important because
+     each [data-burn-text] carries its own inline font-family/weight
+     (Poppins/600) that would otherwise win on specificity. Sized up from
+     that inline clamp() since a script face's letterforms sit smaller
+     within their own em box than a bold sans at the same size */
+  [data-burn-text] { font-family: 'Gochi Hand', cursive !important; font-weight: 400 !important; font-size: clamp(1.7rem, 3vw, 2.2rem) !important; line-height: 1.75 !important; }
+  /* .hl, the flash word, and the Figma-frame word each carry their OWN
+     inline font-family (stamped on by the template runtime, not visible
+     in this file's own markup) — inline styles beat a plain inherited
+     value regardless of the ancestor rule above, so each needs its own
+     !important override too. .figma-frame-label is deliberately excluded:
+     that's the small blue "Frame 1404" tag mimicking Figma's own UI
+     chrome, not part of the sentence, and reads as a genuine Figma label
+     specifically because it stays in a UI font instead of going script */
+  [data-burn-text] .hl, [data-burn-text] [data-curiosity-flash], [data-burn-text] [data-process-icon-origin], [data-burn-text] [data-figma-frame] { font-family: 'Gochi Hand', cursive !important; }
   @media (max-width: 480px) {
     .figma-frame-label { display: none; }
     /* the clamp() on [data-burn-text]'s inline font-size already bottoms
@@ -191,8 +206,11 @@
        spaced-out on a phone screen. These blocks share the project
        titles' ramp so the two track together, but they carry whole
        sentences rather than a short title, so they alone step down here
-       — to 0.9375rem, still a step on the scale */
-    [data-burn-text] { font-size: 0.9375rem !important; line-height: 1.65 !important; }
+       — to 0.9375rem, still a step on the scale. That rule predates the
+       pen font above and was tuned for Poppins — kept as the mobile floor
+       for this face too since it still reads fine and re-tuning a second
+       ramp isn't worth it for a one-line difference */
+    [data-burn-text] { font-size: 1.35rem !important; line-height: 1.65 !important; }
   }
   /* the desktop inset solves for a fixed share of the viewport's area, but
      on a phone that formula's vw/vh terms are still tens of pixels each —
@@ -206,26 +224,46 @@
   }
   [data-burn-grain] { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='gamma' exponent='4'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"); background-size: 180px; }
   /* each block is its own white card floating on the section's black
-     stage — rounded corners and a shadow so the one sliding up over the
-     last reads as a card arriving rather than a flat color swap, and an
-     opaque background of its own since it has to fully cover whatever
-     was under it, not blend into it the way a crossfade would */
+     stage — square corners (a real index card, not a rounded UI card) and
+     a shadow so the one sliding up over the last reads as a card arriving
+     rather than a flat color swap, and an opaque background of its own
+     since it has to fully cover whatever was under it, not blend into it
+     the way a crossfade would */
   /* promotes each card to its own compositor layer up front, so the
      transform update()  writes every scroll tick is a cheap GPU composite
      instead of a synchronous repaint of the card's box-shadow clipped
      against the viewport's overflow:hidden — that repaint cost is what
      reads as the stack lagging behind a fast scroll, worst on quick
      upward flicks where scroll deltas tend to be larger */
-  [data-burn-block] { border-radius: 16px; box-shadow: 0 -30px 60px -40px rgba(0,0,0,0.35), 0 50px 100px -50px rgba(0,0,0,0.6); will-change: transform; }
+  [data-burn-block] { will-change: transform; }
+  /* the actual pinned-index-card visual now lives one level in from
+     [data-burn-block] rather than on it directly — [data-burn-block] is
+     still what update() slides/scales every scroll tick (untouched), and
+     this inner div is free to carry its own static tilt without that
+     scroll transform ever overwriting it (update() only ever sets
+     [data-burn-block]'s own inline transform, never reaches in here) */
+  .al-curiosity-card { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 -30px 60px -40px rgba(0,0,0,0.35), 0 50px 100px -50px rgba(0,0,0,0.6); background-repeat: repeat; }
   /* each card its own faint tint rather than flat white — all four sit
      near the section's #0056FF accent without matching it outright, so
      the stack reads as a related family of cards rather than one repeated
      color. See the "Curiosity Card Tints" demo for the reasoning behind
-     each pick */
-  [data-burn-block]:nth-of-type(1) { background: #F3F6FF; }
-  [data-burn-block]:nth-of-type(2) { background: #FAF6F1; }
-  [data-burn-block]:nth-of-type(3) { background: #F1F0FB; }
-  [data-burn-block]:nth-of-type(4) { background: #EEF5F7; }
+     each pick. The ruled lines are a second background layered UNDER that
+     tint (multiple backgrounds, image first) rather than replacing it —
+     additive index-card texture only. The tilt is what actually reads as
+     "pinned down" rather than just resting flat; alternating direction
+     per card is what keeps four of them side by side from looking like
+     one card copy-pasted four times */
+  [data-burn-block]:nth-of-type(1) .al-curiosity-card { background: repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(10,6,6,0.06) 28px), #F3F6FF; transform: rotate(-2deg); }
+  [data-burn-block]:nth-of-type(2) .al-curiosity-card { background: repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(10,6,6,0.06) 28px), #FAF6F1; transform: rotate(1.5deg); }
+  [data-burn-block]:nth-of-type(3) .al-curiosity-card { background: repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(10,6,6,0.06) 28px), #F1F0FB; transform: rotate(-1.5deg); }
+  [data-burn-block]:nth-of-type(4) .al-curiosity-card { background: repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(10,6,6,0.06) 28px), #EEF5F7; transform: rotate(2deg); }
+  /* the pin holding each card down — reuses the section's own #0056FF
+     accent (see the tint comment above) rather than a new color, so it
+     reads as part of the same family instead of a foreign addition. Sits
+     half outside the card's own top edge, which is why .al-curiosity-card
+     can't clip overflow; rotates with the card since it's inside it, same
+     as a real pin would stay put relative to the card it's stuck through */
+  .al-curiosity-pin { position: absolute; top: -11px; left: 50%; transform: translateX(-50%); width: 22px; height: 22px; border-radius: 50%; background: #0056FF; box-shadow: 0 2px 4px rgba(10,6,6,0.35), inset 0 -2px 2px rgba(0,0,0,0.2); z-index: 2; pointer-events: none; }
   .burn-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(10,6,6,0.2); transition: background .3s cubic-bezier(.22,1,.36,1), transform .3s cubic-bezier(.22,1,.36,1); }
   .burn-dot.is-active { background: #0a0606; transform: scale(1.3); }
   /* the block-4 curiosity cat: five drawn poses (looking up, arm low →
@@ -303,10 +341,11 @@
     [data-burn-runway] { height: auto !important; }
     [data-burn-viewport] { position: static !important; height: auto !important; overflow: visible !important; padding: 32px 0; }
     [data-burn-block] { position: static !important; visibility: visible !important; opacity: 1 !important; transform: none !important; display: block !important; margin-bottom: 28px; }
+    .al-curiosity-card { position: static !important; transform: none !important; }
     /* the pitch cursor goes too: it's parked by JS from the measured
        position of the phrase it points at, and that never runs here, so
        it would otherwise sit at the paragraph's top-left over the text */
-    [data-burn-grain], [data-pitch-cursor], [data-burn-dots] { display: none !important; }
+    [data-burn-grain], [data-pitch-cursor], [data-burn-dots], .al-curiosity-pin { display: none !important; }
     /* [data-burn-icon] sits opacity:0 by default (see its inline style),
        only revealed by playProcessIcon()'s fly-in — which never runs
        here, since that method's own reduced-motion check returns before
@@ -386,44 +425,63 @@
          depending on whatever toolbar state happened to be in effect -->
     <div data-burn-runway style="width: 100%; height: calc(150svh * 4);">
       <div data-burn-viewport style="position: sticky; top: 0; height: 100svh; width: 100%; overflow: hidden;">
-        <div data-burn-block style="position: absolute; inset: max(24px, 14.64vh) max(24px, 14.64vw); display: flex; align-items: center; justify-content: center;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(60vw, 38rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.4vw, 1.62rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">Curiosity is what <span data-curiosity-flash>drives</span> how I work.</p>
-          <div data-burn-dots aria-hidden="true" style="position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px;">
-            <span class="burn-dot" data-burn-dot></span>
-            <span class="burn-dot" data-burn-dot></span>
-            <span class="burn-dot" data-burn-dot></span>
-            <span class="burn-dot" data-burn-dot></span>
+        <div data-burn-block style="position: absolute; inset: max(24px, 14.64vh) max(24px, 14.64vw);">
+          <div class="al-curiosity-card">
+            <span class="al-curiosity-pin" aria-hidden="true"></span>
+            <p data-burn-text style="position: relative; margin: 0; max-width: min(60vw, 38rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.4vw, 1.62rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">Curiosity is what <span data-curiosity-flash>drives</span> how I work.</p>
+            <div data-burn-dots aria-hidden="true" style="position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px;">
+              <span class="burn-dot" data-burn-dot></span>
+              <span class="burn-dot" data-burn-dot></span>
+              <span class="burn-dot" data-burn-dot></span>
+              <span class="burn-dot" data-burn-dot></span>
+            </div>
           </div>
+          <!-- kept a direct child of data-burn-block, not .al-curiosity-card
+               below — this flies in from a fixed viewport corner via
+               left/top calc()'d against data-burn-block's own inset, and
+               that math (and the straight fall/drive-off path
+               playCuriosityIcon() animates it along) assumes an
+               axis-aligned frame; nesting it inside the card would tilt
+               both along with the card's static rotate() -->
           <div data-curiosity-icon aria-hidden="true" style="position: absolute; left: calc(-1 * max(24px, 14.64vw)); top: calc(-1 * max(24px, 14.64vh)); width: 0; height: 0; opacity: 0; pointer-events: none; z-index: 6;">
             <img data-curiosity-bulb src="images/curiosity-bulb.svg" alt="" style="position: absolute; left: 0; top: 0; height: 42px; width: auto; transform: translate(-50%, -50%); filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));">
             <img data-curiosity-car src="images/curiosity-car.png" alt="" style="position: absolute; left: 0; top: 0; height: 22px; width: auto; opacity: 0; transform: translate(-50%, -50%); filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25));">
           </div>
         </div>
-        <div data-burn-block style="position: absolute; inset: max(24px, 14.64vh) max(24px, 14.64vw); display: flex; align-items: center; justify-content: center;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(60vw, 38rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.4vw, 1.62rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">It shows up early. I ask why a flow works the way it does, or <span class="hl hl-seam-a">whether a feature is </span><span data-pitch-anchor><span class="hl hl-seam-b">solving the right problem, before anyone starts</span> <span data-figma-frame>building<span class="figma-frame-label" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tr" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="bl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="br" aria-hidden="true"></span></span></span>. That&#39;s where the real problems are still cheap to fix.<span data-pitch-cursor aria-hidden="true" style="position: absolute; left: 0; top: 0; z-index: 2; display: block; opacity: 0; pointer-events: none; transform-origin: 0 0; will-change: transform, opacity;"><svg width="17" height="18" viewBox="0 0 17 18" fill="none" style="display: block; flex: 0 0 auto; filter: drop-shadow(0 2px 5px rgba(10,6,6,0.28));"><path d="M1.4 1.1 L1.4 13.9 L4.8 10.7 L7.1 15.9 L9.6 14.7 L7.3 9.6 L12 9.4 Z" fill="#0056FF" stroke="#FFFFFF" stroke-width="1.1" stroke-linejoin="round"/></svg></span></p>
-          <div data-burn-dots aria-hidden="true" style="position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px;">
-            <span class="burn-dot" data-burn-dot></span>
-            <span class="burn-dot" data-burn-dot></span>
-            <span class="burn-dot" data-burn-dot></span>
-            <span class="burn-dot" data-burn-dot></span>
+        <div data-burn-block style="position: absolute; inset: max(24px, 14.64vh) max(24px, 14.64vw);">
+          <div class="al-curiosity-card">
+            <span class="al-curiosity-pin" aria-hidden="true"></span>
+            <p data-burn-text style="position: relative; margin: 0; max-width: min(60vw, 38rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.4vw, 1.62rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">It shows up early. I ask why a flow works the way it does, or <span class="hl hl-seam-a">whether a feature is </span><span data-pitch-anchor><span class="hl hl-seam-b">solving the right problem, before anyone starts</span> <span data-figma-frame>building<span class="figma-frame-label" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="tr" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="bl" aria-hidden="true"></span><span class="figma-frame-handle" data-corner="br" aria-hidden="true"></span></span></span>. That&#39;s where the real problems are still cheap to fix.<span data-pitch-cursor aria-hidden="true" style="position: absolute; left: 0; top: 0; z-index: 2; display: block; opacity: 0; pointer-events: none; transform-origin: 0 0; will-change: transform, opacity;"><svg width="17" height="18" viewBox="0 0 17 18" fill="none" style="display: block; flex: 0 0 auto; filter: drop-shadow(0 2px 5px rgba(10,6,6,0.28));"><path d="M1.4 1.1 L1.4 13.9 L4.8 10.7 L7.1 15.9 L9.6 14.7 L7.3 9.6 L12 9.4 Z" fill="#0056FF" stroke="#FFFFFF" stroke-width="1.1" stroke-linejoin="round"/></svg></span></p>
+            <div data-burn-dots aria-hidden="true" style="position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px;">
+              <span class="burn-dot" data-burn-dot></span>
+              <span class="burn-dot" data-burn-dot></span>
+              <span class="burn-dot" data-burn-dot></span>
+              <span class="burn-dot" data-burn-dot></span>
+            </div>
           </div>
         </div>
-        <div data-burn-block style="position: absolute; inset: max(24px, 14.64vh) max(24px, 14.64vw); display: flex; align-items: center; justify-content: center;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(60vw, 38rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.4vw, 1.62rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;"><span data-process-icon-origin>That&#39;s</span> also why I&#39;ve spent the last year bringing AI into my process<img data-search-icon src="images/search-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block; margin-left: 0.34em; margin-right: 0.22em;"><img data-burn-icon src="images/claude-ai-icon.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block; opacity: 0; margin-right: 0.22em;"><img data-figma-icon src="images/figma-logo.svg" alt="" style="height: 1.3em; width: 1.3em; vertical-align: -0.32em; display: inline-block;"> <span class="hl">not as a shortcut</span>, but as another way to <span class="hl">dig deeper into problems, explore more possibilities</span>, and get from an idea to something tangible <span class="hl">faster.</span></p>
-          <div data-burn-dots aria-hidden="true" style="position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px;">
-            <span class="burn-dot" data-burn-dot></span>
-            <span class="burn-dot" data-burn-dot></span>
-            <span class="burn-dot" data-burn-dot></span>
-            <span class="burn-dot" data-burn-dot></span>
+        <div data-burn-block style="position: absolute; inset: max(24px, 14.64vh) max(24px, 14.64vw);">
+          <div class="al-curiosity-card">
+            <span class="al-curiosity-pin" aria-hidden="true"></span>
+            <p data-burn-text style="position: relative; margin: 0; max-width: min(60vw, 38rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.4vw, 1.62rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;"><span data-process-icon-origin>That&#39;s</span> also why I&#39;ve spent the last year bringing AI into my process<img data-search-icon src="images/search-icon.svg" alt="" style="height: 1.1em; width: 1.1em; vertical-align: -0.27em; display: inline-block; margin-left: 0.34em; margin-right: 0.22em;"><img data-burn-icon src="images/claude-ai-icon.svg" alt="" style="height: 1.1em; width: 1.1em; vertical-align: -0.27em; display: inline-block; opacity: 0; margin-right: 0.22em;"><img data-figma-icon src="images/figma-logo.svg" alt="" style="height: 1.1em; width: 1.1em; vertical-align: -0.27em; display: inline-block;"> <span class="hl">not as a shortcut</span>, but as another way to <span class="hl">dig deeper into problems, explore more possibilities</span>, and get from an idea to something tangible <span class="hl">faster.</span></p>
+            <div data-burn-dots aria-hidden="true" style="position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px;">
+              <span class="burn-dot" data-burn-dot></span>
+              <span class="burn-dot" data-burn-dot></span>
+              <span class="burn-dot" data-burn-dot></span>
+              <span class="burn-dot" data-burn-dot></span>
+            </div>
           </div>
         </div>
-        <div data-burn-block style="position: absolute; inset: max(24px, 14.64vh) max(24px, 14.64vw); display: flex; align-items: center; justify-content: center;">
-          <p data-burn-text style="position: relative; margin: 0; max-width: min(60vw, 38rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.4vw, 1.62rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">Because good ideas only matter when they work, I collaborate closely with developers and stakeholders to turn them into products people can actually use.<span class="curiosity-cat" aria-hidden="true" style="position: relative; display: block; height: 1.9em; width: 2.4em; margin: 22px auto 0;"><img data-curiosity-cat-img src="images/cat-frame-1.svg" alt="" class="curiosity-cat-frame"></span></p>
-          <div data-burn-dots aria-hidden="true" style="position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px;">
-            <span class="burn-dot" data-burn-dot></span>
-            <span class="burn-dot" data-burn-dot></span>
-            <span class="burn-dot" data-burn-dot></span>
-            <span class="burn-dot" data-burn-dot></span>
+        <div data-burn-block style="position: absolute; inset: max(24px, 14.64vh) max(24px, 14.64vw);">
+          <div class="al-curiosity-card">
+            <span class="al-curiosity-pin" aria-hidden="true"></span>
+            <p data-burn-text style="position: relative; margin: 0; max-width: min(60vw, 38rem); text-align: center; font-family: Poppins, Helvetica, sans-serif; font-weight: 600; font-size: clamp(1.35rem, 2.4vw, 1.62rem); line-height: 2; letter-spacing: normal; text-wrap: pretty;">Because good ideas only matter when they work, I collaborate closely with developers and stakeholders to turn them into products people can actually use.<span class="curiosity-cat" aria-hidden="true" style="position: relative; display: block; height: 1.9em; width: 2.4em; margin: 22px auto 0;"><img data-curiosity-cat-img src="images/cat-frame-1.svg" alt="" class="curiosity-cat-frame"></span></p>
+            <div data-burn-dots aria-hidden="true" style="position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px;">
+              <span class="burn-dot" data-burn-dot></span>
+              <span class="burn-dot" data-burn-dot></span>
+              <span class="burn-dot" data-burn-dot></span>
+              <span class="burn-dot" data-burn-dot></span>
+            </div>
           </div>
         </div>
         <div data-burn-grain aria-hidden="true" style="position: absolute; inset: 0; z-index: 4; opacity: 0.4; pointer-events: none;"></div>
@@ -489,7 +547,7 @@ class Component extends DCLogic {
     document.querySelectorAll('h1, h2, h3').forEach((el) => { el.style.fontFamily = display; });
     document.querySelectorAll('p, a, span, li').forEach((el) => {
       const f = el.style.fontFamily || '';
-      if (f.indexOf('JetBrains') !== -1 || f.indexOf('Instrument Serif') !== -1) return;
+      if (f.indexOf('Instrument Serif') !== -1) return;
       el.style.fontFamily = body;
     });
   }
