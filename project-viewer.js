@@ -740,6 +740,14 @@
       rebuildMoreWork(inner, href);
       fixMediaCrops(inner);
       fixCaseStudyLinkLayout(inner);
+      // a fresh project just replaced this card's content — give the
+      // "click image to view full size" hint its own chance to show for
+      // it, the same as landing on this project's standalone page would
+      // (see the comment on resetLightboxHint in lightbox.js for why this
+      // is needed at all: the popup never reloads the page, so without
+      // this the hint's page-view-scoped "already shown" flag would carry
+      // over from whatever project was peeked at before this one)
+      AL.resetLightboxHint();
       AL.wireLightboxIn(inner);
       // the reveal: content starts at opacity 0 (see .al-pv-card-inner)
       // and fades in once it's actually ready, rather than popping in the

@@ -229,6 +229,13 @@
     // down move this box instead, which only ever needs to move
     // vertically since it always spans the navigator's own full width
     ".al-lightbox-navbox{position:absolute;left:0;width:100%;border:2px solid #ffd60a;background:rgba(255,214,10,0.14);cursor:grab;box-sizing:border-box;}",
+    // a synthetic cursor that drags the yellow box a short distance right
+    // after entering zoom, demonstrating it's draggable rather than
+    // leaving a visitor to discover that by trial — plays once per zoom-in
+    // (see playNavDragHint) then removes itself, rather than looping,
+    // since this is a one-time demonstration, not an ambient decoration
+    ".al-lightbox-navcursor{position:absolute;left:50%;top:0;z-index:4;width:15px;height:17px;margin-left:-2px;opacity:0;pointer-events:none;filter:drop-shadow(0 2px 5px rgba(10,6,6,0.35));}",
+    ".al-lightbox-navcursor svg{display:block;}",
     ".al-lightbox-navbox.is-dragging{cursor:grabbing;}",
     // sits just outside the navigator panel rather than on top of the
     // thumbnail — overlapping the little image would compete with the
@@ -311,6 +318,7 @@
   var navigatorEl = null;
   var navImgEl = null;
   var navBoxEl = null;
+  var navCursorEl = null;
   var gallery = [];
   var currentIndex = 0;
   var lastFocused = null;
@@ -356,6 +364,34 @@
   // spans the navigator's full width by design (see the CSS), since
   // zoomRatio itself is chosen so the image's scaled width exactly fills
   // the wrap with nothing left over on either side (see enterZoom)
+  // a synthetic cursor that drags the navigator's yellow box a short
+  // distance and back, played once right after entering zoom — see the
+  // CSS comment on .al-lightbox-navcursor for why this doesn't loop.
+  // Positioned in the same top/height coordinate space updateNavBox()
+  // already uses for navBoxEl (both are siblings inside the same
+  // navigator panel), so it lines up with wherever the box actually
+  // landed for this image rather than a fixed guess
+  function playNavDragHint() {
+    if (!navCursorEl || !navImgEl) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    navCursorEl.getAnimations().forEach(function (a) { a.cancel(); });
+    // top-to-bottom of the whole navigator image and back, rather than a
+    // short nudge near the box's own current position — the point is
+    // showing the full range a visitor can drag through, not just that
+    // this particular spot moves
+    var navH = navImgEl.getBoundingClientRect().height;
+    var EDGE_PAD = 6;
+    var travel = Math.max(0, navH - EDGE_PAD * 2);
+    navCursorEl.style.top = EDGE_PAD + 'px';
+    navCursorEl.animate([
+      { transform: 'translateY(0px)', opacity: 0, offset: 0 },
+      { transform: 'translateY(0px)', opacity: 1, offset: 0.06 },
+      { transform: 'translateY(' + travel + 'px)', opacity: 1, offset: 0.47 },
+      { transform: 'translateY(0px)', opacity: 1, offset: 0.94 },
+      { transform: 'translateY(0px)', opacity: 0, offset: 1 },
+    ], { duration: 2400, easing: 'cubic-bezier(.45,0,.55,1)', fill: 'forwards' });
+  }
+
   function updateNavBox() {
     if (!zoomActive) return;
     var scaledH = zoomImgRect.height * zoomRatio;
@@ -451,6 +487,7 @@
     void navigatorEl.offsetWidth;
     navigatorEl.classList.add('is-revealed');
     applyZoomTransform();
+    playNavDragHint();
   }
 
   function exitZoom() {
@@ -525,6 +562,7 @@
         '<div class="al-lightbox-navigator" data-lightbox-navigator>' +
           '<img data-lightbox-navimg alt="">' +
           '<div class="al-lightbox-navbox" data-lightbox-navbox></div>' +
+          '<span class="al-lightbox-navcursor" data-lightbox-navcursor><svg width="15" height="17" viewBox="0 0 15 17" fill="none"><path d="M1.4 1.1 L1.4 13.9 L4.8 10.7 L7.1 15.9 L9.6 14.7 L7.3 9.6 L12 9.4 Z" fill="#0056FF" stroke="#FFFFFF" stroke-width="1.1" stroke-linejoin="round"/></svg></span>' +
           '<span class="al-lightbox-navigator-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="4" x2="12" y2="20"></line><polyline points="8 8 12 4 16 8"></polyline><polyline points="8 16 12 20 16 16"></polyline></svg></span>' +
         '</div>' +
       '</div>' +
@@ -544,6 +582,7 @@
     navigatorEl = overlay.querySelector('[data-lightbox-navigator]');
     navImgEl = overlay.querySelector('[data-lightbox-navimg]');
     navBoxEl = overlay.querySelector('[data-lightbox-navbox]');
+    navCursorEl = overlay.querySelector('[data-lightbox-navcursor]');
     var prevBtn = overlay.querySelector('[data-lightbox-prev]');
     var nextBtn = overlay.querySelector('[data-lightbox-next]');
 
@@ -813,10 +852,17 @@
   }
   // retried rather than given up on after one miss — the visitor may
   // simply not have scrolled a lightbox image into view yet 1800ms after
-  // the page/popup settled. Capped so a page or popup the visitor closes
-  // before ever scrolling one into view doesn't leave this polling forever
+  // the page/popup settled. Still capped, so a page or popup the visitor
+  // closes before ever scrolling one into view doesn't leave this polling
+  // forever, but generously: 20 attempts (12s) turned out to be nowhere
+  // near enough on a page like Danadana's, where the first lightbox image
+  // sits several screens down — a visitor actually reading the case study
+  // on the way there routinely took longer than that to scroll it into
+  // view, so the hint had already silently given up and never fired at
+  // all by the time they got there. 5 minutes comfortably covers even a
+  // slow, thorough read before it stops trying
   var HINT_RETRY_MS = 600;
-  var HINT_MAX_ATTEMPTS = 20;
+  var HINT_MAX_ATTEMPTS = 500;
   function maybeScheduleHint(scopeRoot) {
     if (hintDone || hintTimer) return;
     var attempts = 0;
@@ -864,7 +910,7 @@
       });
       window.addEventListener('scroll', hideHint, { passive: true, once: true });
       document.addEventListener('click', hideHint, { capture: true, once: true });
-      setTimeout(hideHint, 4500);
+      setTimeout(hideHint, 3000);
     };
     hintTimer = setTimeout(fire, 1800);
   }
@@ -933,6 +979,22 @@
   }
 
   AL.wireLightboxIn = wireIn;
+  // hintDone is deliberately page-view-scoped (see the comment above it) so
+  // repeated wireIn(document) calls from selfHeal don't refire the hint on
+  // a standalone case-study page. But the project popup never reloads the
+  // page — it reuses one persistent [data-pv-inner] node and just swaps its
+  // innerHTML on every peek — so without this, "page view" silently meant
+  // "however many projects you peek through in one popup session" instead
+  // of "the project currently showing." project-viewer.js's fillCenter
+  // calls this right before handing the freshly swapped-in project to
+  // wireLightboxIn, so each project peeked to gets its own fresh chance
+  // at the hint, same as landing on its standalone page would
+  AL.resetLightboxHint = function () {
+    clearTimeout(hintTimer);
+    hintTimer = null;
+    hintDone = false;
+    if (hintEl && hintEl.classList.contains('is-visible')) hideHint();
+  };
   // lets project-viewer.js's own Escape/ArrowLeft/ArrowRight handling
   // (closing the project popup, paging between projects) stand down
   // while this is open, since both listeners otherwise react to the
