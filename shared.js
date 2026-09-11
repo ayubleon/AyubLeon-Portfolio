@@ -512,9 +512,17 @@
   AL.audioExplicit = (function () {
     try { return localStorage.getItem(AUDIO_EXPLICIT_KEY) === '1'; } catch (e) { return false; }
   })();
-  AL.audioMuted = isTouchDevice ? false : (AL.audioExplicit ? (function () {
-    try { return localStorage.getItem(AUDIO_MUTE_KEY) === '1'; } catch (e) { return true; }
-  })() : true);
+  // read the persisted mute value whenever one exists, not only once the
+  // toggle itself has been clicked — unlockAudio's automatic first-gesture
+  // unmute (below) writes this same key without setting audioExplicit, and
+  // gating the read behind audioExplicit meant that auto-unmute never
+  // survived the next page's full reload, reading back as freshly muted
+  AL.audioMuted = isTouchDevice ? false : (function () {
+    try {
+      var stored = localStorage.getItem(AUDIO_MUTE_KEY);
+      return stored === null ? true : stored === '1';
+    } catch (e) { return true; }
+  })();
 
   var AUDIO_TOGGLE_CSS = [
     // no card/pill of its own — plain white content, blended against
