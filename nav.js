@@ -36,7 +36,7 @@
     // tilt alternates side to side across the three peaks (-6/+6/-6)
     // rather than all leaning the same way, so it reads as a gentle
     // wobble rather than the icon repeatedly lunging in one direction
-    "@keyframes siteNavAvatarPulse{0%,100%{transform:scale(1) rotate(0deg);}16.6%{transform:scale(1.22) rotate(-6deg);}33.3%{transform:scale(1) rotate(0deg);}50%{transform:scale(1.22) rotate(6deg);}66.6%{transform:scale(1) rotate(0deg);}83.3%{transform:scale(1.22) rotate(-6deg);}}",
+    "@keyframes siteNavAvatarPulse{0%,100%{transform:scale(1) rotate(0deg);}16.6%{transform:scale(1.22) rotate(-12deg);}33.3%{transform:scale(1) rotate(0deg);}50%{transform:scale(1.22) rotate(12deg);}66.6%{transform:scale(1) rotate(0deg);}83.3%{transform:scale(1.22) rotate(-12deg);}}",
     ".site-nav-avatar{width:42px;height:42px;border-radius:50%;background:#fff;display:block;flex:0 0 auto;padding:3px;pointer-events:none;}",
     ".site-nav-tooltip{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,4px);background:var(--al-card,#1C1C1E);color:#f4eeeb;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;font-weight:500;letter-spacing:-0.005em;padding:6px 11px;border-radius:14px;white-space:nowrap;border:1px solid rgba(255,255,255,0.12);box-shadow:0 10px 24px -10px rgba(0,0,0,0.7);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;}",
     ".site-nav-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--al-card,#1C1C1E);}",
