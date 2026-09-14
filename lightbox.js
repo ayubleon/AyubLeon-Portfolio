@@ -77,21 +77,28 @@
     // display:none on the hint for non-zoomable images means it takes no
     // part in this layout at all, so this costs nothing there
     ".al-lightbox-imgwrap{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;max-width:100%;overflow:hidden;transition:transform 420ms cubic-bezier(.22,1,.36,1);}",
-    ".al-lightbox-img{max-width:min(88vw,1400px);max-height:88vh;width:auto;height:auto;display:block;object-fit:contain;border-radius:12px;box-shadow:0 40px 100px -30px rgba(0,0,0,0.7);transform:scale(0.96);transition:transform 420ms cubic-bezier(.22,1,.36,1);}",
+    ".al-lightbox-img,.al-lightbox-video{max-width:min(88vw,1400px);max-height:88vh;width:auto;height:auto;display:block;object-fit:contain;border-radius:12px;box-shadow:0 40px 100px -30px rgba(0,0,0,0.7);transform:scale(0.96);transition:transform 420ms cubic-bezier(.22,1,.36,1);}",
     // matches the padding-bottom override above exactly (100vh minus the
     // 40px top padding minus the 128px bottom padding) rather than the
     // rougher 88vh-based guess this used before that decoupling the
     // filmstrip from the image's own layout made inexact — without this,
     // an image tall enough to want the full 88vh could still overflow
     // into the padding this reserves for the filmstrip
-    ".al-lightbox.has-filmstrip .al-lightbox-img{max-height:calc(100vh - 168px);}",
+    ".al-lightbox.has-filmstrip .al-lightbox-img,.al-lightbox.has-filmstrip .al-lightbox-video{max-height:calc(100vh - 168px);}",
     // shrinks the image just enough to leave room for the zoom hint's own
     // row above it (its height plus the gap above) — scoped to zoomable
     // images only, since a non-zoomable image never renders the hint and
     // has nothing to make room for
-    ".al-lightbox-imgwrap.is-zoomable .al-lightbox-img{max-height:calc(88vh - 44px);}",
-    ".al-lightbox.has-filmstrip .al-lightbox-imgwrap.is-zoomable .al-lightbox-img{max-height:calc(100vh - 168px - 44px);}",
-    ".al-lightbox.is-open .al-lightbox-img{transform:scale(1);}",
+    ".al-lightbox-imgwrap.is-zoomable .al-lightbox-img,.al-lightbox-imgwrap.is-video .al-lightbox-video{max-height:calc(88vh - 44px);}",
+    ".al-lightbox.has-filmstrip .al-lightbox-imgwrap.is-zoomable .al-lightbox-img,.al-lightbox.has-filmstrip .al-lightbox-imgwrap.is-video .al-lightbox-video{max-height:calc(100vh - 168px - 44px);}",
+    ".al-lightbox.is-open .al-lightbox-img,.al-lightbox.is-open .al-lightbox-video{transform:scale(1);}",
+    ".al-lightbox-video{display:none;}",
+    // matches these two prototypes having no rounding on their own case
+    // study page either (see data-lightbox-no-radius) — Kenyan Banking's
+    // prototype keeps the shared 12px radius above, unaffected
+    ".al-lightbox-video.is-square{border-radius:0;}",
+    ".al-lightbox-video.is-active{display:block;}",
+    ".al-lightbox-img.is-hidden{display:none;}",
     // pinned to a fixed spot on screen rather than flowing directly under
     // the image inside the stage — different images in the same gallery
     // vary in height, and stacking the strip right after the image meant
@@ -180,13 +187,31 @@
     // above), not an overlay pinned to the image's corner — flex-shrink:0
     // keeps it at its natural size rather than being squeezed by the
     // column's own height constraints
-    ".al-lightbox-zoom-hint{display:none;flex-shrink:0;align-items:center;gap:6px;background:#0A84FF;color:#fff;font-family:'Schibsted Grotesk',Helvetica,sans-serif;font-size:0.75rem;font-weight:500;padding:6px 12px 6px 10px;border-radius:999px;box-shadow:0 10px 22px -10px rgba(10,132,255,0.6);pointer-events:none;}",
-    ".al-lightbox-zoom-hint svg{width:13px;height:13px;flex-shrink:0;}",
+    // continuous rather than a brief nudge with rest between — the same
+    // three-tone blue (a deep and a light shade either side of the
+    // site's own #0056FF) the #cycle section's ambient shader flows
+    // through on the homepage, so this reads as the same kind of
+    // constantly-alive blue rather than a separate, unrelated animation
+    ".al-lightbox-zoom-hint{display:none;flex-shrink:0;align-items:center;gap:6px;color:#fff;font-family:'Schibsted Grotesk',Helvetica,sans-serif;font-size:0.75rem;font-weight:500;padding:6px 12px 6px 10px;border-radius:999px;box-shadow:0 10px 22px -10px rgba(10,132,255,0.6);pointer-events:none;animation:alZoomHintFlow 3s ease-in-out infinite;}",
+    // same 6.5s cycle and phase as the icon's own pulse (below) so the
+    // two read as one motion rather than two competing ones
+    "@keyframes alZoomHintFlow{0%,100%{background:#001662;}33%{background:#0056FF;}66%{background:#2951C7;}}",
+    // the pulse is a double-tap sitting at the start of a much longer
+    // cycle (6.5s), rather than one continuous back-and-forth loop — a
+    // brief, recurring nudge on the icon reads as a hint; motion running
+    // the whole time it's on screen reads as noise
+    ".al-lightbox-zoom-hint svg{width:13px;height:13px;flex-shrink:0;animation:alZoomHintPulse 3s ease-in-out infinite;}",
+    "@keyframes alZoomHintPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.18);}}",
     // shown for the whole time the image sits zoomable (not on hover
     // only) since hover discovery isn't guaranteed, and a visitor
     // scanning the popup should see this without probing for it
     ".al-lightbox-imgwrap.is-zoomable .al-lightbox-zoom-hint{display:flex;}",
     ".al-lightbox-imgwrap.is-zoomed .al-lightbox-zoom-hint{display:none;}",
+    // same row the zoom hint sits in, plain label instead of a colored
+    // pill — this isn't an affordance to act on, just naming what the
+    // clip is
+    ".al-lightbox-video-caption{display:none;flex-shrink:0;font-family:'Schibsted Grotesk',Helvetica,sans-serif;font-size:0.75rem;font-weight:500;letter-spacing:0.01em;color:rgba(244,238,235,0.6);}",
+    ".al-lightbox-imgwrap.is-video .al-lightbox-video-caption{display:block;}",
     // flush to the top-left corner rather than the base rule's centering
     // — enterZoom's whole translateY/scale math assumes the image's own
     // un-transformed top-left sits exactly at the wrap's own (0,0).
@@ -317,6 +342,7 @@
 
   var overlay = null;
   var imgEl = null;
+  var videoEl = null;
   var imgWrapEl = null;
   var filmstripEl = null;
   var closeBtn = null;
@@ -348,6 +374,7 @@
     // after the fade finishes instead lets whatever's currently on
     // screen — zoomed or not — fade out exactly as it looks
     var wasZoomed = zoomActive;
+    videoEl.pause();
     overlay.classList.remove('is-open');
     overlay.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
@@ -508,12 +535,31 @@
 
   function show(index) {
     exitZoom();
+    // stopped before switching away, not just paused — leaving it playing
+    // would keep decoding frames off-screen for the rest of the visit,
+    // and picking the gallery back up on it later would resume mid-clip
+    // instead of from the start
+    videoEl.pause();
+    videoEl.currentTime = 0;
     currentIndex = index;
     var item = gallery[index];
     if (!item) return;
-    imgEl.src = item.src;
-    imgEl.alt = item.alt || '';
+    if (item.isVideo) {
+      videoEl.src = item.src;
+      videoEl.poster = item.poster || '';
+      videoEl.setAttribute('aria-label', item.alt || '');
+      videoEl.classList.add('is-active');
+      imgEl.classList.add('is-hidden');
+      videoEl.play();
+    } else {
+      imgEl.src = item.src;
+      imgEl.alt = item.alt || '';
+      videoEl.classList.remove('is-active');
+      imgEl.classList.remove('is-hidden');
+    }
     imgWrapEl.classList.toggle('is-zoomable', !!item.zoomable);
+    imgWrapEl.classList.toggle('is-video', !!item.isVideo);
+    videoEl.classList.toggle('is-square', !!item.noRadius);
     Array.prototype.forEach.call(filmstripEl.children, function (thumb, i) {
       thumb.classList.toggle('is-active', i === index);
     });
@@ -541,8 +587,8 @@
       var btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'al-lightbox-thumb';
-      btn.setAttribute('aria-label', 'Image ' + (i + 1) + ' of ' + gallery.length);
-      btn.innerHTML = '<img src="' + item.src + '" alt="">';
+      btn.setAttribute('aria-label', (item.isVideo ? 'Video ' : 'Image ') + (i + 1) + ' of ' + gallery.length);
+      btn.innerHTML = '<img src="' + (item.isVideo ? item.poster : item.src) + '" alt="">';
       btn.addEventListener('click', function () { show(i); });
       filmstripEl.appendChild(btn);
     });
@@ -562,7 +608,9 @@
       '<div class="al-lightbox-stage">' +
         '<div class="al-lightbox-imgwrap" data-lightbox-imgwrap>' +
           '<span class="al-lightbox-zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>Click to zoom</span>' +
+          '<span class="al-lightbox-video-caption">Figma prototype</span>' +
           '<img class="al-lightbox-img" data-lightbox-img decoding="async" alt="">' +
+          '<video class="al-lightbox-video" data-lightbox-video playsinline muted loop></video>' +
         '</div>' +
         '<div class="al-lightbox-navigator" data-lightbox-navigator>' +
           '<span class="al-lightbox-navigator-caption">Drag the yellow box, scroll, or use the arrow keys to look up and down</span>' +
@@ -582,6 +630,7 @@
 
     backdrop = overlay.querySelector('[data-lightbox-backdrop]');
     imgEl = overlay.querySelector('[data-lightbox-img]');
+    videoEl = overlay.querySelector('[data-lightbox-video]');
     imgWrapEl = overlay.querySelector('[data-lightbox-imgwrap]');
     filmstripEl = overlay.querySelector('[data-lightbox-filmstrip]');
     closeBtn = overlay.querySelector('[data-lightbox-close]');
@@ -921,7 +970,19 @@
     ensureOverlay();
     var scopeRoot = img.closest('[data-pv-inner]') || img.closest('main') || document;
     var imgs = Array.prototype.slice.call(scopeRoot.querySelectorAll('[data-lightbox]'));
-    gallery = imgs.map(function (el) { return { src: el.currentSrc || el.src, alt: el.alt || '', zoomable: el.hasAttribute('data-lightbox-zoom') }; });
+    gallery = imgs.map(function (el) {
+      var isVideo = el.tagName === 'VIDEO';
+      return {
+        isVideo: isVideo,
+        src: el.currentSrc || el.src,
+        poster: isVideo ? el.poster : '',
+        alt: el.alt || el.getAttribute('aria-label') || '',
+        // a video is never zoomable, regardless of the attribute — panning
+        // and scaling only make sense for a static image
+        zoomable: !isVideo && el.hasAttribute('data-lightbox-zoom'),
+        noRadius: el.hasAttribute('data-lightbox-no-radius')
+      };
+    });
     var index = imgs.indexOf(img);
     lastFocused = img;
     renderFilmstrip();
