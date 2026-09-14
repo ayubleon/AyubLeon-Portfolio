@@ -196,7 +196,7 @@
     // side was originally inset — overflow:hidden then clipped that
     // overflow, cropping the image's right side rather than showing it
     // in full
-    ".al-lightbox-imgwrap.is-zoomed{cursor:grab;width:calc(min(88vw,1400px) - 182px);height:calc(100vh - 224px);justify-content:flex-start;align-items:flex-start;}",
+    ".al-lightbox-imgwrap.is-zoomed{cursor:zoom-out;width:calc(min(88vw,1400px) - 182px);height:calc(100vh - 224px);justify-content:flex-start;align-items:flex-start;}",
     ".al-lightbox-imgwrap.is-panning{cursor:grabbing;}",
     ".al-lightbox-imgwrap.is-panning .al-lightbox-img{transition:none;}",
     // square corners while zoomed — the rounding reads as an odd inset
@@ -221,6 +221,12 @@
     // below instead) so the drag-hint arrow can sit just outside the
     // panel's own right edge without being clipped
     ".al-lightbox-navigator{display:none;position:relative;z-index:2;border-radius:10px;box-shadow:0 16px 34px -16px rgba(0,0,0,0.7);border:1px solid var(--al-border,rgba(255,255,255,0.13));background:var(--al-card,#1C1C1E);opacity:0;transform:translateX(14px);transition:opacity 420ms cubic-bezier(.22,1,.36,1),transform 420ms cubic-bezier(.22,1,.36,1);}",
+    // sits above the little thumbnail in the space the stage's own
+    // padding-top already reserves, rather than squeezed inside the
+    // navigator's own bordered card — explains what the yellow box (and
+    // dragging the main image itself) actually does, since neither is a
+    // pattern visitors reach for on their own
+    ".al-lightbox-navigator-caption{position:absolute;bottom:100%;left:0;width:100%;margin-bottom:12px;text-align:center;font-family:'Schibsted Grotesk',Helvetica,sans-serif;font-size:0.6875rem;line-height:1.4;color:rgba(244,238,235,0.6);}",
     ".al-lightbox-navigator.is-visible{display:block;}",
     ".al-lightbox-navigator.is-revealed{opacity:1;transform:translateX(0);}",
     ".al-lightbox-navigator img{display:block;width:140px;height:auto;border-radius:10px;user-select:none;-webkit-user-drag:none;}",
@@ -330,7 +336,6 @@
   var panY = 0;
   var zoomImgRect = null;
   var zoomWrapRect = null;
-  var zoomDragging = false;
 
   function close() {
     // exitZoom is normally instant everywhere else it's called (see its
@@ -560,6 +565,7 @@
           '<img class="al-lightbox-img" data-lightbox-img decoding="async" alt="">' +
         '</div>' +
         '<div class="al-lightbox-navigator" data-lightbox-navigator>' +
+          '<span class="al-lightbox-navigator-caption">Drag the yellow box, scroll, or use the arrow keys to look up and down</span>' +
           '<img data-lightbox-navimg alt="">' +
           '<div class="al-lightbox-navbox" data-lightbox-navbox></div>' +
           '<span class="al-lightbox-navcursor" data-lightbox-navcursor><svg width="15" height="17" viewBox="0 0 15 17" fill="none"><path d="M1.4 1.1 L1.4 13.9 L4.8 10.7 L7.1 15.9 L9.6 14.7 L7.3 9.6 L12 9.4 Z" fill="#0056FF" stroke="#FFFFFF" stroke-width="1.1" stroke-linejoin="round"/></svg></span>' +
@@ -596,33 +602,20 @@
     // gallery just opens at its regular fit-to-screen size, with no
     // click behavior of its own on the image itself
     imgWrapEl.addEventListener('click', function () {
-      if (zoomDragging) return; // a real drag shouldn't also toggle zoom on release
       var item = gallery[currentIndex];
       if (!item || !item.zoomable) return;
       if (!zoomActive) enterZoom();
       else exitZoom();
     });
-    imgWrapEl.addEventListener('mousedown', function (e) {
+    // scrolling over the zoomed image pans it instead of the page behind
+    // it — preventDefault is what stops that underlying scroll, since the
+    // overlay's own overflow:hidden only blocks it while the cursor is
+    // outside this element
+    imgWrapEl.addEventListener('wheel', function (e) {
       if (!zoomActive) return;
-      zoomDragging = false;
-      var dragStartY = e.clientY;
-      var dragStartPanY = panY;
-      function onMove(e2) {
-        var dy = e2.clientY - dragStartY;
-        if (Math.abs(dy) > 3) { zoomDragging = true; imgWrapEl.classList.add('is-panning'); }
-        panY = dragStartPanY + dy;
-        clampZoomPan();
-        applyZoomTransform();
-      }
-      function onUp() {
-        window.removeEventListener('mousemove', onMove);
-        window.removeEventListener('mouseup', onUp);
-        imgWrapEl.classList.remove('is-panning');
-        setTimeout(function () { zoomDragging = false; }, 0);
-      }
-      window.addEventListener('mousemove', onMove);
-      window.addEventListener('mouseup', onUp);
-    });
+      e.preventDefault();
+      panZoomBy(-e.deltaY);
+    }, { passive: false });
     // dragging the yellow box pans the big view — moving the box down on
     // the thumbnail should reveal content further down in the zoomed
     // view, which means panning the actual image up, the inverse of the

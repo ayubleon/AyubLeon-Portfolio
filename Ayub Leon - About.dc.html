@@ -106,7 +106,11 @@
      rather than pushing them apart; timing (see initBehanceShake) keeps
      this rare enough that it reads as a hint, not a distraction */
   [data-behance-icon] { position: relative; }
-  [data-behance-icon].is-shaking { animation: behanceZoomShake 1.5s cubic-bezier(.34,1.2,.34,1); z-index: 5; }
+  /* three variants, cycled round-robin by initBehanceShake so the nudge
+     doesn't play identically every time */
+  [data-behance-icon].is-shake-a { animation: behanceZoomShake 1.5s cubic-bezier(.34,1.2,.34,1); z-index: 5; }
+  [data-behance-icon].is-shake-b { animation: behancePop 1.5s cubic-bezier(.34,1.2,.34,1); z-index: 5; }
+  [data-behance-icon].is-shake-c { animation: behanceSpin 1.5s cubic-bezier(.34,1.2,.34,1); z-index: 5; }
   @keyframes behanceZoomShake {
     0%   { transform: scale(1) rotate(0deg); }
     22%  { transform: scale(1.5) rotate(0deg); }
@@ -116,6 +120,19 @@
     68%  { transform: scale(1.5) rotate(5deg); }
     78%  { transform: scale(1.5) rotate(-2deg); }
     100% { transform: scale(1) rotate(0deg); }
+  }
+  @keyframes behancePop {
+    0%   { transform: scale(1); }
+    30%  { transform: scale(1.55); }
+    50%  { transform: scale(1.22); }
+    70%  { transform: scale(1.42); }
+    100% { transform: scale(1); }
+  }
+  @keyframes behanceSpin {
+    0%   { transform: scale(1) rotate(0deg); }
+    25%  { transform: scale(1.4) rotate(0deg); }
+    70%  { transform: scale(1.4) rotate(360deg); }
+    100% { transform: scale(1) rotate(360deg); }
   }
   a:focus-visible, button:focus-visible { outline: 2px solid #EF4418; outline-offset: 3px; border-radius: 4px; }
   a:active, button:active { opacity: 0.7; }
@@ -347,18 +364,23 @@ class Component extends DCLogic {
     this.shakeBound = true;
     icon.__shakeWired = true;
     this.behanceIcon = icon;
+    // cycled round-robin (a, b, c, a, b, c…) rather than picked at random,
+    // so back-to-back plays never repeat the same one
+    const shakeClasses = ['is-shake-a', 'is-shake-b', 'is-shake-c'];
+    let shakeIndex = 0;
     // removing then re-adding (rather than just adding, which is a no-op
     // if the class is already present) is what lets a hover mid-animation
     // restart it from the top instead of doing nothing
     const trigger = () => {
-      icon.classList.remove('is-shaking');
+      icon.classList.remove(...shakeClasses);
       void icon.offsetWidth;
-      icon.classList.add('is-shaking');
+      icon.classList.add(shakeClasses[shakeIndex]);
+      shakeIndex = (shakeIndex + 1) % shakeClasses.length;
     };
-    this.behanceShakeInterval = setInterval(trigger, 7000);
+    this.behanceShakeInterval = setInterval(trigger, 4000);
     this.onBehanceIconEnter = trigger;
     icon.addEventListener('mouseenter', this.onBehanceIconEnter);
-    icon.addEventListener('animationend', () => icon.classList.remove('is-shaking'));
+    icon.addEventListener('animationend', () => icon.classList.remove(...shakeClasses));
   }
 
   // the same hover tick the nav dock's links play, on each "People I've
