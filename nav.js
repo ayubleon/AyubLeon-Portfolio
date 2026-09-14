@@ -25,6 +25,18 @@
     ".site-nav-link.is-active{color:#fff;background:var(--al-card-hover,#2A2A2C);font-weight:600;}",
     ".site-nav-divider{width:1px;align-self:stretch;margin:8px 6px;background:rgba(255,255,255,0.14);}",
     ".site-nav-avatar-btn{position:relative;border:0;padding:0;margin:0;background:none;cursor:pointer;border-radius:50%;flex:0 0 auto;display:flex;-webkit-tap-highlight-color:transparent;}",
+    // a quiet, periodic nudge toward the contact card — first fires 5s
+    // after this mounts (see initContactPulse), then repeats on the same
+    // 5s beat so a visitor who hasn't opened it yet keeps getting drawn
+    // back to it every so often
+    // ease-in-out rather than the spring/overshoot curve this started
+    // with — a symmetric glide in and out of each peak reads as calm and
+    // deliberate, where the overshoot read as poppy/mechanical
+    ".site-nav-avatar-btn.is-pulsing{animation:siteNavAvatarPulse 1.6s ease-in-out;}",
+    // tilt alternates side to side across the three peaks (-6/+6/-6)
+    // rather than all leaning the same way, so it reads as a gentle
+    // wobble rather than the icon repeatedly lunging in one direction
+    "@keyframes siteNavAvatarPulse{0%,100%{transform:scale(1) rotate(0deg);}16.6%{transform:scale(1.12) rotate(-6deg);}33.3%{transform:scale(1) rotate(0deg);}50%{transform:scale(1.12) rotate(6deg);}66.6%{transform:scale(1) rotate(0deg);}83.3%{transform:scale(1.12) rotate(-6deg);}}",
     ".site-nav-avatar{width:42px;height:42px;border-radius:50%;background:#fff;display:block;flex:0 0 auto;padding:3px;pointer-events:none;}",
     ".site-nav-tooltip{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,4px);background:var(--al-card,#1C1C1E);color:#f4eeeb;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;font-weight:500;letter-spacing:-0.005em;padding:6px 11px;border-radius:14px;white-space:nowrap;border:1px solid rgba(255,255,255,0.12);box-shadow:0 10px 24px -10px rgba(0,0,0,0.7);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;}",
     ".site-nav-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--al-card,#1C1C1E);}",
@@ -430,6 +442,29 @@
     toggleBtn.__navWired = true;
   }
 
+  // periodic size nudge on the avatar button itself — see the CSS
+  // comment on .site-nav-avatar-btn.is-pulsing for the timing rationale.
+  // Guarded on its own flag (not toggleBtn.__navWired above) since that
+  // one's set by initContactCard, a different function with its own
+  // unrelated wiring concerns
+  function initContactPulse(el) {
+    var btn = el.querySelector('[data-contact-toggle]');
+    if (!btn || btn.__pulseWired) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    btn.__pulseWired = true;
+    // removing then re-adding (rather than just adding, which is a no-op
+    // if the class is already present) is what lets a hover mid-animation
+    // restart it from the top instead of doing nothing
+    var trigger = function () {
+      btn.classList.remove('is-pulsing');
+      void btn.offsetWidth;
+      btn.classList.add('is-pulsing');
+    };
+    setInterval(trigger, 5000);
+    btn.addEventListener('mouseenter', trigger);
+    btn.addEventListener('animationend', function () { btn.classList.remove('is-pulsing'); });
+  }
+
   function initNavGlow(el) {
     var dock = el.querySelector('.site-nav-dock');
     var glow = el.querySelector('[data-nav-glow]');
@@ -462,6 +497,7 @@
     el.innerHTML = navHTML(AL.pageLinks());
     initContactCard(el);
     initNavGlow(el);
+    initContactPulse(el);
   }
 
   function fillAll() {

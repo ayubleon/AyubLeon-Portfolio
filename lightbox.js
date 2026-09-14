@@ -30,7 +30,7 @@
     // fades in on its own slower schedule whenever it actually finishes,
     // so it reads as a graceful reveal arriving on its own beat rather
     // than a broken, sudden pop the moment the browser gets to it
-    ".al-lightbox-backdrop{position:absolute;inset:0;background:rgba(10,6,6,0.55);opacity:0;transition:opacity .3s ease;}",
+    ".al-lightbox-backdrop{position:absolute;inset:0;background:rgba(10,6,6,0.72);opacity:0;transition:opacity .3s ease;}",
     ".al-lightbox.is-open .al-lightbox-backdrop{opacity:1;}",
     // the delay is the important part here, not the duration — opacity
     // starting to rise before the blur itself has actually finished
@@ -607,7 +607,7 @@
       '<div class="al-lightbox-blur"></div>' +
       '<div class="al-lightbox-stage">' +
         '<div class="al-lightbox-imgwrap" data-lightbox-imgwrap>' +
-          '<span class="al-lightbox-zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>Click to zoom</span>' +
+          '<span class="al-lightbox-zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>Click image to zoom</span>' +
           '<span class="al-lightbox-video-caption">Figma prototype</span>' +
           '<img class="al-lightbox-img" data-lightbox-img decoding="async" alt="">' +
           '<video class="al-lightbox-video" data-lightbox-video playsinline muted loop></video>' +
