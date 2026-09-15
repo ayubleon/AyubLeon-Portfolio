@@ -26,9 +26,9 @@
     ".site-nav-divider{width:1px;align-self:stretch;margin:8px 6px;background:rgba(255,255,255,0.14);}",
     ".site-nav-avatar-btn{position:relative;border:0;padding:0;margin:0;background:none;cursor:pointer;border-radius:50%;flex:0 0 auto;display:flex;-webkit-tap-highlight-color:transparent;}",
     // a quiet, periodic nudge toward the contact card — first fires 5s
-    // after this mounts (see initContactPulse), then repeats on the same
-    // 5s beat so a visitor who hasn't opened it yet keeps getting drawn
-    // back to it every so often
+    // after this mounts (see initContactPulse), then repeats every 10s
+    // after that so a visitor who hasn't opened it yet keeps getting
+    // drawn back to it every so often
     // ease-in-out rather than the spring/overshoot curve this started
     // with — a symmetric glide in and out of each peak reads as calm and
     // deliberate, where the overshoot read as poppy/mechanical
@@ -453,15 +453,20 @@
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     btn.__pulseWired = true;
     // removing then re-adding (rather than just adding, which is a no-op
-    // if the class is already present) is what lets a hover mid-animation
-    // restart it from the top instead of doing nothing
+    // if the class is already present) is what lets a second trigger
+    // mid-animation restart it from the top instead of doing nothing
     var trigger = function () {
       btn.classList.remove('is-pulsing');
       void btn.offsetWidth;
       btn.classList.add('is-pulsing');
     };
-    setInterval(trigger, 5000);
-    btn.addEventListener('mouseenter', trigger);
+    // first nudge at 5s, then every 10s after that — not tied to hover at
+    // all: the tooltip already answers "what is this" on hover, so
+    // hovering doesn't also re-tilt the icon
+    setTimeout(function () {
+      trigger();
+      setInterval(trigger, 10000);
+    }, 5000);
     btn.addEventListener('animationend', function () { btn.classList.remove('is-pulsing'); });
   }
 
