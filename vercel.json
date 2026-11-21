@@ -13,6 +13,10 @@
       "destination": "/Ayub%20Leon%20-%20Work.dc.html"
     },
     {
+      "source": "/camp-fearless",
+      "destination": "/Camp%20Fearless.dc.html"
+    },
+    {
       "source": "/buzziq",
       "destination": "/BuzzIQ.dc.html"
     },
@@ -47,6 +51,11 @@
     {
       "source": "/Ayub%20Leon%20-%20Work.dc.html",
       "destination": "/work",
+      "permanent": true
+    },
+    {
+      "source": "/Camp%20Fearless.dc.html",
+      "destination": "/camp-fearless",
       "permanent": true
     },
     {

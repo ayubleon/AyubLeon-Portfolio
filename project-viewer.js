@@ -12,10 +12,11 @@
   // touchstart/touchend swipe handlers further down, which give phones a
   // gesture to move between projects alongside tapping the peeking sides.
   //
-  // Card order matches both the Landing page's 01-04 work list and the
+  // Card order matches both the Work page's card list and the
   // Previous/Next links each case study page already ships with (which
   // form the same loop) — one canonical order, not re-decided here.
   var ORDER = [
+    '/camp-fearless',
     '/buzziq',
     '/danadana',
     '/building-a-shadcn-system-from-scratch',
