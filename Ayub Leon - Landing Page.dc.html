@@ -132,6 +132,20 @@
      hero's own rounded frame before it snaps back — this stops that
      bounce so the hero's top edge stays put */
   html, body { margin: 0; padding: 0; background: #000000; overscroll-behavior-y: none; }
+  /* card snapping is switched on (by initBurnText's update()) only while
+     the page sits between two curiosity cards. Any scroll that ends there
+     settles on a card, and scroll-snap-stop makes even a hard fling stop
+     at the next one instead of flying past several. Resting exactly on
+     the first or last card leaves it off, so scrolling out of the section
+     is completely normal: with it on, there was no snap point past either
+     end to move to, and the page refused to leave */
+  html.is-card-snapping { scroll-snap-type: y mandatory; }
+  .burn-snap { position: absolute; left: 0; width: 1px; height: 1px; pointer-events: none; scroll-snap-align: start; scroll-snap-stop: always; }
+  /* the reduced-motion layout unpins the cards into a plain stack, where
+     card snap points would no longer mean anything */
+  @media (prefers-reduced-motion: reduce) {
+    .burn-snap { display: none; }
+  }
   /* see the matching comment on this same rule in the static <head>
      above — kept in sync here since that copy is what the page's own
      runtime actually manages once it boots */
@@ -390,6 +404,61 @@
      of whether it matched, silently breaking the swap on very wide
      screens (caught at ultra-wide aspect ratios like 21:9/32:9, where the
      override needs to actually take effect) */
+  /* the monitor's live screen. Every number is the screen opening of
+     hero-monitor.svg (846 x 666, with an 11.03-unit bezel around an
+     846 x 482.6 display) converted into percentages of .al-hero-stage,
+     so it stays locked to the monitor at any viewport size, same as the
+     monitor itself */
+  .al-hero-screen { position: absolute; left: 35.576%; top: 36.9%; width: 28.848%; height: 23.03%; display: block; overflow: hidden; background: #000000; container-type: inline-size; opacity: 0; transition: opacity 1.1s ease; }
+  .al-hero-screen.is-on { opacity: 1; }
+  .al-hero-screen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transform: scale(1.04); transition: opacity .9s ease, transform 4s cubic-bezier(.22,1,.36,1), filter .35s ease; }
+  .al-hero-screen img.is-current { opacity: 1; transform: scale(1); }
+  /* the site's square blue tag, sized off the screen's own width (cqw) so it
+     scales with the monitor instead of the viewport */
+  .al-hero-screen-tag { position: absolute; left: 3cqw; bottom: 3cqw; display: inline-flex; align-items: center; gap: 1cqw; padding: 1cqw 1.6cqw; background: #0056FF; color: #ffffff; font-family: Poppins, Helvetica, sans-serif; font-size: 2.6cqw; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; line-height: 1.2; border-radius: 0; }
+  .al-hero-screen-tag svg { width: 2.6cqw; height: 2.6cqw; transition: transform .35s cubic-bezier(.22,1,.36,1); }
+  @media (hover: hover) and (pointer: fine) {
+    .al-hero-screen:hover img.is-current { filter: brightness(1.08); }
+    .al-hero-screen:hover .al-hero-screen-tag svg { transform: translate(0.3cqw, -0.3cqw); }
+  }
+  .al-hero-screen:focus-visible { outline: 2px solid #EF4418; outline-offset: 2px; }
+  /* the screen's light falling onto the desk below it, on only while the
+     screen is awake */
+  .al-hero-spill { position: absolute; left: 33%; top: 60.5%; width: 34%; height: 13%; border-radius: 50%; background: radial-gradient(closest-side, rgba(190,215,255,0.22), rgba(190,215,255,0.06) 60%, transparent); mix-blend-mode: screen; pointer-events: none; opacity: 0; transition: opacity 1.4s ease; }
+  .al-hero-screen.is-on ~ .al-hero-spill { opacity: 1; }
+
+  /* ---------- the living room ---------- */
+  /* sunlight on the back wall swelling and fading as if clouds pass */
+  .al-hero-sun { position: absolute; left: 48%; top: 12%; width: 44%; height: 56%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,186,110,0.55), rgba(255,170,90,0.18) 55%, transparent); mix-blend-mode: soft-light; pointer-events: none; animation: alSunDrift 16s ease-in-out infinite alternate; }
+  @keyframes alSunDrift {
+    0% { opacity: 0.25; transform: translateX(0); }
+    45% { opacity: 0.9; transform: translateX(1.5%); }
+    70% { opacity: 0.45; transform: translateX(0.5%); }
+    100% { opacity: 0.8; transform: translateX(2%); }
+  }
+
+  /* the shelf lamp: a warm pool on the wall that breathes, and the bulb
+     itself flickering slightly, like a filament on a dimmer */
+  .al-hero-lamp-room { position: absolute; left: 84%; top: 37%; width: 17%; height: 26%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,170,80,0.5), rgba(255,150,60,0.14) 55%, transparent); mix-blend-mode: screen; pointer-events: none; animation: alLampBreathe 6s ease-in-out infinite; }
+  .al-hero-lamp-flame { position: absolute; left: 91.7%; top: 47.4%; width: 1.4%; height: 4.2%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,246,220,0.95), rgba(255,200,120,0.45) 60%, transparent); mix-blend-mode: screen; pointer-events: none; animation: alLampFlicker 2.8s steps(1, end) infinite; }
+  @keyframes alLampBreathe {
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 0.9; }
+  }
+  @keyframes alLampFlicker {
+    0% { opacity: 0.85; } 12% { opacity: 1; } 19% { opacity: 0.78; } 27% { opacity: 0.95; }
+    46% { opacity: 0.88; } 58% { opacity: 1; } 71% { opacity: 0.8; } 84% { opacity: 0.97; } 100% { opacity: 0.85; }
+  }
+  /* parked while the hero is scrolled away: nobody can see them */
+  .al-hero-stage.is-paused .al-hero-sun, .al-hero-stage.is-paused .al-hero-lamp-room, .al-hero-stage.is-paused .al-hero-lamp-flame { animation-play-state: paused; }
+  @media (prefers-reduced-motion: reduce) {
+    .al-hero-sun, .al-hero-lamp-room, .al-hero-lamp-flame { animation: none; }
+  }
+
+  /* #top sits over the whole hero so it can position the text; letting
+     clicks fall through it is what makes the screen underneath clickable */
+  #top { pointer-events: none; }
+  #top [data-hero-text] { pointer-events: auto; }
   .al-hero-stage { width: auto; height: 100%; }
   @media (min-aspect-ratio: 1428/1000) {
     .al-hero-stage { width: 100%; height: auto; }
@@ -401,7 +470,7 @@
        to sit, so the two would overlap. Dropping the monitor here (rather
        than shrinking or repositioning either one) keeps the text legible
        instead of cramming both into the same space */
-    [data-hero-monitor] { display: none !important; }
+    [data-hero-monitor], [data-hero-screen] { display: none !important; }
     /* the monitor's gone here, so the top-anchored clearance
        initSignatureClearance() computes for desktop (avoiding the
        monitor) has nothing left to clear — center the text in the
@@ -421,7 +490,26 @@
     <div class="al-hero-frame" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; height: 100svh; overflow: hidden;">
       <div class="al-hero-stage" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); aspect-ratio: 1428 / 1000;">
         <img src="images/hero-desk.jpg" alt="A warmly lit home desk with plants and books" loading="eager" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block;">
+        <!-- light on top of the photo: the sunlight patch on the back wall
+             and the shelf lamp are blended glows positioned in percentages
+             of the stage, measured from the photo -->
+        <div class="al-hero-sun" aria-hidden="true"></div>
+        <div class="al-hero-lamp-room" aria-hidden="true"></div>
+        <div class="al-hero-lamp-flame" aria-hidden="true"></div>
         <img data-hero-monitor src="images/hero-monitor.svg" alt="" style="position: absolute; left: 35.19%; top: 36.35%; width: 29.62%; height: auto; display: block;">
+        <!-- the monitor's screen wakes up and plays through the work, one
+             project at a time; clicking it opens whichever project is on
+             screen in the project viewer. Positioned over the screen
+             opening of hero-monitor.svg (see .al-hero-screen) -->
+        <a class="al-hero-screen" data-hero-screen href="/camp-fearless" aria-label="Now showing Camp Fearless. Open the case study">
+          <img data-screen-slide data-href="/camp-fearless" data-title="Camp Fearless" src="images/hero-screen-camp-fearless.jpg" alt="" class="is-current">
+          <img data-screen-slide data-href="/buzziq" data-title="BuzzIQ" src="images/hero-screen-buzziq.jpg" alt="" loading="lazy">
+          <img data-screen-slide data-href="/danadana" data-title="Danadana" src="images/hero-screen-danadana.jpg" alt="" loading="lazy">
+          <img data-screen-slide data-href="/building-a-shadcn-system-from-scratch" data-title="Component System" src="images/hero-screen-design-system.jpg" alt="" loading="lazy">
+          <img data-screen-slide data-href="/kenyan-banking-redesign" data-title="Kenyan Banking" src="images/hero-screen-banking.jpg" alt="" loading="lazy">
+          <span class="al-hero-screen-tag"><span data-screen-tag>Camp Fearless</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
+        </a>
+        <div class="al-hero-spill" aria-hidden="true"></div>
       </div>
       <div style="position: absolute; inset: 0; z-index: 15; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.05) 55%, rgba(0,0,0,0.72) 87%, #000000 100%);"></div>
     </div>
@@ -434,7 +522,7 @@
     </div>
   </div>
 
-  <div data-nav-mount="1"><noscript><nav style="display:flex;gap:20px;justify-content:center;align-items:center;padding:16px;font-family:Poppins,Helvetica,sans-serif;font-size:14px;"><a href="/" style="color:#f4eeeb;">Home</a><a href="/work" style="color:#f4eeeb;">Work</a><a href="/about" style="color:#f4eeeb;">About</a></nav></noscript></div>
+  <div data-nav-mount="1"><!-- real links, not inside <noscript>: AI fetchers skip noscript content, so the site looked like it had no way to reach any other page. nav.js replaces this with the nav dock as soon as it runs --><nav aria-label="Site" style="display:flex;gap:20px;justify-content:center;align-items:center;padding:16px;font-family:Poppins,Helvetica,sans-serif;font-size:14px;"><a href="/" style="color:#f4eeeb;">Home</a><a href="/work" style="color:#f4eeeb;">Work</a><a href="/about" style="color:#f4eeeb;">About</a></nav></div>
   <div data-badge-mount="1"></div>
 
   <main>
@@ -449,7 +537,20 @@
          shows/hides mid-scroll — the cause of the stack animating
          inconsistently (sometimes correctly, sometimes stuck or slow)
          depending on whatever toolbar state happened to be in effect -->
-    <div data-burn-runway style="width: 100%; height: calc(150svh * 4);">
+    <!-- each card has a snap point at the scroll position where it is
+         fully in place, and the browser's own scroll snapping settles the
+         page on one, the same way on any trackpad, mouse, keyboard or
+         touch screen, instead of this page guessing at gestures itself.
+         Cards sit 60svh of scroll apart: snapping springs back from any
+         scroll shorter than half that gap, and a full screen per card made
+         a gentle trackpad swipe spring back instead of moving on. The
+         runway is the pinned screen itself plus the three gaps between
+         its four cards (100svh + 3 x 60svh) -->
+    <div data-burn-runway style="position: relative; width: 100%; height: calc(100svh + 60svh * 3);">
+      <div class="burn-snap" aria-hidden="true" style="top: 0;"></div>
+      <div class="burn-snap" aria-hidden="true" style="top: 60svh;"></div>
+      <div class="burn-snap" aria-hidden="true" style="top: 120svh;"></div>
+      <div class="burn-snap" aria-hidden="true" style="top: 180svh;"></div>
       <div data-burn-viewport style="position: sticky; top: 0; height: 100svh; width: 100%; overflow: hidden;">
         <div data-burn-block style="position: absolute; inset: max(24px, 14.64vh) max(24px, 14.64vw);">
           <div class="al-curiosity-card">
@@ -524,7 +625,7 @@
            width where the sentence sets on two lines a longer one would
            push the break, making the whole block jump a line's height as
            the reader moves between words -->
-      <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.35rem, 2.4vw, 1.62rem); font-weight: 600; letter-spacing: normal; line-height: 2; color: #f4eeeb;">I'm usually figuring out<span class="cycle-blank-line"><span class="cycle-slot" data-cycle-slot><span class="cycle-slot-phrase is-filled">something</span></span></span></p>
+      <p style="margin: 0; font-family: Poppins, Helvetica, sans-serif; font-size: clamp(1.35rem, 2.4vw, 1.62rem); font-weight: 600; letter-spacing: normal; line-height: 2; color: #f4eeeb;">I'm usually figuring out <span class="cycle-blank-line"><span class="cycle-slot" data-cycle-slot><span class="cycle-slot-phrase is-filled">something</span></span></span></p>
       <div style="margin: clamp(40px, 6vw, 64px) 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 24px;">
         <span class="cycle-word" data-cycle-word>a product</span>
         <span class="cycle-word" data-cycle-word>a prototype</span>
@@ -546,7 +647,7 @@
        pinned in the background for the entire scroll length, so anything
        after it needs an explicit opaque background or the hero bleeds
        through underneath -->
-  <div data-footer-mount="1" style="position: relative; z-index: 10; background: #000000;"></div>
+  <div data-footer-mount="1" style="position: relative; z-index: 10; background: #000000;"><!-- plain links to every page, for anything that reads this page without running its scripts (AI assistants, search crawlers, readers with JS off). footer.js replaces this whole block with the designed footer the moment it runs, so visitors never see it; it used to sit in a <noscript>, which most AI fetchers skip entirely --><footer data-static-footer style="padding: 48px 16px; font-family: Poppins, Helvetica, sans-serif; font-size: 14px; line-height: 1.7; color: #f4eeeb;"><p>Ayub Leon, Product Designer based in Nairobi, Kenya.</p><nav aria-label="Case studies"><p>Case studies:</p><ul><li><a href="/camp-fearless" style="color: #f4eeeb;">Camp Fearless</a>: registration and camp-day software for a church youth camp, designed and shipped to real families.</li><li><a href="/buzziq" style="color: #f4eeeb;">BuzzIQ</a>: a TikTok Shop intelligence platform for creators, as sole product designer.</li><li><a href="/danadana" style="color: #f4eeeb;">Danadana</a>: a crash betting game licensed to gambling operators, built with player-protection safeguards.</li><li><a href="/building-a-shadcn-system-from-scratch" style="color: #f4eeeb;">Component System for Production</a>: a 30-component system with 400+ variants, shipped into a live product.</li><li><a href="/kenyan-banking-redesign" style="color: #f4eeeb;">Kenyan Banking Redesign</a>: reworking navigation and interface friction across four Kenyan banking apps.</li></ul></nav><p><a href="/" style="color: #f4eeeb;">Home</a> · <a href="/work" style="color: #f4eeeb;">Work</a> · <a href="/about" style="color: #f4eeeb;">About</a> · <a href="/resume" style="color: #f4eeeb;">Resume (PDF)</a> · <a href="mailto:ayubleon.pd@gmail.com" style="color: #f4eeeb;">ayubleon.pd@gmail.com</a> · <a href="https://www.linkedin.com/in/ayubleon" style="color: #f4eeeb;">LinkedIn</a></p></footer></div>
 </div>
 
 </x-dc>
@@ -606,6 +707,8 @@ class Component extends DCLogic {
     // before the very layout shift that moves the runway. Heading first
     // means its resize has already landed by the time the runway
     // recalculates
+    AL.selfHeal(() => this.initHeroScreen(), 5000);
+    AL.selfHeal(() => this.initHeroAmbience(), 5000);
     AL.selfHeal(() => this.initHeadingFit(), 5000);
     AL.selfHeal(() => this.initBurnText(), 5000);
     AL.selfHeal(() => this.initCuriosityCat(), 5000);
@@ -976,25 +1079,15 @@ class Component extends DCLogic {
     // hold should even begin
     const START_AT = 0;
 
-    // TEST: plays the curiosity bulb/car icon the instant the section
-    // becomes fully pinned, rather than consuming a dedicated first swipe
-    // for it (that reserved-swipe version lived in initBurnSwipe until
-    // now). Checked here rather than in initBurnSwipe because update()
-    // already runs on every scroll tick regardless of input method (wheel,
-    // touch, keyboard, or a programmatic scrollTo), so this is the one
-    // place that reliably catches the exact frame engagement begins
+    // plays the curiosity bulb/car icon the instant the section becomes
+    // fully pinned. Checked here because update() runs on every scroll
+    // tick regardless of input method (wheel, trackpad, touch, keyboard),
+    // so this is the one place that reliably catches the exact frame
+    // engagement begins
     this.curiosityIconArmed = true;
-    // pitch cursor (block 1) and the AI-process icon (block 2) used to
-    // only fire from goTo()'s own pendingArrival bookkeeping — reliable
-    // for a swipe that actually completes a goTo() step, but silent for
-    // any arrival that gets here some other way (plain continuous
-    // scrolling, a browser/OS interaction that lets native scroll through
-    // instead of this file's own touchmove handling intercepting it — a
-    // real, confirmed case on an actual iPhone, not a hypothetical).
-    // Armed the same way curiosityIconArmed already proves out just
-    // above: watched directly here in update(), which runs on every
-    // scroll tick regardless of what caused it, so an arrival fires no
-    // matter how the visitor actually got to that card
+    // the pitch cursor (block 1) and the AI-process icon (block 2) fire on
+    // arrival at their card, watched here for the same reason as above:
+    // every way of reaching a card goes through update()
     this.pitchCursorArmed = true;
     this.processIconArmed = true;
     // how close `t` needs to be to a whole block index before treating it
@@ -1006,12 +1099,16 @@ class Component extends DCLogic {
     // mid-rise, producing a path aimed at wherever things happened to be
     // sitting mid-transition rather than their actual resting spot
     const ARRIVAL_EPSILON = 0.03;
+    // how far past the first or last card counts as "between cards" for
+    // snapping — just enough to ignore sub-pixel rounding at rest
+    const SNAP_EDGE = 0.01;
 
     const update = () => {
       queued = false;
       const rect = runway.getBoundingClientRect();
       const vh = window.innerHeight;
       const nowEngaged = rect.top <= 1 && rect.bottom >= vh - 1;
+
       if (nowEngaged && this.curiosityIconArmed) {
         this.curiosityIconArmed = false;
         this.playCuriosityIcon();
@@ -1020,6 +1117,8 @@ class Component extends DCLogic {
       }
       const p = clamp01(-rect.top / (rect.height - vh || 1));
       const t = START_AT + p * (count - 1);
+      const betweenCards = nowEngaged && t > SNAP_EDGE && t < count - 1 - SNAP_EDGE;
+      document.documentElement.classList.toggle('is-card-snapping', betweenCards);
       if (Math.abs(t - 1) < ARRIVAL_EPSILON) {
         if (this.pitchCursorArmed) {
           this.pitchCursorArmed = false;
@@ -1079,39 +1178,6 @@ class Component extends DCLogic {
     let queued = false;
     this.onBurnScroll = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
     this.onBurnResize = update;
-    let __dbgLastVh = window.innerHeight;
-    window.addEventListener('resize', () => {
-      const newVh = window.innerHeight;
-      console.log('[dbg] resize event: innerHeight ' + __dbgLastVh + ' -> ' + newVh + ', scrollY=' + window.scrollY);
-      __dbgLastVh = newVh;
-    });
-    // catches any backward scrollY movement while this.__curiosityScrollActive
-    // is true — i.e. only during the window animateScrollTo() (below, in
-    // initBurnSwipe) is supposed to have exclusive control of the scroll
-    // position, from a swipe's goTo() through its post-arrival hold.
-    // Gated on that flag rather than logging any backward scroll anywhere:
-    // ordinary momentum from the visitor scrolling back up elsewhere on
-    // the page is normal and expected, not a bug, and an earlier
-    // ungated version of this logged that too, which read as the section
-    // being broken everywhere rather than the one specific window where
-    // a backward move actually means something fought this file's own
-    // scroll control
-    let __dbgLastY = window.scrollY;
-    let __dbgLastYTime = performance.now();
-    const __dbgWatchScroll = () => {
-      const y = window.scrollY;
-      const now = performance.now();
-      const dy = y - __dbgLastY;
-      if (dy < -5 && this.__curiosityScrollActive) {
-        console.log('[dbg] UNEXPECTED backward scroll: ' + __dbgLastY.toFixed(0) + ' -> ' + y.toFixed(0) + ' (' + dy.toFixed(0) + 'px) over ' + (now - __dbgLastYTime).toFixed(0) + 'ms, innerHeight=' + window.innerHeight);
-      }
-      __dbgLastY = y;
-      __dbgLastYTime = now;
-      requestAnimationFrame(__dbgWatchScroll);
-    };
-    requestAnimationFrame(__dbgWatchScroll);
-    this.initBurnSwipe(runway, count, update);
-
     update();
     window.addEventListener('scroll', this.onBurnScroll, { passive: true });
     window.addEventListener('resize', this.onBurnResize);
@@ -1130,457 +1196,6 @@ class Component extends DCLogic {
       this.burnResizeObserver = new ResizeObserver(this.onBurnResize);
       this.burnResizeObserver.observe(document.body);
     }
-  }
-
-  // turns the scroll-scrub into one-gesture-per-step: each swipe advances
-  // exactly one block, from block 1 through the last one. (The curiosity
-  // bulb/car icon used to consume a reserved first swipe here instead of
-  // advancing — TEST: it now plays automatically on arrival, from
-  // initBurnText's update() above, so every swipe here just advances.)
-  initBurnSwipe(runway, count, update) {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    // guards against being bound twice: initBurnText() re-runs whenever
-    // AL.selfHeal sees the DOM change, and its own guard only checks each
-    // block element's own marker property — if a support.js rebuild wave
-    // ever swaps in fresh block nodes, initBurnText() (and this) would
-    // otherwise run again in full, stacking a second, independent set of
-    // listeners with their own index/animating state racing the first
-    if (this.onBurnWheel) return;
-
-    let index = 0; // 0 = block 1 ... count-1 = the last block
-    let animating = false;
-    // every card's own arrival animation (block 0's bulb-and-car, block
-    // 1's pitch cursor, block 2's AI-process icon) is now armed and fired
-    // straight from initBurnText's update() — see ARRIVAL_EPSILON there —
-    // which runs on every scroll tick regardless of what caused it, not
-    // just a goTo() step. This used to live here instead, gated behind
-    // settle() so a still-mid-transition card's layout wasn't measured
-    // too early, but that only ever fired for a swipe that completed a
-    // full goTo() step, going silent for any arrival that got here some
-    // other way — confirmed on a real iPhone, where a swipe visually
-    // advanced the cards via update()'s own scroll-reactive positioning
-    // without ever calling goTo() at all
-    const engaged = () => {
-      const rect = runway.getBoundingClientRect();
-      return rect.top <= 1 && rect.bottom >= window.innerHeight - 1;
-    };
-    const targetFor = (i) => {
-      const rect = runway.getBoundingClientRect();
-      const runwayTop = rect.top + window.scrollY;
-      const scrollable = rect.height - window.innerHeight;
-      return runwayTop + (i / (count - 1)) * scrollable;
-    };
-    const settle = () => {
-      animating = false;
-      this.__curiosityScrollActive = false;
-    };
-    // hand-driven rather than window.scrollTo({behavior:'smooth'}): a real
-    // iPhone measured via Safari's remote inspector showed the native
-    // smooth-scroll occasionally taking 7+ SECONDS for the exact same
-    // one-step distance that normally takes ~300ms. The cause, confirmed
-    // in that same session: targetFor() is computed once against
-    // window.innerHeight, but the very first scroll of a page (and any
-    // later one where the visitor has scrolled back up far enough) is
-    // also exactly when iOS's own address bar collapses or expands,
-    // changing window.innerHeight out from under an already-in-flight
-    // native scroll — the browser is left reconciling a moving target,
-    // which is what actually cost the seconds, not scroll distance or
-    // device speed. Re-deriving the target every frame here instead of
-    // once up front means an innerHeight change mid-flight just nudges
-    // where this frame is heading rather than fighting a stale destination
-    // — and since this is the only thing moving the scroll position
-    // (no native smooth-scroll running in parallel), there's nothing left
-    // for it to fight. This also removes the old scrollend-or-poll
-    // settle detection entirely: with a self-timed animation there's no
-    // need to guess when the browser's own scroll finished, since this
-    // one calls settle() the instant it's actually done
-    const SCROLL_DURATION_MS = 280;
-    // measured live on a real iPhone (Safari remote inspector): the instant
-    // this animation stopped actively setting the scroll position, the
-    // page kept drifting backward on its own for several more frames — a
-    // steady ~8px/frame for ~150ms, the signature of native iOS scroll
-    // momentum the original touch queued, which e.preventDefault() on
-    // touchmove doesn't fully suppress once any of it has already been
-    // queued. That's what was undoing a just-settled card with no new
-    // touch input. Holding the position pinned at the target for a bit
-    // longer after the eased approach finishes — still actively calling
-    // scrollTo() every frame, just at a fixed value instead of an easing
-    // one — absorbs that trailing momentum instead of releasing control
-    // right as it starts
-    const SCROLL_HOLD_MS = 220;
-    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
-    let scrollAnimId = null;
-    const animateScrollTo = (i) => {
-      this.__curiosityScrollActive = true;
-      if (scrollAnimId) {
-        console.log('[dbg] animateScrollTo(' + i + ') cancelling a still-running previous animation');
-        cancelAnimationFrame(scrollAnimId);
-      }
-      const startY = window.scrollY;
-      const startTime = performance.now();
-      let frameCount = 0;
-      let lastFrameTime = startTime;
-      let maxFrameGap = 0;
-      let loggedArrival = false;
-      console.log('[dbg] animateScrollTo(' + i + ') starting, startY=' + startY.toFixed(0) + ' target=' + targetFor(i).toFixed(0));
-      const step = (now) => {
-        frameCount++;
-        const gap = now - lastFrameTime;
-        if (gap > maxFrameGap) maxFrameGap = gap;
-        lastFrameTime = now;
-        const elapsed = now - startTime;
-        const t = Math.min(1, elapsed / SCROLL_DURATION_MS);
-        const target = targetFor(i);
-        window.scrollTo(0, startY + (target - startY) * easeOutCubic(t));
-        // the card's own rise/lift/scale (initBurnText's update(), passed
-        // in above) is normally driven by a 'scroll' event listener, which
-        // assumes the browser dispatches one every time scrollY changes.
-        // That held for native smooth-scroll, but calling scrollTo()
-        // manually every rAF tick isn't guaranteed the same treatment —
-        // some engines coalesce or delay 'scroll' dispatch for rapid
-        // programmatic scrolling, which left the visual reveal lagging
-        // behind the position this loop had already reached (cards
-        // reported as peeking partway, or snapping back before finishing,
-        // even though the scroll position itself was moving correctly).
-        // Calling it directly here puts the reveal in lockstep with the
-        // exact position just set, this same frame, with no dependency on
-        // however the browser chooses to schedule the native event
-        update();
-        if (t >= 1 && !loggedArrival) {
-          loggedArrival = true;
-          console.log('[dbg] animateScrollTo(' + i + ') eased approach done at ' + elapsed.toFixed(0) + 'ms, holding for ' + SCROLL_HOLD_MS + 'ms to absorb any trailing momentum');
-        }
-        if (elapsed < SCROLL_DURATION_MS + SCROLL_HOLD_MS) {
-          scrollAnimId = requestAnimationFrame(step);
-        } else {
-          scrollAnimId = null;
-          console.log('[dbg] animateScrollTo(' + i + ') finished: ' + frameCount + ' frames, ' + elapsed.toFixed(0) + 'ms wall time, largest gap between frames ' + maxFrameGap.toFixed(0) + 'ms, finalTarget=' + target.toFixed(0));
-          settle();
-        }
-      };
-      scrollAnimId = requestAnimationFrame(step);
-    };
-    const goTo = (i) => {
-      console.log('[dbg] goTo(' + i + ') called, current index=' + index + ' animating=' + animating);
-      const nextIndex = Math.max(0, Math.min(count - 1, i));
-      index = nextIndex;
-      animating = true;
-      animateScrollTo(index);
-    };
-
-    // a hard/fast trackpad swipe doesn't fire one wheel event — it fires a
-    // burst with decaying deltaY. Treating any wheel event within
-    // GESTURE_GAP_MS of the last one as still the same physical gesture is
-    // what lets the effort threshold below sum a whole swipe's ticks
-    // together rather than judging each in isolation, and is what marks
-    // the exact tick a gesture first crosses into engagement (see
-    // `wasEngaged` below). The actual "one swipe, one step" guarantee — no
-    // cascading through multiple blocks once a swipe's tail outlasts a
-    // transition's own settle time — is enforced by ACTION_COOLDOWN_MS
-    // further down, since GESTURE_GAP_MS alone is too easily fooled by how
-    // unevenly a real swipe's momentum decays
-    const GESTURE_GAP_MS = 30;
-    let gestureActive = false;
-    let gestureTimer = null;
-    const extendGesture = () => {
-      clearTimeout(gestureTimer);
-      gestureTimer = setTimeout(() => { gestureActive = false; }, GESTURE_GAP_MS);
-    };
-
-    // GESTURE_GAP_MS alone isn't enough against real trackpad hardware: as
-    // a hard swipe's momentum decays, the gaps between its later, weaker
-    // ticks can themselves grow past 30ms even though it's still the same
-    // unbroken coast-down — which makes the next tick look like a fresh
-    // "new gesture" and fire a second action, then a third, each still
-    // riding the tail of what the user felt as one swipe. This cooldown is
-    // a hard floor on top of that: once any action fires, no further
-    // action can fire until it expires, regardless of how the momentum's
-    // tick timing happens to fall. Long enough to outlast a firm swipe's
-    // tail, short enough that a genuinely separate follow-up swipe still
-    // reads as responsive
-    const ACTION_COOLDOWN_MS = 900;
-    let cooldownUntil = 0;
-    const startCooldown = () => { cooldownUntil = performance.now() + ACTION_COOLDOWN_MS; };
-    // whether the section was engaged as of the last wheel tick — lets the
-    // handler notice the exact tick where engagement begins
-    let wasEngaged = false;
-    // a light brush of the trackpad (resting a finger, a stray touch)
-    // fires a wheel event too, just with a tiny deltaY — without a floor
-    // on that, the section would advance on input the user didn't mean as
-    // a swipe at all. Summed across the whole gesture rather than checked
-    // per-tick, so a real but gentle scroll (small ticks that keep coming)
-    // still adds up and registers, while one isolated small nudge — the
-    // gesture ends, nothing else arrives — never crosses it. Matches the
-    // 24px drag threshold already used for touch below
-    const MIN_SWIPE_DELTA = 24;
-    let gestureDelta = 0;
-    // lets a genuinely new, separate swipe break through the entry
-    // cooldown above instead of waiting out the rest of its ~900ms. A
-    // magnitude comparison against recent ticks was tried here first and
-    // measured to be unreliable: a real swipe often ramps up for its
-    // first couple ticks before decaying, so the exact tick that crosses
-    // into engagement can be much bigger than the (still small) ticks
-    // before it while still being that same gesture's own ramp-up, not a
-    // new one — confirmed live, where that comparison fired on the third
-    // tick of one single continuous swipe. Real elapsed time since the
-    // last tick doesn't have that problem: it's shape-independent. This
-    // needs to be meaningfully larger than GESTURE_GAP_MS below (30ms) —
-    // that constant governs a different, narrower question (does this
-    // tick still belong to the same gesture for delta-summing purposes),
-    // and is deliberately tight enough that real momentum's uneven decay
-    // routinely exceeds it while still unbroken. This threshold answers
-    // a coarser question — has the physical gesture actually ended — so
-    // it can afford to be far more conservative
-    const RENEWED_SWIPE_GAP_MS = 120;
-    let lastTickTime = 0;
-
-    this.onBurnWheel = (e) => {
-      // tracked on every tick, before the engaged() check below — a hard
-      // swipe that's still carrying the page's native scroll INTO
-      // engagement is one continuous physical gesture, and its momentum
-      // tail keeps arriving for a while after the section actually snaps
-      // into place. Tracking continuity across that boundary (rather than
-      // resetting it while !engaged(), which used to wipe it right as the
-      // section engaged) means most of an entry swipe's tail already
-      // reads as "not a new gesture" once it crosses into engagement
-      const now = performance.now();
-      const gapSinceLastTick = now - lastTickTime;
-      lastTickTime = now;
-      const isNewGesture = !gestureActive;
-      gestureActive = true;
-      extendGesture();
-      if (isNewGesture) gestureDelta = 0;
-
-      const nowEngaged = engaged();
-      if (nowEngaged && !wasEngaged && !isNewGesture) {
-        // this is the exact tick that just crossed into engagement, and
-        // it's arriving mid-gesture rather than after a real pause — i.e.
-        // it's the entry swipe's own momentum, not a deliberate first
-        // swipe. GESTURE_GAP_MS alone can't be trusted to keep recognizing
-        // that for the rest of this tail: real trackpad momentum decays
-        // unevenly, and the gaps between its later, weaker ticks routinely
-        // grow past GESTURE_GAP_MS while it's still the same unbroken
-        // coast-down, which would otherwise let a later straggler
-        // masquerade as a fresh gesture and fire early. Starting the
-        // cooldown right here, before anything has fired, closes that —
-        // nothing in this tail can act until it expires, no matter how
-        // its own gaps happen to fall. RENEWED_SWIPE_GAP_MS below is what
-        // keeps this from also swallowing a genuinely separate follow-up
-        // swipe that happens to land inside that same window
-        startCooldown();
-      }
-      wasEngaged = nowEngaged;
-
-      if (!nowEngaged) return;
-      if (animating) { e.preventDefault(); return; }
-      if (performance.now() < cooldownUntil) {
-        if (gapSinceLastTick >= RENEWED_SWIPE_GAP_MS) {
-          cooldownUntil = 0;
-        } else {
-          e.preventDefault();
-          return;
-        }
-      }
-      const dir = e.deltaY > 0 ? 1 : -1;
-
-      if (dir > 0) {
-        // at the last block, let the wheel event through un-prevented so
-        // it exits the section via native scroll instead of trapping the
-        // user against a clamped index that never moves — checked before
-        // the effort threshold below and for every tick, not just the
-        // first, so a hard swipe still exits cleanly rather than only its
-        // opening tick getting through
-        if (index >= count - 1) return;
-        e.preventDefault();
-        gestureDelta += Math.abs(e.deltaY);
-        if (gestureDelta < MIN_SWIPE_DELTA) return;
-        startCooldown();
-        goTo(index + 1);
-        return;
-      }
-
-      // scrolling back up: let it exit at block 1 rather than trapping
-      // the user, same reasoning as the forward case at the last block
-      if (index === 0) return;
-      e.preventDefault();
-      gestureDelta += Math.abs(e.deltaY);
-      if (gestureDelta < MIN_SWIPE_DELTA) return;
-      startCooldown();
-      const next = index - 1;
-      goTo(next);
-    };
-
-    let touchStartX = null;
-    let touchStartY = null;
-    let touchStartTime = 0;
-    // set the moment a drag crosses onBurnTouchMove's own 24px threshold
-    // below and fires a navigation from it — lets onBurnTouchEnd tell "this
-    // touch was already handled as a drag" apart from "the section merely
-    // happens to be mid-transition for some unrelated reason" (checking
-    // `animating` alone would wrongly swallow a legitimate tap that lands
-    // while a previous transition is still settling)
-    let touchDidDrag = false;
-    // null until the first touchmove of a gesture resolves a direction,
-    // then true if this is a gesture the section has to let go of
-    let touchExiting = null;
-    this.onBurnTouchStart = (e) => {
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-      touchStartTime = performance.now();
-      touchDidDrag = false;
-      touchExiting = null;
-    };
-    this.onBurnTouchMove = (e) => {
-      if (!engaged()) return;
-      if (touchStartY === null) return;
-      const dy = touchStartY - e.touches[0].clientY;
-      // at either end of the sequence, a gesture heading out of the section
-      // has to be left to native scroll or the user is simply trapped —
-      // reaching the last block and then swiping down went nowhere, because
-      // the preventDefault below used to run unconditionally. Resolved on
-      // the first touchmove that carries any movement at all, rather than
-      // at the 24px step threshold: iOS Safari only ever starts native
-      // scrolling for a gesture whose *first* touchmove went un-prevented,
-      // so deciding this any later is already too late to release it
-      if (touchExiting === null && dy !== 0) {
-        touchExiting = (dy > 0 && index >= count - 1) || (dy < 0 && index === 0);
-      }
-      if (touchExiting) return;
-      // prevented before the drag-distance check below — iOS Safari only
-      // honors preventDefault() called on a touchmove before native
-      // scrolling has started for that gesture; waiting until the 24px
-      // threshold is crossed calls it one tick too late; by then the page
-      // has already started its own native scroll, which then fights the
-      // programmatic scrollTo() in goTo() below, landing short of the
-      // target block and needing a second swipe to finish
-      e.preventDefault();
-      // one step per gesture, but the gesture stays captured for the rest
-      // of the finger's travel rather than being released the moment it
-      // steps. Releasing early (this used to null touchStartY, so every
-      // later touchmove returned above before ever reaching the
-      // preventDefault) handed the tail of a long swipe back to native
-      // scroll, which then dragged the page on past the block goTo() was
-      // busy animating to — landing between blocks with the progress bar
-      // part-filled, and needing another swipe to finish. Short flicks
-      // that ended right on the threshold snapped cleanly, which is what
-      // made it look intermittent rather than simply broken
-      if (touchDidDrag) return;
-      if (animating) return;
-      if (Math.abs(dy) < 24) return;
-      const dir = dy > 0 ? 1 : -1;
-      touchDidDrag = true;
-
-      if (dir > 0) {
-        if (index >= count - 1) return;
-        goTo(index + 1);
-        return;
-      }
-
-      if (index === 0) return;
-      const next = index - 1;
-      goTo(next);
-    };
-
-    // phone/tablet only: a tap (not a drag) on the left or right edge of
-    // the screen steps to the previous/next block, mirroring the
-    // left/right paging affordance from e.g. Instagram Stories. Gated to
-    // coarse-pointer/no-hover devices with the same media query shared.js
-    // already uses for its own touch-vs-desktop split, since this is a
-    // touch-only affordance that would otherwise steal clicks from a
-    // mouse user hovering the edge of the viewport
-    const isTouchNav = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
-    // above this, a touch has moved enough to be a drag/swipe rather than
-    // a tap — matches the 24px drag threshold onBurnTouchMove already uses
-    const TAP_MAX_MOVEMENT = 10;
-    // above this, a slow press-and-release reads as something other than
-    // a deliberate tap (e.g. a long-press or an accidental rest of a finger)
-    const TAP_MAX_DURATION_MS = 300;
-    // the middle share of the screen width left untapped for navigation,
-    // so a tap near the center of the text — not clearly aimed at either
-    // edge — does nothing rather than guessing a direction
-    const TAP_DEAD_ZONE = 0.3;
-    this.onBurnTouchEnd = (e) => {
-      if (!isTouchNav) return;
-      if (!engaged()) return;
-      if (touchStartX === null || touchStartY === null) return;
-      const dragged = touchDidDrag;
-      const startX = touchStartX;
-      const startY = touchStartY;
-      const elapsed = performance.now() - touchStartTime;
-      touchStartX = null;
-      touchStartY = null;
-      if (dragged) return;
-      if (animating) return;
-      if (performance.now() < cooldownUntil) return;
-      const touch = e.changedTouches[0];
-      const dx = touch.clientX - startX;
-      const dy = touch.clientY - startY;
-      if (Math.abs(dx) > TAP_MAX_MOVEMENT || Math.abs(dy) > TAP_MAX_MOVEMENT) return;
-      if (elapsed > TAP_MAX_DURATION_MS) return;
-      const half = window.innerWidth / 2;
-      const distanceFromCenter = Math.abs(touch.clientX - half) / half;
-      if (distanceFromCenter < TAP_DEAD_ZONE) return;
-
-      if (touch.clientX > half) {
-        if (index >= count - 1) return;
-        startCooldown();
-        goTo(index + 1);
-        return;
-      }
-
-      if (index === 0) return;
-      startCooldown();
-      goTo(index - 1);
-    };
-
-    // keyboard scrolling (arrow keys, Space, Page Up/Down) previously
-    // fell straight through to the browser's own native scroll, which —
-    // unlike wheel/touch above — was never hijacked into the same one-
-    // step-per-input model, so it could jump straight past several
-    // blocks in one press instead of playing through them. Simpler than
-    // the wheel handler above: a keydown is inherently one discrete
-    // event, not a continuous stream of decaying momentum ticks, so
-    // there's no gesture-grouping or entry-cooldown-escape-hatch to
-    // reason about — engaged() is checked before this event's own
-    // native scroll would happen, so a press that's what carries the
-    // page into engagement is naturally left un-prevented (handled as a
-    // later, separate press once actually engaged), the same "entering
-    // stays separate" behavior the wheel handler works much harder for
-    const ADVANCE_KEYS = { ' ': 1, 'Spacebar': 1, 'PageDown': 1, 'ArrowDown': 1 };
-    const RETREAT_KEYS = { PageUp: 1, ArrowUp: 1 };
-    this.onBurnKey = (e) => {
-      const advancing = ADVANCE_KEYS[e.key];
-      const retreating = RETREAT_KEYS[e.key];
-      if (!advancing && !retreating) return;
-      if (!engaged()) return;
-      if (animating) { e.preventDefault(); return; }
-      if (performance.now() < cooldownUntil) { e.preventDefault(); return; }
-
-      if (advancing) {
-        // at the last block, let the key through un-prevented so it
-        // exits the section via native scroll instead of trapping the
-        // user against a clamped index that never moves
-        if (index >= count - 1) return;
-        e.preventDefault();
-        startCooldown();
-        goTo(index + 1);
-        return;
-      }
-
-      // scrolling back up: let it exit at block 1 rather than trapping
-      // the user, same reasoning as the forward case at the last block
-      if (index === 0) return;
-      e.preventDefault();
-      startCooldown();
-      const next = index - 1;
-      goTo(next);
-    };
-
-    window.addEventListener('wheel', this.onBurnWheel, { passive: false });
-    window.addEventListener('touchstart', this.onBurnTouchStart, { passive: true });
-    window.addEventListener('touchmove', this.onBurnTouchMove, { passive: false });
-    window.addEventListener('touchend', this.onBurnTouchEnd, { passive: true });
-    window.addEventListener('keydown', this.onBurnKey, { passive: false });
   }
 
   // the "Curiosity" block's bulb-falls-bounces-twice-then-drives-off-as-a-
@@ -1702,8 +1317,8 @@ class Component extends DCLogic {
   }
 
   // the inline AI-icon image sitting right after "process" in block 3 —
-  // replayed from scratch every time initBurnSwipe's goTo() lands the
-  // section on that block (from either direction), so returning to it
+  // replayed from scratch every time the section arrives on that block
+  // (from either direction — see ARRIVAL_EPSILON in initBurnText), so returning to it
   // always gets the same little entrance rather than just being static.
   // It flies in from wherever the word "curiosity" actually sits on
   // screen right now (measured fresh here, since that word's position
@@ -1720,16 +1335,9 @@ class Component extends DCLogic {
   // which is what actually sells "squeezing into the gap and wobbling to
   // a rest" without competing against the flight's own motion
   playProcessIcon() {
-    console.log('[dbg] playProcessIcon() called');
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      console.log('[dbg] playProcessIcon() bailing: prefers-reduced-motion is on');
-      return;
-    }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const icon = document.querySelector('[data-burn-icon]');
-    if (!icon) {
-      console.log('[dbg] playProcessIcon() bailing: [data-burn-icon] not found in DOM');
-      return;
-    }
+    if (!icon) return;
     icon.getAnimations().forEach((a) => a.cancel());
     // sits opacity:0 by default (see the reduced-motion override in
     // <style> above, which forces it back to visible for anyone who never
@@ -1758,7 +1366,6 @@ class Component extends DCLogic {
 
     const flight = 'cubic-bezier(.32,.09,.32,1)';
     const land = 'cubic-bezier(.34,1.56,.64,1)';
-    console.log('[dbg] playProcessIcon() animating: originFound=' + !!origin + ' iconRect=' + JSON.stringify({ x: iconRect.x, y: iconRect.y, w: iconRect.width, h: iconRect.height }) + ' dx=' + dx.toFixed(1) + ' dy=' + dy.toFixed(1) + ' iconOpacity=' + getComputedStyle(icon).opacity);
     icon.animate([
       { transform: at(dx, dy) + ' scale(1.5) rotate(0deg)', offset: 0, easing: flight },
       { transform: at(dx * 0.32, peakY) + ' scale(1.05) rotate(190deg)', offset: 0.45, easing: flight },
@@ -1928,6 +1535,65 @@ class Component extends DCLogic {
     }
   }
 
+  // the monitor wakes once the hero text has landed, then plays through
+  // the projects. It holds still while hovered, so whatever the reader is
+  // looking at is what a click opens, and stops entirely while the hero is
+  // off screen or the tab is hidden, since nobody can see it then
+  initHeroScreen() {
+    const screen = document.querySelector('[data-hero-screen]');
+    if (!screen || screen.dataset.ready) return;
+    screen.dataset.ready = '1';
+    const WAKE_DELAY_MS = 1600;
+    const SLIDE_HOLD_MS = 3600;
+    const slides = Array.from(screen.querySelectorAll('[data-screen-slide]'));
+    const tag = screen.querySelector('[data-screen-tag]');
+    let index = 0;
+    let hovered = false;
+    let inView = true;
+
+    const show = (next) => {
+      slides[index].classList.remove('is-current');
+      index = next;
+      const slide = slides[index];
+      slide.classList.add('is-current');
+      screen.setAttribute('href', slide.dataset.href);
+      screen.setAttribute('aria-label', 'Now showing ' + slide.dataset.title + '. Open the case study');
+      if (tag) tag.textContent = slide.dataset.title;
+    };
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      screen.classList.add('is-on');
+      return;
+    }
+    screen.addEventListener('mouseenter', () => { hovered = true; });
+    screen.addEventListener('mouseleave', () => { hovered = false; });
+    if (window.IntersectionObserver) {
+      this.heroScreenObserver = new IntersectionObserver((entries) => {
+        inView = entries[0].isIntersecting;
+      });
+      this.heroScreenObserver.observe(screen);
+    }
+    this.heroScreenWakeTimer = setTimeout(() => {
+      screen.classList.add('is-on');
+      this.heroScreenTimer = setInterval(() => {
+        if (hovered || !inView || document.hidden) return;
+        show((index + 1) % slides.length);
+      }, SLIDE_HOLD_MS);
+    }, WAKE_DELAY_MS);
+  }
+
+  // pauses the lamp and sunlight glows while the hero is scrolled away
+  initHeroAmbience() {
+    const stage = document.querySelector('.al-hero-stage');
+    if (!stage || stage.dataset.ambience || !window.IntersectionObserver) return;
+    stage.dataset.ambience = '1';
+    if (this.ambienceObserver) this.ambienceObserver.disconnect();
+    this.ambienceObserver = new IntersectionObserver((entries) => {
+      stage.classList.toggle('is-paused', !entries[0].isIntersecting);
+    });
+    this.ambienceObserver.observe(stage);
+  }
+
   // arriving with #curiosity / #cycle: re-apply the jump once layout has settled.
   // Always instant, never smooth: a smooth jump here would animate through
   // every intermediate scroll position on the way to the target, including
@@ -1973,6 +1639,10 @@ class Component extends DCLogic {
 
 
   componentWillUnmount() {
+    clearTimeout(this.heroScreenWakeTimer);
+    clearInterval(this.heroScreenTimer);
+    if (this.heroScreenObserver) this.heroScreenObserver.disconnect();
+    if (this.ambienceObserver) this.ambienceObserver.disconnect();
     if (this.curiosityCatInterval) clearInterval(this.curiosityCatInterval);
     (this.hashTimers || []).forEach(clearTimeout);
     window.removeEventListener('hashchange', this.onHash);
@@ -1986,11 +1656,6 @@ class Component extends DCLogic {
     window.removeEventListener('resize', this.onBurnResize);
     if (this.burnResizeObserver) this.burnResizeObserver.disconnect();
     window.removeEventListener('resize', this.onHeadingFitResize);
-    window.removeEventListener('wheel', this.onBurnWheel);
-    window.removeEventListener('touchstart', this.onBurnTouchStart);
-    window.removeEventListener('touchmove', this.onBurnTouchMove);
-    window.removeEventListener('touchend', this.onBurnTouchEnd);
-    window.removeEventListener('keydown', this.onBurnKey);
   }
 }
 

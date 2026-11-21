@@ -1,0 +1,21 @@
+# Ayub Leon
+
+> Portfolio of Ayub Leon, a product designer based in Nairobi, Kenya, with 4+ years designing products end to end: TikTok Shop analytics, a licensed crash betting game, a production design system, a banking app redesign, and live registration software for a church youth camp.
+
+The site's navigation and footer are drawn by JavaScript; every page also carries plain links to the pages below, and each case study page contains its full text in the HTML.
+
+## Case studies
+
+- [Camp Fearless](https://ayubleon.vercel.app/camp-fearless): Registration and camp-day software for Mavuno Church's youth camp. Lead product designer and product owner, Aug 2026 to present; live in use.
+- [BuzzIQ](https://ayubleon.vercel.app/buzziq): TikTok Shop intelligence platform for IGNITEAMZ, a US-based creator commerce company. Sole product designer, Sep 2025 to 2026; 550+ screens across mobile, tablet and web.
+- [Danadana](https://ayubleon.vercel.app/danadana): A crash betting game licensed to gambling operators, built with player-protection safeguards from the start. Product designer, 2024 to 2025.
+- [Component System for Production](https://ayubleon.vercel.app/building-a-shadcn-system-from-scratch): A 30-component shadcn-based system with 400+ variants, built from scratch and shipped into a live product. 2024 to present.
+- [Kenyan Banking Redesign](https://ayubleon.vercel.app/kenyan-banking-redesign): Self-initiated redesign fixing navigation and interface friction across four Kenyan banking apps. 2025.
+
+## About and contact
+
+- [Work](https://ayubleon.vercel.app/work): Index of all case studies.
+- [About](https://ayubleon.vercel.app/about): Background, how Ayub got into design, and people he has built with.
+- [Resume (PDF)](https://ayubleon.vercel.app/resume)
+- Email: ayubleon.pd@gmail.com
+- [LinkedIn](https://www.linkedin.com/in/ayubleon)
