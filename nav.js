@@ -5,7 +5,7 @@
     // without one) on top of the usual 22px, so the dock still clears the
     // home indicator on notched iPhones now that viewport-fit=cover lets
     // the page draw underneath it, instead of sitting right against it
-    ".site-nav-dock{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:4px;padding:8px;border-radius:999px;border:1px solid var(--al-border,rgba(255,255,255,0.13));background:var(--al-card,#1C1C1E);box-shadow:inset 0 1px 0 var(--al-border-strong,rgba(255,255,255,0.16)),inset 0 -1px 0 rgba(0,0,0,0.35),0 22px 50px -28px rgba(0,0,0,0.9);}",
+    ".site-nav-dock{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:4px;padding:8px;border-radius:999px;border:1px solid var(--al-glass-border);background:var(--al-glass-bg);-webkit-backdrop-filter:var(--al-glass-blur);backdrop-filter:var(--al-glass-blur);box-shadow:var(--al-glass-highlight),inset 0 -1px 0 rgba(0,0,0,0.35),0 22px 50px -28px rgba(0,0,0,0.9);}",
     // this rise plays once per browser tab, not on every single page —
     // see the sessionStorage check in navHTML() below. Split into its own
     // modifier class rather than left on .site-nav-dock unconditionally,
@@ -38,8 +38,8 @@
     // rather than the icon lunging in one direction twice
     "@keyframes siteNavAvatarPulse{0%,100%{transform:scale(1) rotate(0deg);}25%{transform:scale(1.22) rotate(-12deg);}50%{transform:scale(1) rotate(0deg);}75%{transform:scale(1.22) rotate(12deg);}}",
     ".site-nav-avatar{width:42px;height:42px;border-radius:50%;background:#fff;display:block;flex:0 0 auto;padding:3px;pointer-events:none;}",
-    ".site-nav-tooltip{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,4px);background:var(--al-card,#1C1C1E);color:#f4eeeb;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;font-weight:500;letter-spacing:-0.005em;padding:6px 11px;border-radius:14px;white-space:nowrap;border:1px solid rgba(255,255,255,0.12);box-shadow:0 10px 24px -10px rgba(0,0,0,0.7);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;}",
-    ".site-nav-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--al-card,#1C1C1E);}",
+    ".site-nav-tooltip{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,4px);background:var(--al-glass-bg);-webkit-backdrop-filter:var(--al-glass-blur);backdrop-filter:var(--al-glass-blur);color:#f4eeeb;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;font-weight:500;letter-spacing:-0.005em;padding:6px 11px;border-radius:14px;white-space:nowrap;border:1px solid var(--al-glass-border);box-shadow:0 10px 24px -10px rgba(0,0,0,0.7);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;}",
+    ".site-nav-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--al-glass-tint);}",
     // scoped to real hover support: on touch, a tap applies :hover too
     // (often "stuck" until the next tap elsewhere), popping this up as an
     // unwanted side effect of just tapping the button rather than an
@@ -50,7 +50,7 @@
     "@media (max-width:700px){.site-nav-dock{bottom:calc(16px + env(safe-area-inset-bottom));gap:4px;}.site-nav-link{padding:11px 16px;font-size: 0.7812rem;}}",
     ".site-contact-backdrop{position:fixed;inset:0;z-index:39;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .35s ease;}",
     ".site-contact-backdrop.is-open{opacity:1;pointer-events:auto;}",
-    ".site-contact-card{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) rotate(2deg) scale(0.4);width:min(300px,calc(100vw - 32px));background:var(--al-card,#1C1C1E);border:1px solid var(--al-border,rgba(255,255,255,0.13));border-radius:18px;padding:68px 24px 24px;box-shadow:inset 0 1px 0 var(--al-border-strong,rgba(255,255,255,0.16)),inset 0 -1px 0 rgba(0,0,0,0.35),0 30px 70px -26px rgba(0,0,0,0.9);z-index:41;opacity:0;pointer-events:none;transition:opacity .35s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.16,1,.3,1);" +
+    ".site-contact-card{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) rotate(2deg) scale(0.4);width:min(300px,calc(100vw - 32px));background:var(--al-glass-bg);-webkit-backdrop-filter:var(--al-glass-blur);backdrop-filter:var(--al-glass-blur);border:1px solid var(--al-glass-border);border-radius:18px;padding:68px 24px 24px;box-shadow:var(--al-glass-highlight),inset 0 -1px 0 rgba(0,0,0,0.3),0 30px 70px -26px rgba(0,0,0,0.9);z-index:41;opacity:0;pointer-events:none;transition:opacity .35s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.16,1,.3,1);" +
     // nametag lanyard-hole: punch a fixed-size pill out of the card so
     // whatever sits behind it (the blurred page backdrop) shows through,
     // via the same dual-layer mask-composite:exclude technique used for
@@ -93,17 +93,17 @@
     ".site-contact-role{margin:2px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;font-weight:500;color:#0A84FF;}",
     // grouped with the email below, not the name/role above — this answers
     // "when can I reach this person", which belongs with "how", not "who"
-    ".site-contact-meta{margin:18px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;color:rgba(244,238,235,0.5);text-align:center;}",
-    ".site-contact-blurb{margin:18px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;line-height:1.6;color:rgba(244,238,235,0.82);}",
+    ".site-contact-meta{margin:18px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;color:rgba(244,238,235,0.68);text-align:center;}",
+    ".site-contact-blurb{margin:18px 0 0;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;line-height:1.6;color:rgba(244,238,235,0.9);}",
     ".site-contact-link{display:block;color:#FFFFFF;text-decoration:none;}",
     ".site-contact-link:hover{color:#54A9FF;}",
     ".site-contact-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px;}",
-    ".site-contact-action{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px;border-radius:16px;background:var(--al-card-hover,#2A2A2C);text-decoration:none;color:var(--al-section-title,rgba(244,238,235,0.66));transition:background .25s ease,color .25s ease;}",
-    ".site-contact-action:hover{background:#343438;color:#fff;}",
-    ".site-contact-action span{font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;color:rgba(244,238,235,0.75);transition:color .25s ease;}",
+    ".site-contact-action{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px;border-radius:16px;background:rgba(255,255,255,0.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.08);text-decoration:none;color:rgba(244,238,235,0.78);transition:background .25s ease,color .25s ease;}",
+    ".site-contact-action:hover{background:rgba(255,255,255,0.15);color:#fff;}",
+    ".site-contact-action span{font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;color:rgba(244,238,235,0.86);transition:color .25s ease;}",
     ".site-contact-action:hover span{color:#fff;}",
     ".site-contact-action svg{display:block;}",
-    ".site-contact-email{margin:4px 0 0;text-align:center;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;color:var(--al-text-muted,rgba(244,238,235,0.45));}"
+    ".site-contact-email{margin:4px 0 0;text-align:center;font-family:Poppins,Helvetica,sans-serif;font-size: 0.7812rem;color:rgba(244,238,235,0.64);}"
   ].join('');
   var styleTag = document.createElement('style');
   styleTag.textContent = CSS;

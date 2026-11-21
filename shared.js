@@ -19,7 +19,20 @@
     "--al-section-title:rgba(244,238,235,0.66);",
     "--al-border:rgba(255,255,255,0.13);",
     "--al-border-strong:rgba(255,255,255,0.16);",
-    "}"
+    // frosted glass, shared by every floating surface (the nav dock and its
+    // tooltip, the contact card, notification popups) so they always match.
+    // The tint is dark enough (82%) that white text keeps its contrast even
+    // over the light case-study pages; the heavy blur turns whatever is
+    // behind into soft light rather than shapes competing with the text
+    "--al-glass-tint:rgba(18,18,20,0.82);",
+    "--al-glass-bg:linear-gradient(160deg,rgba(255,255,255,0.10),rgba(255,255,255,0.02) 45%,rgba(255,255,255,0)),var(--al-glass-tint);",
+    "--al-glass-blur:blur(28px) saturate(170%);",
+    "--al-glass-border:rgba(255,255,255,0.18);",
+    "--al-glass-highlight:inset 0 1px 0 rgba(255,255,255,0.22);",
+    "}",
+    // without backdrop-filter the tint alone would just be a see-through
+    // panel, so those browsers get the solid card colour instead
+    "@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){:root{--al-glass-tint:var(--al-card);--al-glass-bg:var(--al-card);}}"
   ].join('');
   document.head.appendChild(tokenStyle);
 
@@ -351,11 +364,17 @@
     var wrap = document.createElement('div');
     wrap.setAttribute('role', 'status');
     wrap.setAttribute('aria-live', 'polite');
-    wrap.style.cssText = 'position:fixed;left:50%;bottom:92px;z-index:60;padding:1.6px;border-radius:999px;overflow:hidden;isolation:isolate;box-shadow:0 30px 70px -26px rgba(0,0,0,0.98);opacity:0;transform:translate(-50%,18px);pointer-events:none;transition:opacity .45s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1);';
+    wrap.style.cssText = 'position:fixed;left:50%;bottom:92px;z-index:60;border-radius:999px;box-shadow:0 30px 70px -26px rgba(0,0,0,0.98);opacity:0;transform:translate(-50%,18px);pointer-events:none;transition:opacity .45s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1);';
+    // the pill is glass, so the spinning light can no longer sit behind it
+    // (it would show straight through). It lives in a ring on top instead:
+    // a 1.6px band masked out of a full-size layer with the same
+    // content-box "exclude" technique the site's border glows use
     wrap.innerHTML =
-      '<div data-toast-glow aria-hidden="true" style="position:absolute;left:50%;top:50%;width:260%;aspect-ratio:1;background:conic-gradient(from 0deg, rgba(255,255,255,0) 0deg, rgba(255,255,255,0) 200deg, rgba(255,255,255,0.55) 292deg, rgba(255,255,255,0.92) 330deg, #ffffff 348deg, rgba(255,255,255,0) 360deg);animation:alToastSpin 2.6s linear infinite;"></div>' +
-      '<div style="position:relative;display:flex;align-items:center;padding:14px 24px;border-radius:999px;background:var(--al-card,#1C1C1E);font-family:\'Schibsted Grotesk\',Helvetica,sans-serif;font-size: 0.9375rem;letter-spacing:-0.005em;color:#f4eeeb;">' +
+      '<div style="position:relative;display:flex;align-items:center;padding:14px 24px;border-radius:999px;background:var(--al-glass-bg);-webkit-backdrop-filter:var(--al-glass-blur);backdrop-filter:var(--al-glass-blur);border:1px solid var(--al-glass-border);box-shadow:var(--al-glass-highlight);font-family:\'Schibsted Grotesk\',Helvetica,sans-serif;font-size: 0.9375rem;letter-spacing:-0.005em;color:#f4eeeb;">' +
         '<span data-toast-text style="font-family:Poppins">Copied to Clipboard</span>' +
+      '</div>' +
+      '<div data-toast-glow aria-hidden="true" style="position:absolute;inset:0;padding:1.6px;border-radius:inherit;overflow:hidden;pointer-events:none;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);">' +
+        '<div style="position:absolute;left:50%;top:50%;width:260%;aspect-ratio:1;background:conic-gradient(from 0deg, rgba(255,255,255,0) 0deg, rgba(255,255,255,0) 200deg, rgba(255,255,255,0.55) 292deg, rgba(255,255,255,0.92) 330deg, #ffffff 348deg, rgba(255,255,255,0) 360deg);animation:alToastSpin 2.6s linear infinite;"></div>' +
       '</div>';
     document.body.appendChild(wrap);
     toastEl = wrap;
