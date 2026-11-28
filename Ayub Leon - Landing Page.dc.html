@@ -23,6 +23,15 @@
 <meta name="twitter:image" content="https://ayubleon.vercel.app/images/link-preview.png">
 <style>html, body { background: #000000; margin: 0; }
   @view-transition { navigation: auto; }
+  /* Playfair Display italic, self-hosted for the case-study pull quotes.
+     Self-hosted because the Google Fonts copy strips the italic's
+     discretionary ligatures (the connected swashes the quotes switch on with
+     'dlig'); this file keeps the full glyph set. Declared on every page, not
+     only the case studies: the project popup injects a case study's body
+     into whichever page opened it, without that page's own <head>, so the
+     face has to be registered wherever the popup can open. Not Instrument
+     Serif: Ayub replaced it on purpose as an AI-site giveaway */
+  @font-face { font-family: 'Playfair Display'; font-style: italic; font-weight: 100 900; font-display: block; src: url('fonts/playfair-display-italic-variable.woff2') format('woff2-variations'); }
   /* iOS Safari's rubber-band overscroll can pull the page past its own
      top/bottom edge and briefly reveal the browser's blank canvas beyond
      the document's own painted bounds — that shows as a flash of white
@@ -105,7 +114,7 @@
 <script src="badge.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=Instrument+Serif:ital@0;1&amp;family=Gochi+Hand&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=Gochi+Hand&amp;display=swap" rel="stylesheet">
 </head>
 <body>
 <!-- sits outside <x-dc> so boot()'s dc.replaceWith swap (see the
@@ -124,7 +133,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=Instrument+Serif:ital@0;1&amp;family=Gochi+Hand&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;family=Gochi+Hand&amp;display=swap" rel="stylesheet">
 <style>
   /* overscroll-behavior-y: without it, a trackpad flick or an
      upward scroll past the very top rubber-bands the whole page
@@ -651,7 +660,7 @@
 </div>
 
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;bodyFont&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Poppins&quot;,&quot;Schibsted Grotesk&quot;,&quot;Helvetica&quot;],&quot;default&quot;:&quot;Poppins&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Typography&quot;},&quot;displayFont&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Poppins&quot;,&quot;Schibsted Grotesk&quot;,&quot;Instrument Serif&quot;],&quot;default&quot;:&quot;Poppins&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Typography&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;bodyFont&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Poppins&quot;,&quot;Schibsted Grotesk&quot;,&quot;Helvetica&quot;],&quot;default&quot;:&quot;Poppins&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Typography&quot;},&quot;displayFont&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Poppins&quot;,&quot;Schibsted Grotesk&quot;,&quot;Playfair Display&quot;],&quot;default&quot;:&quot;Poppins&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Typography&quot;}}">
 class Component extends DCLogic {
   constructor(props) {
     super(props);
@@ -666,7 +675,7 @@ class Component extends DCLogic {
       'Poppins': "Poppins, 'Schibsted Grotesk', Helvetica, Arial, sans-serif",
       'Schibsted Grotesk': "'Schibsted Grotesk', Helvetica, Arial, sans-serif",
       'Helvetica': "Helvetica, 'Helvetica Neue', Arial, sans-serif",
-      'Instrument Serif': "'Instrument Serif', Georgia, serif"
+      'Playfair Display': "'Playfair Display', Georgia, serif"
     };
     const body = stack[this.props.bodyFont ?? 'Poppins'] || stack['Poppins'];
     const display = stack[this.props.displayFont ?? 'Poppins'] || stack['Poppins'];
@@ -674,7 +683,7 @@ class Component extends DCLogic {
     document.querySelectorAll('h1, h2, h3').forEach((el) => { el.style.fontFamily = display; });
     document.querySelectorAll('p, a, span, li').forEach((el) => {
       const f = el.style.fontFamily || '';
-      if (f.indexOf('Instrument Serif') !== -1) return;
+      if (f.indexOf('Playfair Display') !== -1) return;
       el.style.fontFamily = body;
     });
   }

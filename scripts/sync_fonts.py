@@ -13,6 +13,10 @@ hand-editing both spots in every file (which is exactly how the Instrument
 Serif and JetBrains Mono mismatches happened), this script is the single
 place the font list is declared. Edit SHARED_FAMILIES or PAGE_EXTRAS below,
 then run this — never hand-edit a font <link> in a .dc.html file directly.
+
+Instrument Serif is deliberately absent: it was replaced as a recognisable
+AI-site default. The pull-quote face is a self-hosted Playfair Display
+italic, declared by @font-face in each page's <head>, not loaded here.
 """
 import re
 import sys
@@ -24,7 +28,6 @@ ROOT = Path(__file__).resolve().parent.parent
 SHARED_FAMILIES = [
     "Poppins:wght@400;500;600;700",
     "Schibsted+Grotesk:wght@400;500;600",
-    "Instrument+Serif:ital@0;1",
 ]
 
 # Per-page additions, layered on top of SHARED_FAMILIES. A page not listed
@@ -46,6 +49,7 @@ ALL_PAGES = [
     "Danadana.dc.html",
     "Building a shadcn System from Scratch.dc.html",
     "Kenyan Banking Redesign.dc.html",
+    "Camp Fearless.dc.html",
 ]
 
 LINK_RE = re.compile(

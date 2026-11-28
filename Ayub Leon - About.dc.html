@@ -22,6 +22,15 @@
 <meta name="twitter:image" content="https://ayubleon.vercel.app/images/link-preview.png">
 <style>html, body { background: #000000; margin: 0; }
   @view-transition { navigation: auto; }
+  /* Playfair Display italic, self-hosted for the case-study pull quotes.
+     Self-hosted because the Google Fonts copy strips the italic's
+     discretionary ligatures (the connected swashes the quotes switch on with
+     'dlig'); this file keeps the full glyph set. Declared on every page, not
+     only the case studies: the project popup injects a case study's body
+     into whichever page opened it, without that page's own <head>, so the
+     face has to be registered wherever the popup can open. Not Instrument
+     Serif: Ayub replaced it on purpose as an AI-site giveaway */
+  @font-face { font-family: 'Playfair Display'; font-style: italic; font-weight: 100 900; font-display: block; src: url('fonts/playfair-display-italic-variable.woff2') format('woff2-variations'); }
   [data-settle-veil] { position: fixed; inset: 0; z-index: 9999; background: #000000; opacity: 1; transition: opacity .35s ease; }
 </style>
 <!-- the settle veil is opaque black until shared.js fades it, so anything
@@ -70,7 +79,7 @@
 <script src="signature.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600&amp;display=swap" rel="stylesheet">
 </head>
 <body>
 <!-- sits outside <x-dc> so boot()'s dc.replaceWith swap (see the
@@ -83,7 +92,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600&amp;family=Instrument+Serif:ital@0;1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Schibsted+Grotesk:wght@400;500;600&amp;display=swap" rel="stylesheet">
 <style>
   html, body { margin: 0; padding: 0; background: #000000; }
   body { -webkit-font-smoothing: antialiased; }
